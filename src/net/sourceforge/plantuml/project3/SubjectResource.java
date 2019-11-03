@@ -46,7 +46,7 @@ import net.sourceforge.plantuml.command.regex.RegexResult;
 public class SubjectResource implements SubjectPattern {
 
 	public Collection<VerbPattern> getVerbs() {
-		return Arrays.<VerbPattern> asList(new VerbIsOff());
+		return Arrays.<VerbPattern> asList(new VerbIsOff(), new VerbIsOn());
 	}
 
 	public IRegex toRegex() {

@@ -54,24 +54,16 @@ import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.graphic.color.ColorParser;
 import net.sourceforge.plantuml.graphic.color.ColorType;
 
-public class CommandNamespace2 extends SingleLineCommand2<ClassDiagram> {
+public class CommandNamespaceEmpty extends SingleLineCommand2<ClassDiagram> {
 
-	public CommandNamespace2() {
+	public CommandNamespaceEmpty() {
 		super(getRegexConcat());
 	}
 
 	private static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandNamespace2.class.getName(), RegexLeaf.start(), //
+		return RegexConcat.build(CommandNamespaceEmpty.class.getName(), RegexLeaf.start(), //
 				new RegexLeaf("namespace"), //
 				RegexLeaf.spaceOneOrMore(), //
-
-				new RegexLeaf("[%g]"), //
-				new RegexLeaf("DISPLAY", "([^%g]+)"), //
-				new RegexLeaf("[%g]"), //
-				RegexLeaf.spaceOneOrMore(), //
-				new RegexLeaf("as"), //
-				RegexLeaf.spaceOneOrMore(), //
-
 				new RegexLeaf("NAME", "([\\p{L}0-9_][-\\p{L}0-9_.:\\\\]*)"), //
 				RegexLeaf.spaceZeroOrMore(), //
 				new RegexLeaf("STEREOTYPE", "(\\<\\<.*\\>\\>)?"), //
@@ -80,15 +72,17 @@ public class CommandNamespace2 extends SingleLineCommand2<ClassDiagram> {
 				RegexLeaf.spaceZeroOrMore(), //
 				ColorParser.exp1(), //
 				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\\{"), RegexLeaf.end());
+				new RegexLeaf("\\{"), //
+				RegexLeaf.spaceZeroOrMore(), //
+				new RegexLeaf("\\}"), //
+				RegexLeaf.end());
 	}
 
 	@Override
 	protected CommandExecutionResult executeArg(ClassDiagram diagram, LineLocation location, RegexResult arg) {
 		final Code code = Code.of(arg.get("NAME", 0));
 		final IGroup currentPackage = diagram.getCurrentGroup();
-		final String disp = arg.getLazzy("DISPLAY", 0);
-		final Display display = Display.getWithNewlines(disp);
+		final Display display = Display.getWithNewlines(code);
 		diagram.gotoGroup2(code, display, GroupType.PACKAGE, currentPackage, NamespaceStrategy.MULTIPLE);
 		final IEntity p = diagram.getCurrentGroup();
 		final String stereotype = arg.get("STEREOTYPE", 0);
@@ -108,6 +102,7 @@ public class CommandNamespace2 extends SingleLineCommand2<ClassDiagram> {
 			p.setSpecificColorTOBEREMOVED(ColorType.BACK,
 					diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(color));
 		}
+		diagram.endGroup();
 		return CommandExecutionResult.ok();
 	}
 

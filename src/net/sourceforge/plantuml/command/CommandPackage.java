@@ -69,7 +69,7 @@ public class CommandPackage extends SingleLineCommand2<AbstractEntityDiagram> {
 
 	private static IRegex getRegexConcat() {
 		return RegexConcat.build(CommandPackage.class.getName(), RegexLeaf.start(), //
-				new RegexLeaf("TYPE", "(package|together)"), //
+				new RegexLeaf("TYPE", "(package)"), //
 				RegexLeaf.spaceOneOrMore(), //
 				new RegexLeaf("NAME", "([%g][^%g]+[%g]|[^#%s{}]*)"), //
 				new RegexOptional( //
