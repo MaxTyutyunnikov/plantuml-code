@@ -30,48 +30,28 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
  *
+ * 
  */
-package net.sourceforge.plantuml.preproc2;
+package net.sourceforge.plantuml.svek.extremity;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.geom.Point2D;
 
-import net.sourceforge.plantuml.StringLocated;
-import net.sourceforge.plantuml.preproc.ReadLine;
+import net.sourceforge.plantuml.graphic.UDrawable;
+import net.sourceforge.plantuml.svek.AbstractExtremityFactory;
+import net.sourceforge.plantuml.svek.Side;
 
-public abstract class ReadLineInsertable implements ReadLine {
+public class ExtremityFactoryHalfArrow extends AbstractExtremityFactory implements ExtremityFactory {
 
-	private final List<ReadLine> sources = new ArrayList<ReadLine>();
-
-	final protected void insert(ReadLine inserted) throws IOException {
-		sources.add(0, inserted);
+	@Override
+	public UDrawable createUDrawable(Point2D p0, double angle, Side side) {
+		return new ExtremityHalfArrow(p0, angle);
 	}
 
-	abstract StringLocated readLineInternal() throws IOException;
-
-	final public StringLocated readLine() throws IOException {
-		while (sources.size() > 0) {
-			final ReadLine tmp = sources.get(0);
-			final StringLocated result = tmp.readLine();
-			if (result != null) {
-				return result;
-			}
-			tmp.close();
-			sources.remove(0);
-		}
-		return readLineInternal();
-	}
-
-	abstract void closeInternal() throws IOException;
-
-	final public void close() throws IOException {
-		for (ReadLine s : sources) {
-			s.close();
-		}
-		closeInternal();
+	public UDrawable createUDrawable(Point2D p0, Point2D p1, Point2D p2, Side side) {
+		final double ortho = atan2(p0, p2);
+		final Point2D center = new Point2D.Double((p0.getX() + p2.getX()) / 2, (p0.getY() + p2.getY()) / 2);
+		return new ExtremityHalfArrow(p1, ortho, center);
 	}
 
 }

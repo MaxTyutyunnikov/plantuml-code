@@ -33,35 +33,50 @@
  * 
  *
  */
-package net.sourceforge.plantuml.preproc;
+package net.sourceforge.plantuml.preproc2;
 
 import java.io.IOException;
 
 import net.sourceforge.plantuml.StringLocated;
-import net.sourceforge.plantuml.preproc2.PreprocessorMode;
-import net.sourceforge.plantuml.preproc2.PreprocessorModeSet;
+import net.sourceforge.plantuml.preproc.ReadLine;
 
-public class PreprocessorChangeModeReader implements ReadLine {
+public class ReadFilterQuoteComment implements ReadFilter {
 
-	private final ReadLine raw;
-	private final PreprocessorModeSet mode;
+	public ReadLine applyFilter(final ReadLine source) {
+		return new ReadLine() {
+			public void close() throws IOException {
+				source.close();
+			}
 
-	public PreprocessorChangeModeReader(ReadLine source, PreprocessorModeSet mode) {
-		this.raw = source;
-		this.mode = mode;
-	}
-
-	public void close() throws IOException {
-		raw.close();
-	}
-
-	public StringLocated readLine() throws IOException {
-		final StringLocated line = raw.readLine();
-		if (line != null && line.getTrimmed().getString().endsWith("!preprocessorV2")) {
-			this.mode.setPreprocessorMode(PreprocessorMode.V2_NEW_TIM);
-			return new StringLocated("", line.getLocation());
-		}
-		return line;
+			public StringLocated readLine() throws IOException {
+				boolean longComment = false;
+				while (true) {
+					final StringLocated result = source.readLine();
+					if (result == null) {
+						return null;
+					}
+					final String trim = result.getString().replace('\t', ' ').trim();
+					if (longComment && trim.endsWith("'/")) {
+						longComment = false;
+						continue;
+					}
+					if (longComment) {
+						continue;
+					}
+					if (trim.startsWith("'")) {
+						continue;
+					}
+					if (trim.startsWith("/'") && trim.endsWith("'/")) {
+						continue;
+					}
+					if (trim.startsWith("/'") && trim.contains("'/") == false) {
+						longComment = true;
+						continue;
+					}
+					return ((StringLocated) result).removeInnerComment();
+				}
+			}
+		};
 	}
 
 }

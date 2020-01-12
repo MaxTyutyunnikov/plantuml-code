@@ -36,56 +36,47 @@
 package net.sourceforge.plantuml.preproc2;
 
 import java.io.IOException;
+import java.util.List;
 
 import net.sourceforge.plantuml.StringLocated;
 import net.sourceforge.plantuml.preproc.ReadLine;
+import net.sourceforge.plantuml.preproc.ReadLineList;
+import net.sourceforge.plantuml.utils.StartUtils;
 
-public class ReadLineQuoteComment implements ReadFilter {
+public class ReadFilterAddConfig implements ReadFilter {
 
-	private final boolean ignoreMe;
+	private final List<String> config;
 
-	public ReadLineQuoteComment(boolean ignoreMe) {
-		this.ignoreMe = ignoreMe;
+	public ReadFilterAddConfig(List<String> config) {
+		this.config = config;
 	}
 
-	public ReadLine applyFilter(final ReadLine source) {
-		if (ignoreMe) {
-			return source;
-		}
-		
+	public ReadLine applyFilter(final ReadLine raw) {
+
 		return new ReadLine() {
 
+			private ReadLine inserted;
+
 			public void close() throws IOException {
-				source.close();
+				raw.close();
 			}
 
 			public StringLocated readLine() throws IOException {
-				boolean longComment = false;
-				while (true) {
-					final StringLocated result = source.readLine();
+				StringLocated result = null;
+				if (inserted != null) {
+					result = inserted.readLine();
 					if (result == null) {
-						return null;
+						inserted.close();
+						inserted = null;
+					} else {
+						return result;
 					}
-					final String trim = result.getString().replace('\t', ' ').trim();
-					if (longComment && trim.endsWith("'/")) {
-						longComment = false;
-						continue;
-					}
-					if (longComment) {
-						continue;
-					}
-					if (trim.startsWith("'")) {
-						continue;
-					}
-					if (trim.startsWith("/'") && trim.endsWith("'/")) {
-						continue;
-					}
-					if (trim.startsWith("/'") && trim.contains("'/") == false) {
-						longComment = true;
-						continue;
-					}
-					return ((StringLocated) result).removeInnerComment();
 				}
+				result = raw.readLine();
+				if (result != null && StartUtils.isArobaseStartDiagram(result.getString()) && config.size() > 0) {
+					inserted = new ReadFilterQuoteComment().applyFilter(new ReadLineList(config, result.getLocation()));
+				}
+				return result;
 			}
 		};
 	}

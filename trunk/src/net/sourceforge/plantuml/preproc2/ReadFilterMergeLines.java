@@ -35,8 +35,33 @@
  */
 package net.sourceforge.plantuml.preproc2;
 
-public enum PreprocessorMode {
+import java.io.IOException;
 
-	V1_LEGACY, V2_NEW_TIM
+import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.preproc.ReadLine;
+
+public class ReadFilterMergeLines implements ReadFilter {
+
+	public ReadLine applyFilter(final ReadLine source) {
+		return new ReadLine() {
+			public void close() throws IOException {
+				source.close();
+			}
+
+			public StringLocated readLine() throws IOException {
+				StringLocated result = source.readLine();
+				while (result != null && StringUtils.endsWithBackslash(result.getString())) {
+					final StringLocated next = source.readLine();
+					if (next == null) {
+						break;
+					} else {
+						result = result.mergeEndBackslash(next);
+					}
+				}
+				return result;
+			}
+		};
+	}
 
 }
