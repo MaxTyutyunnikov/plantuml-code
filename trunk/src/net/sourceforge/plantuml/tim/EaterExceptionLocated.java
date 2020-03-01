@@ -34,32 +34,31 @@
  */
 package net.sourceforge.plantuml.tim;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import net.sourceforge.plantuml.StringLocated;
 
-public abstract class ConditionalContexts {
+public class EaterExceptionLocated extends Exception {
 
-	private final Deque<ConditionalContext> allIfs = new LinkedList<ConditionalContext>();
+	private final String message;
+	private final StringLocated location;
 
-	public ConditionalContext peekConditionalContext() {
-		return allIfs.peekLast();
+	private EaterExceptionLocated(String message, StringLocated location) {
+		this.message = message;
+		this.location = location;
 	}
 
-	public void addConditionalContext(ConditionalContext fromValue) {
-		allIfs.addLast(fromValue);
-	}
-
-	public ConditionalContext pollConditionalContext() {
-		return allIfs.pollLast();
-	}
-
-	public boolean areAllIfOk() {
-		for (ConditionalContext conditionalContext : allIfs) {
-			if (conditionalContext.conditionIsOkHere() == false) {
-				return false;
-			}
+	public static EaterExceptionLocated located(String message, StringLocated location) {
+		if (location == null) {
+			throw new IllegalArgumentException();
 		}
-		return true;
+		return new EaterExceptionLocated(message, location);
+	}
+
+	public final String getMessage() {
+		return message;
+	}
+
+	public final StringLocated getLocation() {
+		return location;
 	}
 
 }

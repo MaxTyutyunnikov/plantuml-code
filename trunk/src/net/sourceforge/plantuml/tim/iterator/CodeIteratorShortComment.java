@@ -32,28 +32,37 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.tim;
+package net.sourceforge.plantuml.tim.iterator;
 
-import net.sourceforge.plantuml.tim.expression.TValue;
+import java.util.List;
 
-public class TVariable {
+import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.tim.EaterExceptionLocated;
+import net.sourceforge.plantuml.tim.EaterException;
+import net.sourceforge.plantuml.tim.TLineType;
 
-	private final TValue value;
+public class CodeIteratorShortComment extends AbstractCodeIterator {
 
-	public TVariable(TValue value) {
-		if (value == null) {
-			throw new IllegalArgumentException();
+	private final List<StringLocated> logs;
+
+	public CodeIteratorShortComment(CodeIterator source, List<StringLocated> logs) {
+		super(source);
+		this.logs = logs;
+	}
+
+	public StringLocated peek() throws EaterException, EaterExceptionLocated {
+		while (true) {
+			final StringLocated result = source.peek();
+			if (result == null) {
+				return null;
+			}
+			if (result.getType() == TLineType.COMMENT_SIMPLE) {
+				logs.add(result);
+				next();
+				continue;
+			}
+			assert result != null && result.getType() != TLineType.COMMENT_SIMPLE;
+			return result;
 		}
-		this.value = value;
 	}
-
-	@Override
-	public String toString() {
-		return super.toString() + " " + value.toString();
-	}
-
-	public TValue getValue() {
-		return value;
-	}
-
 }
