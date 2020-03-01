@@ -32,47 +32,8 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.tim;
+package net.sourceforge.plantuml.tim.iterator;
 
-public class ConditionalContext {
-
-	private boolean isTrue;
-	private boolean hasBeenBurn;
-
-	private ConditionalContext(boolean isTrue) {
-		this.isTrue = isTrue;
-		if (this.isTrue) {
-			hasBeenBurn = true;
-		}
-	}
-
-	public static ConditionalContext fromValue(boolean isTrue) {
-		return new ConditionalContext(isTrue);
-	}
-
-	public boolean conditionIsOkHere() {
-		return isTrue;
-	}
-
-	public void enteringElseIf() {
-		this.isTrue = false;
-	}
-
-	public void nowInElse() {
-		this.isTrue = !hasBeenBurn;
-	}
-
-	public void nowInSomeElseIf() {
-		this.isTrue = true;
-		this.hasBeenBurn = true;
-	}
-
-	public final boolean hasBeenBurn() {
-		return hasBeenBurn;
-	}
-
-	public final void setHasBeenBurn(boolean hasBeenBurn) {
-		this.hasBeenBurn = hasBeenBurn;
-	}
+public interface CodePosition {
 
 }
