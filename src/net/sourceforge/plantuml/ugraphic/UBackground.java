@@ -37,15 +37,8 @@ package net.sourceforge.plantuml.ugraphic;
 
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-public class UChangeColor implements UChange {
+public interface UBackground extends UChange {
 
-	private final HColor color;
+	public HColor getBackColor();
 
-	public UChangeColor(HColor color) {
-		this.color = color;
-	}
-
-	public HColor getColor() {
-		return color;
-	}
 }

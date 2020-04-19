@@ -38,8 +38,8 @@ import java.util.List;
 
 import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.StringLocated;
-import net.sourceforge.plantuml.tim.EaterExceptionLocated;
 import net.sourceforge.plantuml.tim.EaterException;
+import net.sourceforge.plantuml.tim.EaterExceptionLocated;
 import net.sourceforge.plantuml.tim.EaterFunctionCall;
 import net.sourceforge.plantuml.tim.TContext;
 import net.sourceforge.plantuml.tim.TFunction;
@@ -48,10 +48,10 @@ import net.sourceforge.plantuml.tim.TFunctionType;
 import net.sourceforge.plantuml.tim.TMemory;
 import net.sourceforge.plantuml.tim.expression.TValue;
 
-public class InvokeVoidFunction implements TFunction {
+public class InvokeProcedure implements TFunction {
 
 	public TFunctionSignature getSignature() {
-		return new TFunctionSignature("%invoke_void_func", 1);
+		return new TFunctionSignature("%invoke_procedure", 1);
 	}
 
 	public boolean canCover(int nbArg) {
@@ -59,10 +59,10 @@ public class InvokeVoidFunction implements TFunction {
 	}
 
 	public TFunctionType getFunctionType() {
-		return TFunctionType.VOID;
+		return TFunctionType.PROCEDURE;
 	}
 
-	public void executeVoid(TContext context, TMemory memory, LineLocation location, String s) throws EaterException, EaterExceptionLocated {
+	public void executeProcedure(TContext context, TMemory memory, LineLocation location, String s) throws EaterException, EaterExceptionLocated {
 		final EaterFunctionCall call = new EaterFunctionCall(new StringLocated(s, location), false, isUnquoted());
 		call.analyze((TContext) context, memory);
 		final List<TValue> values = call.getValues();
@@ -73,14 +73,14 @@ public class InvokeVoidFunction implements TFunction {
 		if (func == null) {
 			throw EaterException.located("Cannot find void function " + fname, new StringLocated(s, location));
 		}
-		func.executeVoidInternal(context, memory, args);
+		func.executeProcedureInternal(context, memory, args);
 	}
 
-	public void executeVoidInternal(TContext context, TMemory memory, List<TValue> args) throws EaterException {
+	public void executeProcedureInternal(TContext context, TMemory memory, List<TValue> args) throws EaterException {
 		throw new UnsupportedOperationException();
 	}
 
-	public TValue executeReturn(TContext context, TMemory memory, LineLocation location, List<TValue> args)
+	public TValue executeReturnFunction(TContext context, TMemory memory, LineLocation location, List<TValue> args)
 			throws EaterException {
 		throw new UnsupportedOperationException();
 	}
