@@ -5,12 +5,12 @@
  * (C) Copyright 2009-2020, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- *
+ * 
  * If you like this project or if you find it useful, you can support us at:
- *
+ * 
  * http://plantuml.com/patreon (only 1$ per month!)
  * http://plantuml.com/paypal
- *
+ * 
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -32,57 +32,18 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.tim;
+package net.sourceforge.plantuml.ugraphic.color;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.StringLocated;
+import net.sourceforge.plantuml.ugraphic.UBackground;
 
-public class EaterDeclareFunction extends Eater {
+public class HColorNone implements HColor {
 
-	private TFunctionImpl function;
-	private final LineLocation location;
-	private boolean finalFlag;
-
-	public EaterDeclareFunction(StringLocated s) {
-		super(s.getTrimmed());
-		this.location = s.getLocation();
-	}
-
-	@Override
-	public void analyze(TContext context, TMemory memory) throws EaterException, EaterExceptionLocated {
-		skipSpaces();
-		checkAndEatChar("!");
-		boolean unquoted = false;
-		while (peekUnquoted() || peekFinal()) {
-			if (peekUnquoted()) {
-				checkAndEatChar("unquoted");
-				skipSpaces();
-				unquoted = true;
-			} else if (peekFinal()) {
-				checkAndEatChar("final");
-				skipSpaces();
-				finalFlag = true;
+	public UBackground bg() {
+		return new UBackground() {
+			public HColor getBackColor() {
+				return null;
 			}
-		}
-		checkAndEatChar("function");
-		skipSpaces();
-		function = eatDeclareFunctionWithOptionalReturn(context, memory, unquoted, location);
-	}
-
-	private boolean peekUnquoted() {
-		return peekChar() == 'u';
-	}
-
-	private boolean peekFinal() {
-		return peekChar() == 'f' && peekCharN2() == 'i';
-	}
-
-	public TFunctionImpl getFunction() {
-		return function;
-	}
-
-	public final boolean getFinalFlag() {
-		return finalFlag;
+		};
 	}
 
 }
