@@ -33,28 +33,21 @@
  * 
  *
  */
-package net.sourceforge.plantuml.math;
+package net.sourceforge.plantuml.ugraphic;
 
-import java.awt.Color;
-import java.awt.geom.Dimension2D;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.image.AffineTransformOp;
 
-import net.sourceforge.plantuml.SvgString;
-import net.sourceforge.plantuml.ugraphic.MutableImage;
+public enum AffineTransformType {
+	TYPE_NEAREST_NEIGHBOR, TYPE_BILINEAR;
 
-public interface ScientificEquation {
-
-	public Dimension2D getDimension();
-
-	public SvgString getSvg(double scale, Color foregroundColor, Color backgroundColor)
-			throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			NoSuchMethodException, SecurityException, InstantiationException, IOException;
-
-	public MutableImage getImage(Color foregroundColor, Color backgroundColor)
-			throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException,
-			IllegalAccessException, IllegalArgumentException, InvocationTargetException;
-
-	public String getSource();
+	public int toLegacyInt() {
+		switch (this) {
+		case TYPE_BILINEAR:
+			return AffineTransformOp.TYPE_BILINEAR;
+		case TYPE_NEAREST_NEIGHBOR:
+			return AffineTransformOp.TYPE_NEAREST_NEIGHBOR;
+		}
+		throw new AssertionError();
+	}
 
 }

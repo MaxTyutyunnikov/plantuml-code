@@ -33,28 +33,19 @@
  * 
  *
  */
-package net.sourceforge.plantuml.math;
+package net.sourceforge.plantuml.ugraphic;
 
 import java.awt.Color;
-import java.awt.geom.Dimension2D;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.image.BufferedImage;
 
-import net.sourceforge.plantuml.SvgString;
-import net.sourceforge.plantuml.ugraphic.MutableImage;
+public interface MutableImage {
 
-public interface ScientificEquation {
+	public BufferedImage getImage();
 
-	public Dimension2D getDimension();
+	public MutableImage withScale(double scale);
 
-	public SvgString getSvg(double scale, Color foregroundColor, Color backgroundColor)
-			throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-			NoSuchMethodException, SecurityException, InstantiationException, IOException;
+	public MutableImage muteColor(Color newColor);
 
-	public MutableImage getImage(Color foregroundColor, Color backgroundColor)
-			throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException,
-			IllegalAccessException, IllegalArgumentException, InvocationTargetException;
-
-	public String getSource();
+	public MutableImage muteTransparentColor(Color newColor);
 
 }
