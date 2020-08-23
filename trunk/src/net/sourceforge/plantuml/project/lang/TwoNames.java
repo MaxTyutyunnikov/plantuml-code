@@ -35,33 +35,22 @@
  */
 package net.sourceforge.plantuml.project.lang;
 
-import java.util.Arrays;
-import java.util.Collection;
+public class TwoNames {
 
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.project.GanttDiagram;
-import net.sourceforge.plantuml.project.core.Task;
+	private final String name1;
+	private final String name2;
 
-public class VerbIsDeleted implements VerbPattern {
-
-	public Collection<ComplementPattern> getComplements() {
-		return Arrays.<ComplementPattern> asList(new ComplementEmpty());
+	public TwoNames(String name1, String name2) {
+		this.name1 = name1;
+		this.name2 = name2;
 	}
 
-	public IRegex toRegex() {
-		return new RegexLeaf("is[%s]+deleted");
+	public final String getName1() {
+		return name1;
 	}
 
-	public Verb getVerb(final GanttDiagram project, RegexResult arg) {
-		return new Verb() {
-			public CommandExecutionResult execute(Subject subject, Complement complement) {
-				final Task task = (Task) subject;
-				return project.deleteTask(task);
-			}
-
-		};
+	public final String getName2() {
+		return name2;
 	}
+
 }

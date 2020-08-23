@@ -33,23 +33,49 @@
  * 
  *
  */
-package net.sourceforge.plantuml.project.core;
+package net.sourceforge.plantuml.project.lang;
 
-public abstract class AbstractTask implements Task {
+import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-	protected final TaskCode code;
-	private Task row;
+public class CenterBorderColor {
 
-	protected AbstractTask(TaskCode code) {
-		this.code = code;
+	private final HColor center;
+	private final HColor border;
+	private final String style;
+
+	public CenterBorderColor(HColor center, HColor border) {
+		this(center, border, null);
 	}
 
-	public void putInSameRowAs(Task row) {
-		this.row = row;
+	public CenterBorderColor(HColor center, HColor border, String style) {
+		this.center = center;
+		this.border = border;
+		this.style = style;
 	}
 
-	public final Task getRow() {
-		return row;
+	public UGraphic apply(UGraphic ug) {
+		if (isOk() == false) {
+			throw new IllegalStateException();
+		}
+		ug = ug.apply(center.bg());
+		if (border == null) {
+			ug = ug.apply(center);
+		} else {
+			ug = ug.apply(border);
+		}
+		return ug;
 	}
 
+	public boolean isOk() {
+		return center != null;
+	}
+
+	public final HColor getCenter() {
+		return center;
+	}
+
+	public final String getStyle() {
+		return style;
+	}
 }

@@ -33,42 +33,33 @@
  * 
  *
  */
-package net.sourceforge.plantuml.project.lang;
+package net.sourceforge.plantuml.project.command;
 
-import java.util.Arrays;
-import java.util.Collection;
-
+import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.command.CommandMultilines;
+import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.project.GanttDiagram;
-import net.sourceforge.plantuml.project.core.Task;
-import net.sourceforge.plantuml.project.time.Day;
 
-public class VerbTaskStartsAbsolute implements VerbPattern {
+public class CommandNoteBottom extends CommandMultilines<GanttDiagram> {
 
-	public Collection<ComplementPattern> getComplements() {
-		return Arrays.<ComplementPattern> asList(new ComplementDate());
+	public CommandNoteBottom() {
+		super("(?i)^note[%s]*bottom$");
 	}
 
-	public IRegex toRegex() {
-		return new RegexLeaf("starts[%s]*(the[%s]*|on[%s]*|at[%s]*)*");
+	@Override
+	public String getPatternEnd() {
+		return "(?i)^end[%s]*note$";
 	}
 
-	public Verb getVerb(final GanttDiagram project, RegexResult arg) {
-		return new Verb() {
-			public CommandExecutionResult execute(Subject subject, Complement complement) {
-				final Task task = (Task) subject;
-				final Day start = (Day) complement;
-				final Day startingDate = project.getStartingDate();
-				if (startingDate == null) {
-					return CommandExecutionResult.error("No starting date for the project");
-				}
-				task.setStart(start.asInstantDay(startingDate));
-				return CommandExecutionResult.ok();
-			}
-
-		};
+	public CommandExecutionResult execute(GanttDiagram diagram, BlocLines lines) {
+		lines = lines.subExtract(1, 1);
+		lines = lines.removeEmptyColumns();
+		final Display strings = lines.toDisplay();
+		if (strings.size() > 0) {
+			return diagram.addNote(strings);
+		}
+		return CommandExecutionResult.error("No note defined");
 	}
+
 }

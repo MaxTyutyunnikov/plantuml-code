@@ -35,37 +35,27 @@
  */
 package net.sourceforge.plantuml.project.lang;
 
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.command.CommandExecutionResult;
+import net.sourceforge.plantuml.project.GanttDiagram;
+import net.sourceforge.plantuml.project.core.Task;
+import net.sourceforge.plantuml.project.time.Day;
 
-public class ComplementColors implements Complement {
+public class SentenceTaskStartsAbsolute extends SentenceSimple {
 
-	private final HColor center;
-	private final HColor border;
-
-	public ComplementColors(HColor center, HColor border) {
-		this.center = center;
-		this.border = border;
+	public SentenceTaskStartsAbsolute() {
+		super(new SubjectTask(), Verbs.starts3(), new ComplementDate());
 	}
 
-	public UGraphic apply(UGraphic ug) {
-		if (isOk() == false) {
-			throw new IllegalStateException();
+	@Override
+	public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
+		final Task task = (Task) subject;
+		final Day start = (Day) complement;
+		final Day startingDate = project.getStartingDate();
+		if (startingDate == null) {
+			return CommandExecutionResult.error("No starting date for the project");
 		}
-		ug = ug.apply(center.bg());
-		if (border == null) {
-			ug = ug.apply(center);
-		} else {
-			ug = ug.apply(border);
-		}
-		return ug;
+		task.setStart(start.asInstantDay(startingDate));
+		return CommandExecutionResult.ok();
 	}
 
-	public boolean isOk() {
-		return center != null;
-	}
-
-	public HColor getCenter() {
-		return center;
-	}
 }
