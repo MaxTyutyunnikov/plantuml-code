@@ -35,16 +35,20 @@
  */
 package net.sourceforge.plantuml.project.lang;
 
-public class ComplementName implements Complement {
+import net.sourceforge.plantuml.command.CommandExecutionResult;
+import net.sourceforge.plantuml.project.GanttDiagram;
+import net.sourceforge.plantuml.project.core.Task;
 
-	private final String name;
+public class SentenceIsDeleted extends SentenceSimple {
 
-	public ComplementName(String name) {
-		this.name = name;
+	public SentenceIsDeleted() {
+		super(new SubjectTask(), Verbs.isDeleted(), new ComplementEmpty());
 	}
 
-	public final String getName() {
-		return name;
+	@Override
+	public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
+		final Task task = (Task) subject;
+		return project.deleteTask(task);
 	}
 
 }

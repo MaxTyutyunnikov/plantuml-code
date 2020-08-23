@@ -35,51 +35,67 @@
  */
 package net.sourceforge.plantuml.project.lang;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.regex.IRegex;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOptional;
-import net.sourceforge.plantuml.command.regex.RegexOr;
 import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.project.Failable;
 import net.sourceforge.plantuml.project.GanttDiagram;
-import net.sourceforge.plantuml.project.time.Day;
 
-public class VerbProjectStarts implements VerbPattern {
+public abstract class SentenceSimple implements Sentence {
 
-	public Collection<ComplementPattern> getComplements() {
-		return Arrays.<ComplementPattern> asList(new ComplementDate());
+	protected final Subject subjectii;
+	private final IRegex verb;
+	protected final Something complementii;
+
+	public SentenceSimple(Subject subject, IRegex verb, Something complement) {
+		this.subjectii = subject;
+		this.verb = verb;
+		this.complementii = complement;
 	}
 
-	public IRegex toRegexOld() {
-		return new RegexLeaf("starts[%s]*(the[%s]*|on[%s]*)*");
+	public final IRegex toRegex() {
+		if (complementii instanceof ComplementEmpty) {
+			return new RegexConcat(//
+					RegexLeaf.start(), //
+					subjectii.toRegex(), //
+					RegexLeaf.spaceOneOrMore(), //
+					verb, //
+					RegexLeaf.end());
+
+		}
+		return new RegexConcat(//
+				RegexLeaf.start(), //
+				subjectii.toRegex(), //
+				RegexLeaf.spaceOneOrMore(), //
+				verb, //
+				RegexLeaf.spaceOneOrMore(), //
+				complementii.toRegex("0"), //
+				RegexLeaf.end());
 	}
 
-	public IRegex toRegex() {
-		return new RegexConcat(new RegexLeaf("start"), //
-				new RegexOptional(new RegexLeaf("s")), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexOptional(new RegexOr(//
-						new RegexLeaf("on"),//
-						new RegexLeaf("for"),//
-						new RegexLeaf("the"),//
-						new RegexLeaf("at") //
-				)) //
-		);
+	public final CommandExecutionResult execute(GanttDiagram project, RegexResult arg) {
+		final Failable<? extends Object> subject = subjectii.getMe(project, arg);
+		if (subject.isFail()) {
+			return CommandExecutionResult.error(subject.getError());
+		}
+		final Failable<? extends Object> complement = complementii.getMe(project, arg, "0");
+		if (complement.isFail()) {
+			return CommandExecutionResult.error(complement.getError());
+		}
+		return execute(project, subject.get(), complement.get());
+
 	}
 
-	public Verb getVerb(final GanttDiagram project, RegexResult arg) {
-		return new Verb() {
-			public CommandExecutionResult execute(Subject subject, Complement complement) {
-				final Day start = (Day) complement;
-				assert project == subject;
-				project.setStartingDate(start);
-				return CommandExecutionResult.ok();
-			}
+	public abstract CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement);
 
-		};
+	public final String getVerbPattern() {
+		return verb.getPattern();
 	}
+
+	public IRegex getVerbRegex() {
+		return verb;
+	}
+
 }

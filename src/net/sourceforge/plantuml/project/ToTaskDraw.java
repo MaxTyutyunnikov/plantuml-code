@@ -33,23 +33,13 @@
  * 
  *
  */
-package net.sourceforge.plantuml.project.core;
+package net.sourceforge.plantuml.project;
 
-public abstract class AbstractTask implements Task {
+import net.sourceforge.plantuml.project.core.Task;
+import net.sourceforge.plantuml.project.draw.TaskDraw;
 
-	protected final TaskCode code;
-	private Task row;
+public interface ToTaskDraw {
 
-	protected AbstractTask(TaskCode code) {
-		this.code = code;
-	}
-
-	public void putInSameRowAs(Task row) {
-		this.row = row;
-	}
-
-	public final Task getRow() {
-		return row;
-	}
+	public TaskDraw getTaskDraw(Task task);
 
 }

@@ -35,45 +35,40 @@
  */
 package net.sourceforge.plantuml.project.lang;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.project.Failable;
+import net.sourceforge.plantuml.project.GanttConstraint;
 import net.sourceforge.plantuml.project.GanttDiagram;
-import net.sourceforge.plantuml.project.time.DayOfWeek;
+import net.sourceforge.plantuml.project.core.Task;
+import net.sourceforge.plantuml.project.core.TaskAttribute;
+import net.sourceforge.plantuml.project.core.TaskInstant;
 
-public class SubjectDayOfWeek implements Subject {
+public class SentenceOccurs extends SentenceSimple {
 
-	public IRegex toRegex() {
-		return new RegexLeaf("SUBJECT", "(" + DayOfWeek.getRegexString() + ")");
+	public SentenceOccurs() {
+		super(new SubjectTask(), Verbs.occurs(), new ComplementFromTo());
 	}
 
-	public Failable<? extends Object> getMe(GanttDiagram project, RegexResult arg) {
-		final String s = arg.get("SUBJECT", 0);
-		return Failable.ok(DayOfWeek.fromString(s));
-	}
-
-	public Collection<? extends SentenceSimple> getSentences() {
-		return Arrays.asList(new AreClose());
-	}
-
-	class AreClose extends SentenceSimple {
-
-		public AreClose() {
-			super(SubjectDayOfWeek.this, Verbs.are(), new ComplementClose());
+	@Override
+	public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
+		final Task task = (Task) subject;
+		final TwoNames bothNames = (TwoNames) complement;
+		final String name1 = bothNames.getName1();
+		final String name2 = bothNames.getName2();
+		final Task from = project.getExistingTask(name1);
+		if (from == null) {
+			return CommandExecutionResult.error("No such " + name1 + " task");
 		}
-
-		@Override
-		public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
-			final DayOfWeek day = (DayOfWeek) subject;
-			project.closeDayOfWeek(day);
-			return CommandExecutionResult.ok();
+		final Task to = project.getExistingTask(name2);
+		if (to == null) {
+			return CommandExecutionResult.error("No such " + name2 + " task");
 		}
-
+		task.setStart(from.getEnd());
+		task.setEnd(to.getEnd());
+		project.addContraint(new GanttConstraint(new TaskInstant(from, TaskAttribute.START),
+				new TaskInstant(task, TaskAttribute.START)));
+		project.addContraint(
+				new GanttConstraint(new TaskInstant(to, TaskAttribute.END), new TaskInstant(task, TaskAttribute.END)));
+		return CommandExecutionResult.ok();
 	}
 
 }

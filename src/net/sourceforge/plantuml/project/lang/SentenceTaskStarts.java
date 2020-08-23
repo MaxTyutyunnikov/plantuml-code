@@ -33,23 +33,33 @@
  * 
  *
  */
-package net.sourceforge.plantuml.project.core;
+package net.sourceforge.plantuml.project.lang;
 
-public abstract class AbstractTask implements Task {
+import net.sourceforge.plantuml.command.CommandExecutionResult;
+import net.sourceforge.plantuml.project.GanttConstraint;
+import net.sourceforge.plantuml.project.GanttDiagram;
+import net.sourceforge.plantuml.project.core.Task;
+import net.sourceforge.plantuml.project.core.TaskAttribute;
+import net.sourceforge.plantuml.project.core.TaskInstant;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-	protected final TaskCode code;
-	private Task row;
+public class SentenceTaskStarts extends SentenceSimple {
 
-	protected AbstractTask(TaskCode code) {
-		this.code = code;
+	public SentenceTaskStarts() {
+		super(new SubjectTask(), Verbs.starts2(), new ComplementBeforeOrAfterOrAtTaskStartOrEnd());
 	}
 
-	public void putInSameRowAs(Task row) {
-		this.row = row;
-	}
+	@Override
+	public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
+		final Task task = (Task) subject;
+		final TaskInstant when;
+		HColor color = null;
+		when = (TaskInstant) complement;
+		task.setStart(when.getInstantPrecise());
+		if (when.isTask()) {
+			project.addContraint(new GanttConstraint(when, new TaskInstant(task, TaskAttribute.START), color));
+		}
+		return CommandExecutionResult.ok();
 
-	public final Task getRow() {
-		return row;
-	}
-
+	};
 }

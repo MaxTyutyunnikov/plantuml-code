@@ -35,45 +35,38 @@
  */
 package net.sourceforge.plantuml.project.lang;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.project.Failable;
+import net.sourceforge.plantuml.project.GanttConstraint;
 import net.sourceforge.plantuml.project.GanttDiagram;
-import net.sourceforge.plantuml.project.time.DayOfWeek;
+import net.sourceforge.plantuml.project.core.Task;
+import net.sourceforge.plantuml.project.core.TaskAttribute;
+import net.sourceforge.plantuml.project.core.TaskInstant;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-public class SubjectDayOfWeek implements Subject {
+public class SentenceTaskStartsWithColor extends SentenceSimple {
 
-	public IRegex toRegex() {
-		return new RegexLeaf("SUBJECT", "(" + DayOfWeek.getRegexString() + ")");
+	public SentenceTaskStartsWithColor() {
+		super(new SubjectTask(), Verbs.starts2(),
+				new PairOfSomething(new ComplementBeforeOrAfterOrAtTaskStartOrEnd(), new ComplementWithColorLink()));
 	}
 
-	public Failable<? extends Object> getMe(GanttDiagram project, RegexResult arg) {
-		final String s = arg.get("SUBJECT", 0);
-		return Failable.ok(DayOfWeek.fromString(s));
-	}
+	@Override
+	public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
+		final Task task = (Task) subject;
+		final TaskInstant when;
 
-	public Collection<? extends SentenceSimple> getSentences() {
-		return Arrays.asList(new AreClose());
-	}
+		final Object[] pairs = (Object[]) complement;
+		when = (TaskInstant) pairs[0];
+		final CenterBorderColor complement22 = (CenterBorderColor) pairs[1];
 
-	class AreClose extends SentenceSimple {
-
-		public AreClose() {
-			super(SubjectDayOfWeek.this, Verbs.are(), new ComplementClose());
+		task.setStart(when.getInstantPrecise());
+		if (when.isTask()) {
+			final HColor color = complement22.getCenter();
+			final GanttConstraint link = new GanttConstraint(when, new TaskInstant(task, TaskAttribute.START), color);
+			link.applyStyle(complement22.getStyle());
+			project.addContraint(link);
 		}
+		return CommandExecutionResult.ok();
 
-		@Override
-		public CommandExecutionResult execute(GanttDiagram project, Object subject, Object complement) {
-			final DayOfWeek day = (DayOfWeek) subject;
-			project.closeDayOfWeek(day);
-			return CommandExecutionResult.ok();
-		}
-
-	}
-
+	};
 }
