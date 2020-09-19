@@ -33,40 +33,40 @@
  * 
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.project.core2;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CommandProperty extends SingleLineCommand2<NwDiagram> {
+public class WorkLoadWithHoles implements WorkLoad {
 
-	public CommandProperty() {
-		super(getRegexConcat());
+	private final WorkLoad source;
+	private final HolesList holes = new HolesList();
+
+	public void addHole(long start, long end) {
+		this.holes.add(new Hole(start, end));
 	}
 
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandProperty.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("NAME", "(address|color|width)"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("="), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\"?"), //
-				new RegexLeaf("VALUE", "([^\"]*)"), //
-				new RegexLeaf("\"?"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf(";?"), //
-				RegexLeaf.end());
+	public WorkLoadWithHoles(WorkLoad source) {
+		this.source = source;
 	}
 
-	@Override
-	protected CommandExecutionResult executeArg(NwDiagram diagram, LineLocation location, RegexResult arg) {
-		return diagram.setProperty(arg.get("NAME", 0), arg.get("VALUE", 0));
+	class MyIterator implements IteratorSlice {
+
+		private final IteratorSlice slices;
+
+		public MyIterator(IteratorSlice slices) {
+			this.slices = slices;
+		}
+
+		public Slice next() {
+			final Slice candidat = slices.next();
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	public IteratorSlice slices(long timeBiggerThan) {
+		return new MyIterator(source.slices(timeBiggerThan));
 	}
 
 }
