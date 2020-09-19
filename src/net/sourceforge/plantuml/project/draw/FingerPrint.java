@@ -33,40 +33,37 @@
  * 
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.project.draw;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+public class FingerPrint {
 
-public class CommandProperty extends SingleLineCommand2<NwDiagram> {
+	private final double x;
+	private final double y;
+	private final double width;
+	private final double height;
 
-	public CommandProperty() {
-		super(getRegexConcat());
-	}
-
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandProperty.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("NAME", "(address|color|width)"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("="), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\"?"), //
-				new RegexLeaf("VALUE", "([^\"]*)"), //
-				new RegexLeaf("\"?"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf(";?"), //
-				RegexLeaf.end());
+	public FingerPrint(double x, double y, double width, double height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
 	}
 
 	@Override
-	protected CommandExecutionResult executeArg(NwDiagram diagram, LineLocation location, RegexResult arg) {
-		return diagram.setProperty(arg.get("NAME", 0), arg.get("VALUE", 0));
+	public String toString() {
+		return "X=(" + x + "->" + (x + width) + ") Y=(" + y + " ->" + (y + height) + ")";
+	}
+
+	public double overlap(FingerPrint other) {
+		if (x >= other.x + other.width || other.x >= x + width) {
+			return 0;
+		}
+
+		if (y >= other.y + other.height || other.y >= y + height) {
+			return 0;
+		}
+
+		return y + height - other.y;
 	}
 
 }

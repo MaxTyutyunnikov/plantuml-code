@@ -33,40 +33,40 @@
  * 
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.project.core2;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.project.time.DayOfWeek;
 
-public class CommandProperty extends SingleLineCommand2<NwDiagram> {
+public class Tooth {
 
-	public CommandProperty() {
-		super(getRegexConcat());
-	}
+	private final long start;
+	private final long end;
+	private final long volume;
 
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandProperty.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("NAME", "(address|color|width)"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("="), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\"?"), //
-				new RegexLeaf("VALUE", "([^\"]*)"), //
-				new RegexLeaf("\"?"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf(";?"), //
-				RegexLeaf.end());
+	public Tooth(long start, long end, long volume) {
+		if (end <= start) {
+			throw new IllegalArgumentException();
+		}
+		this.start = start;
+		this.end = end;
+		this.volume = volume;
 	}
 
 	@Override
-	protected CommandExecutionResult executeArg(NwDiagram diagram, LineLocation location, RegexResult arg) {
-		return diagram.setProperty(arg.get("NAME", 0), arg.get("VALUE", 0));
+	public String toString() {
+		return DayOfWeek.timeToString(start) + " --> " + DayOfWeek.timeToString(end) + " {" + volume + "}";
+	}
+
+	public final long getStart() {
+		return start;
+	}
+
+	public final long getEnd() {
+		return end;
+	}
+
+	public final long getVolume() {
+		return volume;
 	}
 
 }

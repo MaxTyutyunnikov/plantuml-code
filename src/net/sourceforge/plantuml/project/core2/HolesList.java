@@ -33,40 +33,37 @@
  * 
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.project.core2;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-public class CommandProperty extends SingleLineCommand2<NwDiagram> {
+public class HolesList implements Iterable<Hole> {
 
-	public CommandProperty() {
-		super(getRegexConcat());
-	}
+	private final List<Hole> list = new ArrayList<Hole>();
 
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandProperty.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("NAME", "(address|color|width)"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("="), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\"?"), //
-				new RegexLeaf("VALUE", "([^\"]*)"), //
-				new RegexLeaf("\"?"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf(";?"), //
-				RegexLeaf.end());
+	public void add(Hole tooth) {
+		list.add(tooth);
+		Collections.sort(list);
 	}
 
 	@Override
-	protected CommandExecutionResult executeArg(NwDiagram diagram, LineLocation location, RegexResult arg) {
-		return diagram.setProperty(arg.get("NAME", 0), arg.get("VALUE", 0));
+	public String toString() {
+		return list.toString();
+	}
+
+	public long getStart() {
+		return list.get(0).getStart();
+	}
+
+	public long getEnd() {
+		return list.get(list.size() - 1).getEnd();
+	}
+
+	public Iterator<Hole> iterator() {
+		return Collections.unmodifiableList(list).iterator();
 	}
 
 }

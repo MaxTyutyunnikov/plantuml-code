@@ -33,40 +33,38 @@
  * 
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.project.core2;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CommandProperty extends SingleLineCommand2<NwDiagram> {
+public class WorkLoadVariable implements WorkLoad {
 
-	public CommandProperty() {
-		super(getRegexConcat());
+	private final List<Slice> slices = new ArrayList<Slice>();
+
+	public void add(Slice slice) {
+		if (slices.size() > 0) {
+			final Slice last = slices.get(slices.size() - 1);
+			if (slice.getStart() <= last.getEnd()) {
+				throw new IllegalArgumentException();
+			}
+		}
+		slices.add(slice);
 	}
 
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandProperty.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("NAME", "(address|color|width)"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("="), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\"?"), //
-				new RegexLeaf("VALUE", "([^\"]*)"), //
-				new RegexLeaf("\"?"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf(";?"), //
-				RegexLeaf.end());
-	}
-
-	@Override
-	protected CommandExecutionResult executeArg(NwDiagram diagram, LineLocation location, RegexResult arg) {
-		return diagram.setProperty(arg.get("NAME", 0), arg.get("VALUE", 0));
+	public IteratorSlice slices(long timeBiggerThan) {
+		for (int i = 0; i < slices.size(); i++) {
+			final Slice current = slices.get(i);
+			if (current.getEnd() <= timeBiggerThan) {
+				continue;
+			}
+			assert current.getEnd() > timeBiggerThan;
+			assert current.getStart() >= timeBiggerThan;
+			final List<Slice> tmp = slices.subList(i, slices.size());
+			assert tmp.get(0).getStart() >= timeBiggerThan;
+			return new ListIteratorSlice(tmp);
+		}
+		throw new UnsupportedOperationException();
 	}
 
 }

@@ -33,40 +33,37 @@
  * 
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.project.core2;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+public class Solver1 {
 
-public class CommandProperty extends SingleLineCommand2<NwDiagram> {
+	private final WorkLoad workLoad;
 
-	public CommandProperty() {
-		super(getRegexConcat());
+	public Solver1(WorkLoad workLoad) {
+		this.workLoad = workLoad;
 	}
 
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandProperty.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("NAME", "(address|color|width)"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("="), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\"?"), //
-				new RegexLeaf("VALUE", "([^\"]*)"), //
-				new RegexLeaf("\"?"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf(";?"), //
-				RegexLeaf.end());
-	}
+	public TeethRange solveEnd(long start, long fullLoad) {
 
-	@Override
-	protected CommandExecutionResult executeArg(NwDiagram diagram, LineLocation location, RegexResult arg) {
-		return diagram.setProperty(arg.get("NAME", 0), arg.get("VALUE", 0));
+		final IteratorSlice slices = workLoad.slices(start);
+		final TeethRange result = new TeethRange();
+
+		while (true) {
+			final Slice current = slices.next();
+			assert current.getEnd() >= start;
+			start = Math.max(start, current.getStart());
+
+			final long sliceLoad = 1L * (current.getEnd() - start) * current.getWorkLoad();
+			if (sliceLoad >= fullLoad) {
+				final long theoricalEnd = start + fullLoad / current.getWorkLoad();
+				result.add(new Tooth(start, theoricalEnd, fullLoad));
+				return result;
+			}
+			assert sliceLoad < fullLoad;
+			result.add(new Tooth(start, current.getEnd(), sliceLoad));
+			fullLoad -= sliceLoad;
+		}
+
 	}
 
 }
