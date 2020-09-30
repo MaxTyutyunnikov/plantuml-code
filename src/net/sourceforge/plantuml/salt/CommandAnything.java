@@ -33,55 +33,40 @@
  * 
  *
  */
-package net.sourceforge.plantuml.project.time;
+package net.sourceforge.plantuml.salt;
 
-import net.sourceforge.plantuml.project.Value;
+import net.sourceforge.plantuml.LineLocation;
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.CommandExecutionResult;
+import net.sourceforge.plantuml.command.SingleLineCommand2;
+import net.sourceforge.plantuml.command.regex.IRegex;
+import net.sourceforge.plantuml.command.regex.RegexConcat;
+import net.sourceforge.plantuml.command.regex.RegexLeaf;
+import net.sourceforge.plantuml.command.regex.RegexResult;
 
-public class Wink implements Value, Comparable<Wink> {
+public class CommandAnything extends SingleLineCommand2<PSystemSalt> {
 
-	private final int wink;
+	public CommandAnything() {
+		super(false, getRegexConcat());
+	}
 
-	public Wink(int wink) {
-		this.wink = wink;
+	static IRegex getRegexConcat() {
+		return RegexConcat.build(CommandAnything.class.getName(), RegexLeaf.start(), //
+				new RegexLeaf("ALL", "(.*)"), //
+				RegexLeaf.end());
 	}
 
 	@Override
-	public String toString() {
-		return "(Wink +" + wink + ")";
-	}
-
-	public Wink increment() {
-		return new Wink(wink + 1);
-	}
-
-	public Wink decrement() {
-		return new Wink(wink - 1);
-	}
-
-	public final int getWink() {
-		return wink;
-	}
-
-	public int compareTo(Wink other) {
-		return this.wink - other.wink;
-	}
-
-	public String toShortString() {
-		return "" + (wink + 1);
-	}
-
-	public static Wink min(Wink wink1, Wink wink2) {
-		if (wink2.wink < wink1.wink) {
-			return wink2;
+	protected CommandExecutionResult executeArg(PSystemSalt diagram, LineLocation location, RegexResult arg) {
+		final String s = arg.get("ALL", 0);
+		if (diagram.isIamSalt() == false) {
+			if (StringUtils.isEmpty(s)) {
+				return CommandExecutionResult.ok();
+			}
+			return CommandExecutionResult.error("Not ready");
 		}
-		return wink1;
-	}
-
-	public static Wink max(Wink wink1, Wink wink2) {
-		if (wink2.wink > wink1.wink) {
-			return wink2;
-		}
-		return wink1;
+		diagram.add(s);
+		return CommandExecutionResult.ok();
 	}
 
 }
