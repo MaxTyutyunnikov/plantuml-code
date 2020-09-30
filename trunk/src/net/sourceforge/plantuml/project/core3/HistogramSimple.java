@@ -33,50 +33,43 @@
  * 
  *
  */
-package net.sourceforge.plantuml.project.timescale;
+package net.sourceforge.plantuml.project.core3;
 
-import net.sourceforge.plantuml.project.time.Day;
-import net.sourceforge.plantuml.project.time.DayOfWeek;
-import net.sourceforge.plantuml.project.time.GCalendar;
-import net.sourceforge.plantuml.project.time.Wink;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
-public class UnusedTimeScaleWithoutWeekEnd implements TimeScale {
+public class HistogramSimple implements Histogram {
 
-	private final double scale = 16.0;
-	private final GCalendar calendar;
+	private final Map<Long, Long> events = new TreeMap<Long, Long>();
 
-	public UnusedTimeScaleWithoutWeekEnd(GCalendar calendar) {
-		if (calendar == null) {
-			throw new IllegalArgumentException();
+	public long getNext(long moment) {
+		for (long e : events.keySet()) {
+			if (e > moment) {
+				return e;
+			}
 		}
-		this.calendar = calendar;
+		return 1000L * Integer.MAX_VALUE;
 	}
 
-	public double getStartingPosition(Wink instant) {
-		double result = 0;
-		Wink current = (Wink) instant;
-		while (current.getWink() > 0) {
-			current = current.decrement();
-			result += getWidth(current);
+	public void put(long event, long value) {
+		this.events.put(event, value);
+	}
+
+	@Override
+	public String toString() {
+		return events.toString();
+	}
+
+	public long getValueAt(long moment) {
+		long last = 0;
+		for (Entry<Long, Long> ent : events.entrySet()) {
+			if (ent.getKey() > moment) {
+				return last;
+			}
+			last = ent.getValue();
 		}
-		return result;
-	}
-
-	public double getWidth(Wink instant) {
-		final Day day = calendar.toDayAsDate((Wink) instant);
-		final DayOfWeek dayOfWeek = day.getDayOfWeek();
-		if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-			return 1;
-		}
-		return scale;
-	}
-
-	public double getEndingPosition(Wink instant) {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean isBreaking(Wink instant) {
-		throw new UnsupportedOperationException();
+		return last;
 	}
 
 }

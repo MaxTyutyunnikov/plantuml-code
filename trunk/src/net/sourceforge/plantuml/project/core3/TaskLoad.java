@@ -33,27 +33,14 @@
  * 
  *
  */
-package net.sourceforge.plantuml.project.draw;
+package net.sourceforge.plantuml.project.core3;
 
-public class YMovable {
+public interface TaskLoad {
 
-	private double y;
+	public long getStart();
 
-	public YMovable(double y) {
-		this.y = y;
-	}
+	public long getEnd();
 
-	public YMovable add(double v) {
-		return new YMovable(y + v);
-	}
-
-	public final double getValue() {
-		return y;
-	}
-
-	public void pushMe(double delta) {
-		this.y += delta;
-
-	}
+	public Histogram getLoad();
 
 }
