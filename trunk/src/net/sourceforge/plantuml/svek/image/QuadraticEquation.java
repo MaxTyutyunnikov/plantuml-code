@@ -33,41 +33,29 @@
  * 
  *
  */
-package net.sourceforge.plantuml.cucadiagram;
+package net.sourceforge.plantuml.svek.image;
 
-import net.sourceforge.plantuml.svek.extremity.MiddleCircleCircledMode;
-import net.sourceforge.plantuml.svek.extremity.MiddleFactory;
-import net.sourceforge.plantuml.svek.extremity.MiddleFactoryCircle;
-import net.sourceforge.plantuml.svek.extremity.MiddleFactoryCircleCircled;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+public class QuadraticEquation {
 
-public enum LinkMiddleDecor {
+	private final double a;
+	private final double b;
+	private final double c;
 
-	NONE, CIRCLE, CIRCLE_CIRCLED, CIRCLE_CIRCLED1, CIRCLE_CIRCLED2;
-
-	public MiddleFactory getMiddleFactory(HColor backColor) {
-		if (this == CIRCLE) {
-			return new MiddleFactoryCircle(backColor);
-		}
-		if (this == CIRCLE_CIRCLED) {
-			return new MiddleFactoryCircleCircled(MiddleCircleCircledMode.BOTH, backColor);
-		}
-		if (this == CIRCLE_CIRCLED1) {
-			return new MiddleFactoryCircleCircled(MiddleCircleCircledMode.MODE1, backColor);
-		}
-		if (this == CIRCLE_CIRCLED2) {
-			return new MiddleFactoryCircleCircled(MiddleCircleCircledMode.MODE2, backColor);
-		}
-		throw new UnsupportedOperationException();
+	public QuadraticEquation(double a, double b, double c) {
+		this.a = a;
+		this.b = b;
+		this.c = c;
 	}
 
-	public LinkMiddleDecor getInversed() {
-		if (this == CIRCLE_CIRCLED1) {
-			return CIRCLE_CIRCLED2;
-		} else if (this == CIRCLE_CIRCLED2) {
-			return CIRCLE_CIRCLED1;
-		}
-		return this;
+	public double[] solve() {
+		final double delta = b * b - 4 * a * c;
+		final double x0 = (-b - Math.sqrt(delta)) / 2 / a;
+		final double x1 = (-b + Math.sqrt(delta)) / 2 / a;
+		return new double[] { x0, x1 };
+	}
+
+	public double getV(double x) {
+		return a * x * x + b * x + c;
 	}
 
 }
