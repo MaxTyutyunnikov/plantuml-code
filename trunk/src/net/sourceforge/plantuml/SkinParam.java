@@ -102,6 +102,9 @@ public class SkinParam implements ISkinParam {
 		if (type == UmlDiagramType.GANTT) {
 			USE_STYLE2.set(true);
 		}
+		if (type == UmlDiagramType.JSON) {
+			USE_STYLE2.set(true);
+		}
 		if (type == UmlDiagramType.SEQUENCE) {
 			// skin = "debug.skin";
 			// USE_STYLE2.set(true);
@@ -1243,6 +1246,9 @@ public class SkinParam implements ISkinParam {
 		final String value = getValue("actorstyle");
 		if ("awesome".equalsIgnoreCase(value)) {
 			return ActorStyle.AWESOME;
+		}
+		if("hollow".equalsIgnoreCase(value)) {
+			return ActorStyle.HOLLOW;
 		}
 		return ActorStyle.STICKMAN;
 	}
