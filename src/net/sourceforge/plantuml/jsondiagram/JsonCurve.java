@@ -44,7 +44,7 @@ import net.sourceforge.plantuml.ugraphic.UPath;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-public class Curve {
+public class JsonCurve {
 
 	private final List<Point2D> points = new ArrayList<Point2D>();
 	private double maxX, maxY;
@@ -54,10 +54,13 @@ public class Curve {
 	private final Point2D sp;
 	private final Point2D ep;
 
-	public Curve(ST_Agedgeinfo_t data, Mirror xMirror, double veryFirstLine) {
+	public JsonCurve(ST_Agedgeinfo_t data, Mirror xMirror, double veryFirstLine) {
 		this.veryFirstLine = veryFirstLine;
 		this.xMirror = xMirror;
 		final ST_splines splines = data.spl;
+		if (splines.size != 1) {
+			throw new IllegalStateException();
+		}
 		final ST_bezier beziers = splines.list.get__(0);
 		for (int i = 0; i < beziers.size; i++) {
 			final Point2D pt = getPoint(splines, i);
@@ -85,36 +88,23 @@ public class Curve {
 		return new Point2D.Double(pt.x, pt.y);
 	}
 
-//	public void drawCurve(Graphics2D g) {
-//		GeneralPath path = new GeneralPath();
-//		path.moveTo(points.get(0).getX(), points.get(0).getY());
-//		for (int i = 1; i < points.size(); i += 3) {
-//			final Point2D pt2 = points.get(i);
-//			final Point2D pt3 = points.get(i + 1);
-//			final Point2D pt4 = points.get(i + 2);
-//			path.curveTo(pt2.getX(), pt2.getY(), pt3.getX(), pt3.getY(), pt4.getX(), pt4.getY());
-//		}
-//		g.draw(path);
-//
-//	}
-
 	public void drawCurve(HColor color, UGraphic ug) {
 		final UPath path = new UPath();
+
 		path.moveTo(getVeryFirst());
-		path.lineTo(xMirror.inv(points.get(0).getY()), points.get(0).getX());
+		path.lineTo(xMirror.invAndXYSwitch(points.get(0)));
+
 		for (int i = 1; i < points.size(); i += 3) {
-			final Point2D pt2 = points.get(i);
-			final Point2D pt3 = points.get(i + 1);
-			final Point2D pt4 = points.get(i + 2);
-			path.cubicTo(xMirror.inv(pt2.getY()), pt2.getX(), xMirror.inv(pt3.getY()), pt3.getX(),
-					xMirror.inv(pt4.getY()), pt4.getX());
+			final Point2D pt2 = xMirror.invAndXYSwitch(points.get(i));
+			final Point2D pt3 = xMirror.invAndXYSwitch(points.get(i + 1));
+			final Point2D pt4 = xMirror.invAndXYSwitch(points.get(i + 2));
+			path.cubicTo(pt2, pt3, pt4);
 		}
 		ug.draw(path);
 
 		if (ep != null) {
-			final Point2D last = new Point2D.Double(xMirror.inv(points.get(points.size() - 1).getY()),
-					points.get(points.size() - 1).getX());
-			final Point2D trueEp = new Point2D.Double(xMirror.inv(ep.getY()), ep.getX());
+			final Point2D last = xMirror.invAndXYSwitch(points.get(points.size() - 1));
+			final Point2D trueEp = xMirror.invAndXYSwitch(ep);
 			new Arrow(last, trueEp).drawArrow(ug.apply(color.bg()));
 		}
 	}
@@ -125,22 +115,19 @@ public class Curve {
 		ug.draw(new UEllipse(2 * size, 2 * size));
 	}
 
-	private Point2D.Double getVeryFirst() {
-		return new Point2D.Double(xMirror.inv(points.get(0).getY() + veryFirstLine), points.get(0).getX());
+	private Point2D getVeryFirst() {
+		return supp(xMirror.invAndXYSwitch(points.get(0)), xMirror.invAndXYSwitch(points.get(1)), veryFirstLine);
+
 	}
 
-//	public void drawCurveNormal(UGraphic ug) {
-//		final UPath path = new UPath();
-//		path.moveTo(points.get(0).getX(), points.get(0).getY());
-//		for (int i = 1; i < points.size(); i += 3) {
-//			final Point2D pt2 = points.get(i);
-//			final Point2D pt3 = points.get(i + 1);
-//			final Point2D pt4 = points.get(i + 2);
-//			path.cubicTo(pt2.getX(), pt2.getY(), pt3.getX(), pt3.getY(), pt4.getX(), pt4.getY());
-//		}
-//		ug.draw(path);
-//
-//	}
+	private static Point2D supp(Point2D center, Point2D direction, double len) {
+		final double full = center.distance(direction);
+		final double dx = (center.getX() - direction.getX()) / full;
+		final double dy = (center.getY() - direction.getY()) / full;
+
+		return new Point2D.Double(center.getX() + dx * len, center.getY() + dy * len);
+
+	}
 
 	public double getMaxX() {
 		return maxX;
