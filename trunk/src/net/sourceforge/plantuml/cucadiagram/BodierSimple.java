@@ -37,28 +37,23 @@ package net.sourceforge.plantuml.cucadiagram;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.style.Style;
 
-public class BodierMap implements Bodier {
+public class BodierSimple implements Bodier {
 
 	private final List<CharSequence> rawBody = new ArrayList<CharSequence>();
-	private final Map<String, String> map = new LinkedHashMap<String, String>();
 	private ILeaf leaf;
 
 	public void muteClassToObject() {
 		throw new UnsupportedOperationException();
 	}
 
-	public BodierMap() {
+	BodierSimple() {
 	}
 
 	public void setLeaf(ILeaf leaf) {
@@ -66,27 +61,10 @@ public class BodierMap implements Bodier {
 			throw new IllegalArgumentException();
 		}
 		this.leaf = leaf;
-
-	}
-
-	public static String getLinkedEntry(String s) {
-		final Pattern p = Pattern.compile("(\\*-+\\>)");
-		final Matcher m = p.matcher(s);
-		if (m.find()) {
-			return m.group(1);
-		}
-		return null;
 	}
 
 	public void addFieldOrMethod(String s) {
-		if (s.contains("=>")) {
-			final int x = s.indexOf("=>");
-			map.put(s.substring(0, x).trim(), s.substring(x + 2).trim());
-		} else if (getLinkedEntry(s) != null) {
-			final String link = getLinkedEntry(s);
-			final int x = s.indexOf(link);
-			map.put(s.substring(0, x).trim(), "\0");
-		}
+		rawBody.add(s);
 	}
 
 	public Display getMethodsToDisplay() {
@@ -98,16 +76,16 @@ public class BodierMap implements Bodier {
 	}
 
 	public boolean hasUrl() {
-		return false;
-	}
-
-	public TextBlock getBody(FontParam fontParam, ISkinParam skinParam, final boolean showMethods,
-			final boolean showFields, Stereotype stereotype, Style style) {
-		return new TextBlockMap(fontParam, skinParam, map);
+		throw new UnsupportedOperationException();
 	}
 
 	public List<CharSequence> getRawBody() {
 		return Collections.unmodifiableList(rawBody);
+	}
+
+	public TextBlock getBody(FontParam fontParam, ISkinParam skinParam, boolean showMethods, boolean showFields,
+			Stereotype stereotype, Style style) {
+		return BodyFactory.create1(rawBody, fontParam, skinParam, stereotype, leaf, style);
 	}
 
 }
