@@ -30,8 +30,8 @@
 	Script Author: Julien Eluard
 	
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.sourceforge.plantuml</groupId>
@@ -50,7 +50,7 @@
         * state diagram
         * object diagram
     </description>
-    <url>http://plantuml.sourceforge.net</url>
+    <url>https://plantuml.com</url>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -93,18 +93,6 @@
             <email>plantuml@gmail.com</email>
         </developer>
     </developers>
-
-	<profiles>
-	  <profile>
-		<id>doclint-java8-disable</id>
-		<activation>
-		  <jdk>[1.8,)</jdk>
-		</activation>
-		<properties>
-		  <javadoc.opts>-Xdoclint:none</javadoc.opts>
-		</properties>
-	  </profile>
-	</profiles>
 
     <build>
         <sourceDirectory>${project.basedir}/src</sourceDirectory>
@@ -159,7 +147,9 @@
                             <goal>jar</goal>
                         </goals>
 			            <configuration>
-							<additionalparam>${javadoc.opts}</additionalparam>
+						  <javadoc.opts>-Xdoclint:none</javadoc.opts>
+						  <additionalparam>-Xdoclint:none</additionalparam>
+						  <doclint>none</doclint>
 			            </configuration>
                     </execution>
                 </executions>
