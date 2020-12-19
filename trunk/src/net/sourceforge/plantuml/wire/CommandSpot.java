@@ -33,41 +33,63 @@
  * 
  *
  */
-package net.sourceforge.plantuml.descdiagram.command;
+package net.sourceforge.plantuml.wire;
 
 import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.NewpagedDiagram;
-import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.PSystemCommandFactory;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
 import net.sourceforge.plantuml.command.regex.IRegex;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
+import net.sourceforge.plantuml.command.regex.RegexOptional;
 import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.ugraphic.color.HColorSet;
 
-public class CommandNewpage extends SingleLineCommand2<UmlDiagram> {
+public class CommandSpot extends SingleLineCommand2<WireDiagram> {
 
-	private final PSystemCommandFactory factory;
-
-	public CommandNewpage(PSystemCommandFactory factory) {
-		super(getRegexConcat());
-		this.factory = factory;
+	public CommandSpot() {
+		super(false, getRegexConcat());
 	}
 
 	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandNewpage.class.getName(), RegexLeaf.start(), //
-				new RegexLeaf("newpage"), RegexLeaf.end());
+		return RegexConcat.build(CommandSpot.class.getName(), RegexLeaf.start(), //
+				new RegexLeaf("spot"), //
+				RegexLeaf.spaceOneOrMore(), //
+				new RegexLeaf("NAME", "\\$([\\w][.\\w]*)"), //
+				new RegexOptional(new RegexConcat(//
+						new RegexLeaf("\\("), //
+						RegexLeaf.spaceZeroOrMore(), //
+						new RegexLeaf("X", "(-?\\d+(%|%[-+]\\d+)?)"), //
+						RegexLeaf.spaceZeroOrMore(), //
+						new RegexLeaf(","), //
+						RegexLeaf.spaceZeroOrMore(), //
+						new RegexLeaf("Y", "(-?\\d+(%|%[-+]\\d+)?)"), //
+						RegexLeaf.spaceZeroOrMore(), //
+						new RegexLeaf("\\)") //
+				)), //
+				new RegexOptional(new RegexConcat( //
+						RegexLeaf.spaceZeroOrMore(), //
+						new RegexLeaf("COLOR", "(#\\w+)?"))), //
+
+				RegexLeaf.spaceZeroOrMore(), //
+				RegexLeaf.end());
 	}
 
 	@Override
-	protected CommandExecutionResult executeArg(UmlDiagram diagram, LineLocation location, RegexResult arg) {
-		final int dpi = diagram.getSkinParam().getDpi();
-		final UmlDiagram emptyDiagram = (UmlDiagram) factory.createEmptyDiagram();
-		if (dpi != 96) {
-			emptyDiagram.setParam("dpi", "" + dpi);
+	protected CommandExecutionResult executeArg(WireDiagram diagram, LineLocation location, RegexResult arg) {
+		final String name = arg.get("NAME", 0);
+
+		final String stringColor = arg.get("COLOR", 0);
+		HColor color = null;
+		if (stringColor != null) {
+			color = HColorSet.instance().getColorIfValid(stringColor);
 		}
-		NewpagedDiagram result = new NewpagedDiagram(diagram, emptyDiagram);
-		return CommandExecutionResult.newDiagram(result);
+
+		final String x = arg.get("X", 0);
+		final String y = arg.get("Y", 0);
+
+		return diagram.spot(name, color, x, y);
 	}
+
 }

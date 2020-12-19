@@ -31,52 +31,40 @@
  *
  * Original Author:  Arnaud Roques
  *
+ *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.wire;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import net.sourceforge.plantuml.ugraphic.UEllipse;
+import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.UShape;
+import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
-public class DiagGroup {
+public class Spot {
 
-	private final String name;
-	private final Network network;
-	private final Set<String> elements = new HashSet<String>();
-	private HColor color;
+	private final WBlock block;
+	private final HColor color;
+	private final String x;
+	private final String y;
 
-	@Override
-	public String toString() {
-		return name + " " + network + " " + elements;
+	public Spot(WBlock block, HColor color, String x, String y) {
+		this.block = block;
+		this.color = color == null ? HColorUtils.RED : color;
+		this.x = x == null ? "0" : x;
+		this.y = y == null ? "0" : y;
 	}
 
-	public DiagGroup(String name, Network network) {
-		this.name = name;
-		this.network = network;
-	}
+	public void drawMe(UGraphic ug) {
 
-	public final String getName() {
-		return name;
-	}
+		final UTranslate pos = block.getAbsolutePosition(x, y);
+		final UTranslate tr = pos.compose(new UTranslate(-2, -2));
+		final UShape circle = new UEllipse(5, 5);
 
-	public void addElement(String name) {
-		this.elements.add(name);
-	}
+		ug = ug.apply(color).apply(color.bg());
+		ug.apply(tr).draw(circle);
 
-	public boolean matches(LinkedElement tested) {
-		if (network != null && network != tested.getNetwork()) {
-			return false;
-		}
-		return elements.contains(tested.getElement().getName());
-	}
-
-	public final HColor getColor() {
-		return color;
-	}
-
-	public final void setColor(HColor color) {
-		this.color = color;
 	}
 
 }

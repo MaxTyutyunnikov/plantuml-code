@@ -31,41 +31,61 @@
  *
  * Original Author:  Arnaud Roques
  *
- *
  */
-package net.sourceforge.plantuml.wire;
+package net.sourceforge.plantuml.nwdiag;
 
-import java.util.ArrayList;
-import java.util.List;
+public class NwArray {
 
-import net.sourceforge.plantuml.command.Command;
-import net.sourceforge.plantuml.command.PSystemCommandFactory;
-import net.sourceforge.plantuml.core.DiagramType;
+	private final LinkedElement data[][];
 
-public class WireDiagramFactory extends PSystemCommandFactory {
-
-	public WireDiagramFactory() {
-		super(DiagramType.WIRE);
+	public NwArray(int lines, int cols) {
+		this.data = new LinkedElement[lines][cols];
 	}
 
-	@Override
-	protected List<Command> createCommands() {
-
-		final List<Command> cmds = new ArrayList<Command>();
-		addCommonCommands1(cmds);
-		cmds.add(new CommandComponent());
-		cmds.add(new CommandSpot());
-		cmds.add(new CommandGoto());
-		cmds.add(new CommandMove());
-		cmds.add(new CommandWLink());
-		cmds.add(new CommandNewColumn());
-
-		return cmds;
+	public int getNbLines() {
+		return data.length;
 	}
 
-	@Override
-	public WireDiagram createEmptyDiagram() {
-		return new WireDiagram();
+	public int getNbCols() {
+		return data[0].length;
+	}
+
+	public LinkedElement get(int i, int j) {
+		return data[i][j];
+	}
+
+	public LinkedElement[] getLine(int i) {
+		return data[i];
+	}
+
+	public void set(int i, int j, LinkedElement value) {
+		data[i][j] = value;
+	}
+
+	public void swapCols(int col1, int col2) {
+		if (col1 == col2) {
+			throw new IllegalArgumentException();
+		}
+		for (int i = 0; i < getNbLines(); i++) {
+			final LinkedElement tmp = data[i][col1];
+			data[i][col1] = data[i][col2];
+			data[i][col2] = tmp;
+		}
+
+	}
+
+	public Footprint getFootprint(NwGroup group) {
+		int min = Integer.MAX_VALUE;
+		int max = Integer.MIN_VALUE;
+		for (int i = 0; i < getNbLines(); i++) {
+			for (int j = 0; j < getNbCols(); j++) {
+				if (data[i][j] != null && group.matches(data[i][j])) {
+					min = Math.min(min, j);
+					max = Math.max(max, j);
+				}
+			}
+		}
+		return new Footprint(min, max);
 	}
 
 }

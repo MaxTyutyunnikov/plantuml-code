@@ -33,7 +33,7 @@
  *
  *
  */
-package net.sourceforge.plantuml.wire;
+package net.sourceforge.plantuml.board;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +42,10 @@ import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.PSystemCommandFactory;
 import net.sourceforge.plantuml.core.DiagramType;
 
-public class WireDiagramFactory extends PSystemCommandFactory {
+public class BoardDiagramFactory extends PSystemCommandFactory {
 
-	public WireDiagramFactory() {
-		super(DiagramType.WIRE);
+	public BoardDiagramFactory() {
+		super(DiagramType.BOARD);
 	}
 
 	@Override
@@ -53,19 +53,20 @@ public class WireDiagramFactory extends PSystemCommandFactory {
 
 		final List<Command> cmds = new ArrayList<Command>();
 		addCommonCommands1(cmds);
-		cmds.add(new CommandComponent());
-		cmds.add(new CommandSpot());
-		cmds.add(new CommandGoto());
-		cmds.add(new CommandMove());
-		cmds.add(new CommandWLink());
-		cmds.add(new CommandNewColumn());
+		cmds.add(new CommandBoardPlus());
+		// cmds.add(new CommandMindMapTabulation());
+//		cmds.add(new CommandMindMapOrgmode());
+//		cmds.add(new CommandMindMapOrgmodeMultiline());
+//		cmds.add(new CommandMindMapRoot());
+//		cmds.add(new CommandMindMapPlus());
+//		cmds.add(new CommandMindMapDirection());
 
 		return cmds;
 	}
 
 	@Override
-	public WireDiagram createEmptyDiagram() {
-		return new WireDiagram();
+	public BoardDiagram createEmptyDiagram() {
+		return new BoardDiagram();
 	}
 
 }
