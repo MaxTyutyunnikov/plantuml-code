@@ -33,47 +33,34 @@
  * 
  *
  */
-package net.sourceforge.plantuml.wire;
+package net.sourceforge.plantuml.board;
 
 import net.sourceforge.plantuml.LineLocation;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.Position;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
 import net.sourceforge.plantuml.command.regex.IRegex;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOr;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 
-public class CommandPin extends SingleLineCommand2<WireDiagram> {
+public class CommandBoardPlus extends SingleLineCommand2<BoardDiagram> {
 
-	public CommandPin() {
+	public CommandBoardPlus() {
 		super(false, getRegexConcat());
 	}
 
 	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandPin.class.getName(), RegexLeaf.start(), //
+		return RegexConcat.build(CommandBoardPlus.class.getName(), RegexLeaf.start(), //
+				new RegexLeaf("PLUS", "([+]*)"), //
 				RegexLeaf.spaceZeroOrMore(), //
-				new RegexOr("POSITION", //
-						new RegexLeaf("top"), //
-						new RegexLeaf("bottom"), //
-						new RegexLeaf("left"), //
-						new RegexLeaf("right")), //
-				new RegexLeaf(":"), //
-				new RegexLeaf("PINS", "(.*)"), //
-				RegexLeaf.end());
+				new RegexLeaf("LABEL", "([^%s].*)"), RegexLeaf.end());
 	}
 
 	@Override
-	protected CommandExecutionResult executeArg(WireDiagram diagram, LineLocation location, RegexResult arg) {
-		final Position position = Position.fromString(arg.get("POSITION", 0));
-		final String pins = arg.get("PINS", 0);
-
-		for (String s : pins.split(",")) {
-			diagram.addPin(position, s.trim());
-		}
-
-		return CommandExecutionResult.ok();
+	protected CommandExecutionResult executeArg(BoardDiagram diagram, LineLocation location, RegexResult arg) {
+		final String plus = arg.get("PLUS", 0);
+		final String label = arg.get("LABEL", 0);
+		return diagram.addLine(plus, label);
 	}
 
 }

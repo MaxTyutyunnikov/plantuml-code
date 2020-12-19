@@ -31,41 +31,44 @@
  *
  * Original Author:  Arnaud Roques
  *
- *
  */
-package net.sourceforge.plantuml.wire;
+package net.sourceforge.plantuml.nwdiag;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Footprint {
 
-import net.sourceforge.plantuml.command.Command;
-import net.sourceforge.plantuml.command.PSystemCommandFactory;
-import net.sourceforge.plantuml.core.DiagramType;
+	private final int min;
+	private final int max;
 
-public class WireDiagramFactory extends PSystemCommandFactory {
-
-	public WireDiagramFactory() {
-		super(DiagramType.WIRE);
+	public Footprint(int min, int max) {
+		if (max < min) {
+			throw new IllegalArgumentException();
+		}
+		assert max >= min;
+		this.min = min;
+		this.max = max;
 	}
 
 	@Override
-	protected List<Command> createCommands() {
-
-		final List<Command> cmds = new ArrayList<Command>();
-		addCommonCommands1(cmds);
-		cmds.add(new CommandComponent());
-		cmds.add(new CommandSpot());
-		cmds.add(new CommandGoto());
-		cmds.add(new CommandMove());
-		cmds.add(new CommandWLink());
-		cmds.add(new CommandNewColumn());
-
-		return cmds;
+	public String toString() {
+		return "" + min + " -> " + max;
 	}
 
-	@Override
-	public WireDiagram createEmptyDiagram() {
-		return new WireDiagram();
+	public Footprint intersection(Footprint other) {
+		if (this.max < other.min) {
+			return null;
+		}
+		if (this.min > other.max) {
+			return null;
+		}
+		return new Footprint(Math.max(this.min, other.min), Math.min(this.max, other.max));
+	}
+
+	public final int getMin() {
+		return min;
+	}
+
+	public final int getMax() {
+		return max;
 	}
 
 }

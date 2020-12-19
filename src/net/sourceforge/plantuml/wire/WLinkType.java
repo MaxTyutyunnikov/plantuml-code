@@ -30,40 +30,33 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
+ *
  *
  */
 package net.sourceforge.plantuml.wire;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+public enum WLinkType {
 
-public class CommandContainer extends SingleLineCommand2<WireDiagram> {
+	NORMAL, BUS;
 
-	public CommandContainer() {
-		super(false, getRegexConcat());
+	static public WLinkType from(String arg) {
+		if (arg.equals("-")) {
+			return WLinkType.NORMAL;
+		}
+		if (arg.equals("=")) {
+			return WLinkType.BUS;
+		}
+		throw new IllegalArgumentException();
 	}
 
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandContainer.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("TYPE", "component"), //
-				RegexLeaf.spaceOneOrMore(), //
-				new RegexLeaf("NAME", "([\\w]+)"), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("\\{"), //
-				RegexLeaf.end());
-	}
-
-	@Override
-	protected CommandExecutionResult executeArg(WireDiagram diagram, LineLocation location, RegexResult arg) {
-		final String name = arg.get("NAME", 0);
-		return diagram.addStartContainer(name);
+	public double ySpaceForNext() {
+		switch (this) {
+		case NORMAL:
+			return 15;
+		case BUS:
+			return 25;
+		}
+		throw new IllegalArgumentException();
 	}
 
 }

@@ -30,38 +30,38 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
+ *
  *
  */
-package net.sourceforge.plantuml.wire;
+package net.sourceforge.plantuml.board;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.graphic.TextBlock;
 
-public class CommandVspace extends SingleLineCommand2<WireDiagram> {
+public class PostIt {
 
-	public CommandVspace() {
-		super(false, getRegexConcat());
+	private final BNode node;
+	private final ISkinParam skinParam;
+
+	public PostIt(ISkinParam skinParam, BNode node) {
+		this.node = node;
+		this.skinParam = skinParam;
 	}
 
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandVspace.class.getName(), RegexLeaf.start(), //
-				RegexLeaf.spaceZeroOrMore(), //
-				new RegexLeaf("TYPE", "vspace"), //
-				RegexLeaf.spaceOneOrMore(), //
-				new RegexLeaf("HEIGHT", "([\\d]+)"), //
-				RegexLeaf.end());
+	public static double getHeight() {
+		return 90;
+	}
+	
+	public static double getWidth() {
+		return 170;
 	}
 
-	@Override
-	protected CommandExecutionResult executeArg(WireDiagram diagram, LineLocation location, RegexResult arg) {
-		final String height = arg.get("HEIGHT", 0);
-		return diagram.vspace(Integer.parseInt(height));
+
+
+	public TextBlock getCard() {
+		return new CardBox(Display.create(node.getName()), skinParam);
+
 	}
 
 }

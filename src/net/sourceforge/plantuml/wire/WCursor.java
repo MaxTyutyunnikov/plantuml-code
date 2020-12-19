@@ -35,37 +35,20 @@
  */
 package net.sourceforge.plantuml.wire;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.geom.Point2D;
 
-import net.sourceforge.plantuml.command.Command;
-import net.sourceforge.plantuml.command.PSystemCommandFactory;
-import net.sourceforge.plantuml.core.DiagramType;
+import net.sourceforge.plantuml.ugraphic.UTranslate;
 
-public class WireDiagramFactory extends PSystemCommandFactory {
+public class WCursor {
 
-	public WireDiagramFactory() {
-		super(DiagramType.WIRE);
+	private UTranslate position = new UTranslate();
+
+	public Point2D getPosition() {
+		return position.getPosition();
 	}
 
-	@Override
-	protected List<Command> createCommands() {
-
-		final List<Command> cmds = new ArrayList<Command>();
-		addCommonCommands1(cmds);
-		cmds.add(new CommandComponent());
-		cmds.add(new CommandSpot());
-		cmds.add(new CommandGoto());
-		cmds.add(new CommandMove());
-		cmds.add(new CommandWLink());
-		cmds.add(new CommandNewColumn());
-
-		return cmds;
-	}
-
-	@Override
-	public WireDiagram createEmptyDiagram() {
-		return new WireDiagram();
+	public void move(double dx, double dy) {
+		position = position.compose(new UTranslate(dx, dy));
 	}
 
 }
