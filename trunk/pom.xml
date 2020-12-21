@@ -50,7 +50,7 @@
         * state diagram
         * object diagram
     </description>
-    <url>http://plantuml.sourceforge.net</url>
+    <url>https://plantuml.com</url>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -93,18 +93,6 @@
             <email>plantuml@gmail.com</email>
         </developer>
     </developers>
-
-	<profiles>
-	  <profile>
-		<id>doclint-java8-disable</id>
-		<activation>
-		  <jdk>[1.8,)</jdk>
-		</activation>
-		<properties>
-		  <javadoc.opts>-Xdoclint:none</javadoc.opts>
-		</properties>
-	  </profile>
-	</profiles>
 
     <build>
         <sourceDirectory>${project.basedir}/src</sourceDirectory>
@@ -160,7 +148,9 @@
                             <goal>jar</goal>
                         </goals>
 			            <configuration>
-							<additionalparam>${javadoc.opts}</additionalparam>
+						  <javadoc.opts>-Xdoclint:none</javadoc.opts>
+						  <additionalparam>-Xdoclint:none</additionalparam>
+						  <doclint>none</doclint>
 			            </configuration>
                     </execution>
                 </executions>
