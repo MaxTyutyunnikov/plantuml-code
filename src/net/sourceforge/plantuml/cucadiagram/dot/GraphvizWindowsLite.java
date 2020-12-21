@@ -41,7 +41,7 @@ import java.io.IOException;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.windowsdot.WindowsDotArchive;
 
-class GraphvizWindows extends AbstractGraphviz {
+class GraphvizWindowsLite extends AbstractGraphviz {
 
 	static private File specificDotExe;
 
@@ -52,7 +52,7 @@ class GraphvizWindows extends AbstractGraphviz {
 
 	@Override
 	protected File specificDotExe() {
-		synchronized (GraphvizWindows.class) {
+		synchronized (GraphvizWindowsLite.class) {
 			if (specificDotExe == null)
 				try {
 					specificDotExe = new WindowsDotArchive().getWindowsExeLite();
@@ -68,7 +68,7 @@ class GraphvizWindows extends AbstractGraphviz {
 		return false;
 	}
 
-	GraphvizWindows(ISkinParam skinParam, String dotString, String... type) {
+	GraphvizWindowsLite(ISkinParam skinParam, String dotString, String... type) {
 		super(skinParam, dotString, type);
 	}
 

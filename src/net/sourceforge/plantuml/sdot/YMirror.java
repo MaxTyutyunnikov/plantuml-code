@@ -33,7 +33,7 @@
  *
  * 
  */
-package net.sourceforge.plantuml.jdot;
+package net.sourceforge.plantuml.sdot;
 
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Point2D;
