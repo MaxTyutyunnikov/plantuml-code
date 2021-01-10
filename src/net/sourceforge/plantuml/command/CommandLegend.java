@@ -33,47 +33,41 @@
  * 
  *
  */
-package net.sourceforge.plantuml.mindmap;
+package net.sourceforge.plantuml.command;
 
-import net.sourceforge.plantuml.Direction;
 import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.command.CommandExecutionResult;
-import net.sourceforge.plantuml.command.SingleLineCommand2;
+import net.sourceforge.plantuml.TitledDiagram;
 import net.sourceforge.plantuml.command.regex.IRegex;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexOptional;
+import net.sourceforge.plantuml.command.regex.RegexOr;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
+import net.sourceforge.plantuml.graphic.HorizontalAlignment;
+import net.sourceforge.plantuml.graphic.VerticalAlignment;
 
-public class CommandMindMapPlus extends SingleLineCommand2<MindMapDiagram> {
+public class CommandLegend extends SingleLineCommand2<TitledDiagram> {
 
-	public CommandMindMapPlus() {
-		super(false, getRegexConcat());
+	public CommandLegend() {
+		super(getRegexConcat());
 	}
 
 	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandMindMapPlus.class.getName(), RegexLeaf.start(), //
-				new RegexLeaf("TYPE", "([+-]+)"), //
-				new RegexOptional(new RegexLeaf("BACKCOLOR", "\\[(#\\w+)\\]")), //
-				new RegexLeaf("SHAPE", "(_)?"), //
-				RegexLeaf.spaceOneOrMore(), //
-				new RegexLeaf("LABEL", "([^%s].*)"), RegexLeaf.end());
+		return RegexConcat.build(CommandLegend.class.getName(), //
+				RegexLeaf.start(), //
+				new RegexLeaf("legend"), //
+				new RegexLeaf("(?:[%s]*:[%s]*|[%s]+)"), //
+				new RegexOr(//
+						new RegexLeaf("LEGEND1", "[%g](.*)[%g]"), //
+						new RegexLeaf("LEGEND2", "(.*[\\p{L}0-9_.].*)")), //
+				RegexLeaf.end()); //
 	}
 
 	@Override
-	protected CommandExecutionResult executeArg(MindMapDiagram diagram, LineLocation location, RegexResult arg) {
-		final String type = arg.get("TYPE", 0);
-		final String label = arg.get("LABEL", 0);
-		final String stringColor = arg.get("BACKCOLOR", 0);
-		HColor backColor = null;
-		if (stringColor != null) {
-			backColor = diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(stringColor);
-		}
-		final Direction direction = type.contains("-") ? Direction.LEFT : Direction.RIGHT;
-		return diagram.addIdea(backColor, type.length() - 1, Display.getWithNewlines(label),
-				IdeaShape.fromDesc(arg.get("SHAPE", 0)), direction);
+	protected CommandExecutionResult executeArg(TitledDiagram diagram, LineLocation location, RegexResult arg) {
+		final Display s = Display.getWithNewlines(arg.getLazzy("LEGEND", 0));
+		diagram.setLegend(DisplayPositionned.single(s, HorizontalAlignment.CENTER, VerticalAlignment.BOTTOM));
+		return CommandExecutionResult.ok();
 	}
-
 }

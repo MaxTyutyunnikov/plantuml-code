@@ -33,34 +33,12 @@
  * 
  *
  */
-package net.sourceforge.plantuml.compositediagram;
+package net.sourceforge.plantuml.svg;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.classdiagram.AbstractEntityDiagram;
-import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.Ident;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.graphic.USymbol;
+public enum LengthAdjust {
+	NONE, SPACING, SPACING_AND_GLYPHS;
 
-public class CompositeDiagram extends AbstractEntityDiagram {
-
-	public CompositeDiagram(ISkinSimple skinParam) {
-		super(UmlDiagramType.COMPOSITE, skinParam);
+	public static LengthAdjust defaultValue() {
+		return SPACING;
 	}
-
-	@Override
-	public IEntity getOrCreateLeaf(Ident ident, Code code, LeafType type, USymbol symbol) {
-		checkNotNull(ident);
-		// final Ident idNewLong = buildLeafIdent(id);
-		if (type == null) {
-			if (isGroup(code)) {
-				return getGroup(code);
-			}
-			return getOrCreateLeafDefault(ident, code, LeafType.BLOCK, symbol);
-		}
-		return getOrCreateLeafDefault(ident, code, type, symbol);
-	}
-
 }

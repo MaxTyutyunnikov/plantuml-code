@@ -33,34 +33,60 @@
  * 
  *
  */
-package net.sourceforge.plantuml.compositediagram;
+package net.sourceforge.plantuml.graphic;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.classdiagram.AbstractEntityDiagram;
-import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.Ident;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.graphic.USymbol;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class CompositeDiagram extends AbstractEntityDiagram {
+import net.sourceforge.plantuml.StringUtils;
 
-	public CompositeDiagram(ISkinSimple skinParam) {
-		super(UmlDiagramType.COMPOSITE, skinParam);
+public class StyledString {
+
+	private final String text;
+	private final FontStyle style;
+
+	private StyledString(String text, FontStyle style) {
+		this.text = text;
+		this.style = style;
 	}
 
 	@Override
-	public IEntity getOrCreateLeaf(Ident ident, Code code, LeafType type, USymbol symbol) {
-		checkNotNull(ident);
-		// final Ident idNewLong = buildLeafIdent(id);
-		if (type == null) {
-			if (isGroup(code)) {
-				return getGroup(code);
+	public String toString() {
+		return style + "[" + text + "]";
+	}
+
+	public final String getText() {
+		return text;
+	}
+
+	public final FontStyle getStyle() {
+		return style;
+	}
+
+	public static List<StyledString> build(String s) {
+		final List<StyledString> result = new ArrayList<StyledString>();
+		while (s.length() > 0) {
+			final int i1 = s.indexOf(StringUtils.BOLD_START);
+			if (i1 == -1) {
+				result.add(new StyledString(s, FontStyle.PLAIN));
+				s = "";
+				break;
 			}
-			return getOrCreateLeafDefault(ident, code, LeafType.BLOCK, symbol);
+			final int i2 = s.indexOf(StringUtils.BOLD_END);
+			if (i1 > 0)
+				result.add(new StyledString(s.substring(0, i1), FontStyle.PLAIN));
+
+			if (i2 == -1) {
+				result.add(new StyledString(s.substring(i1 + 1), FontStyle.BOLD));
+				s = "";
+			} else {
+				result.add(new StyledString(s.substring(i1 + 1, i2), FontStyle.BOLD));
+				s = s.substring(i2 + 1);
+			}
 		}
-		return getOrCreateLeafDefault(ident, code, type, symbol);
+		return Collections.unmodifiableList(result);
+
 	}
 
 }
