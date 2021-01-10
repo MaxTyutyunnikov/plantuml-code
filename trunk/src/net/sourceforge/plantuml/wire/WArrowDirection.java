@@ -33,34 +33,22 @@
  * 
  *
  */
-package net.sourceforge.plantuml.compositediagram;
+package net.sourceforge.plantuml.wire;
 
-import net.sourceforge.plantuml.ISkinSimple;
-import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.classdiagram.AbstractEntityDiagram;
-import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.Ident;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.graphic.USymbol;
+public enum WArrowDirection {
+	NORMAL, REVERSE, BOTH, NONE;
 
-public class CompositeDiagram extends AbstractEntityDiagram {
-
-	public CompositeDiagram(ISkinSimple skinParam) {
-		super(UmlDiagramType.COMPOSITE, skinParam);
-	}
-
-	@Override
-	public IEntity getOrCreateLeaf(Ident ident, Code code, LeafType type, USymbol symbol) {
-		checkNotNull(ident);
-		// final Ident idNewLong = buildLeafIdent(id);
-		if (type == null) {
-			if (isGroup(code)) {
-				return getGroup(code);
-			}
-			return getOrCreateLeafDefault(ident, code, LeafType.BLOCK, symbol);
+	public static WArrowDirection from(String type) {
+		if (type.contains("<") && type.contains(">")) {
+			return BOTH;
 		}
-		return getOrCreateLeafDefault(ident, code, type, symbol);
+		if (type.contains(">")) {
+			return NORMAL;
+		}
+		if (type.contains("<")) {
+			return REVERSE;
+		}
+		return NONE;
 	}
 
 }

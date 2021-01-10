@@ -33,34 +33,47 @@
  * 
  *
  */
-package net.sourceforge.plantuml.compositediagram;
+package net.sourceforge.plantuml.yaml;
 
-import net.sourceforge.plantuml.ISkinSimple;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import net.sourceforge.plantuml.StringLocated;
 import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.classdiagram.AbstractEntityDiagram;
-import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.IEntity;
-import net.sourceforge.plantuml.cucadiagram.Ident;
-import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.graphic.USymbol;
+import net.sourceforge.plantuml.command.PSystemAbstractFactory;
+import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.core.DiagramType;
+import net.sourceforge.plantuml.core.UmlSource;
+import net.sourceforge.plantuml.json.JsonObject;
+import net.sourceforge.plantuml.jsondiagram.JsonDiagram;
 
-public class CompositeDiagram extends AbstractEntityDiagram {
+public class YamlDiagramFactory extends PSystemAbstractFactory {
 
-	public CompositeDiagram(ISkinSimple skinParam) {
-		super(UmlDiagramType.COMPOSITE, skinParam);
+	public YamlDiagramFactory() {
+		super(DiagramType.YAML);
 	}
 
-	@Override
-	public IEntity getOrCreateLeaf(Ident ident, Code code, LeafType type, USymbol symbol) {
-		checkNotNull(ident);
-		// final Ident idNewLong = buildLeafIdent(id);
-		if (type == null) {
-			if (isGroup(code)) {
-				return getGroup(code);
+	public Diagram createSystem(UmlSource source) {
+		JsonObject yaml = null;
+		try {
+			final List<String> list = new ArrayList<String>();
+			final Iterator<StringLocated> it = source.iterator2();
+			it.next();
+			while (true) {
+				final String line = it.next().getString();
+				if (it.hasNext() == false) {
+					break;
+				}
+				list.add(line);
 			}
-			return getOrCreateLeafDefault(ident, code, LeafType.BLOCK, symbol);
+			yaml = new SimpleYamlParser().parse(list);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return getOrCreateLeafDefault(ident, code, type, symbol);
+		final JsonDiagram result = new JsonDiagram(UmlDiagramType.YAML, yaml, new ArrayList<String>());
+		result.setSource(source);
+		return result;
 	}
 
 }
