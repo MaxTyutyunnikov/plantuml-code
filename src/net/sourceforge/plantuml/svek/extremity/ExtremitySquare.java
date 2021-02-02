@@ -37,20 +37,30 @@ package net.sourceforge.plantuml.svek.extremity;
 
 import java.awt.geom.Point2D;
 
-import net.sourceforge.plantuml.graphic.UDrawable;
-import net.sourceforge.plantuml.svek.AbstractExtremityFactory;
-import net.sourceforge.plantuml.svek.Side;
+import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.URectangle;
+import net.sourceforge.plantuml.ugraphic.UStroke;
+import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-public class ExtremityFactorySquarre extends AbstractExtremityFactory implements ExtremityFactory {
+class ExtremitySquare extends Extremity {
+
+	private final HColor backgroundColor;
+	private final Point2D dest;
+	private final double radius = 5;
 
 	@Override
-	public UDrawable createUDrawable(Point2D p0, double angle, Side side) {
-		return new ExtremitySquarre(p0);
-		}
+	public Point2D somePoint() {
+		return dest;
+	}
 
-	public UDrawable createUDrawable(Point2D p0, Point2D p1, Point2D p2, Side side) {
-		// final double ortho = atan2(p0, p2);
-		return new ExtremitySquarre(p1);
+	public ExtremitySquare(Point2D p1, HColor backgroundColor) {
+		this.dest = new Point2D.Double(p1.getX(), p1.getY());
+		this.backgroundColor = backgroundColor;
+	}
+
+	public void drawU(UGraphic ug) {
+		ug.apply(new UStroke(1.5)).apply(backgroundColor.bg()).apply(new UTranslate(dest.getX() - radius, dest.getY() - radius)).draw(new URectangle(radius * 2, radius * 2));
 	}
 
 }
