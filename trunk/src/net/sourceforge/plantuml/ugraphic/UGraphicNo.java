@@ -42,7 +42,7 @@ public abstract class UGraphicNo {
 	final public void startUrl(Url url) {
 	}
 
-	final public void startGroup(String groupId) {
+	public void startGroup(UGroupType type, String ident) {
 	}
 
 	final public void closeUrl() {

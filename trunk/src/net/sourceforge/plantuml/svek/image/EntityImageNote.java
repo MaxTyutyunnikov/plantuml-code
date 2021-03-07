@@ -72,10 +72,11 @@ import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.Line;
-import net.sourceforge.plantuml.svek.SvekNode;
 import net.sourceforge.plantuml.svek.ShapeType;
+import net.sourceforge.plantuml.svek.SvekNode;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UGraphicStencil;
+import net.sourceforge.plantuml.ugraphic.UGroupType;
 import net.sourceforge.plantuml.ugraphic.UPath;
 import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
@@ -201,6 +202,9 @@ public class EntityImageNote extends AbstractEntityImage implements Stencil {
 
 	final public void drawU(UGraphic ug) {
 		final Url url = getEntity().getUrl99();
+
+		ug.startGroup(UGroupType.CLASS, "elem " + getEntity().getCode() + " selected");
+
 		if (url != null) {
 			ug.startUrl(url);
 		}
@@ -236,6 +240,8 @@ public class EntityImageNote extends AbstractEntityImage implements Stencil {
 		if (url != null) {
 			ug.closeUrl();
 		}
+
+		ug.closeGroup();
 	}
 
 	private double getRoundCorner() {

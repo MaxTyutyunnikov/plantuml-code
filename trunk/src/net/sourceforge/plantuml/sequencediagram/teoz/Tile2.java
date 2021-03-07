@@ -35,8 +35,8 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
+import net.sourceforge.plantuml.graphic.UDrawable;
 
-public interface TileWithCallbackY extends Tile {
+public interface Tile2 extends UDrawable {
 
-	public void callbackY(double y);
 }

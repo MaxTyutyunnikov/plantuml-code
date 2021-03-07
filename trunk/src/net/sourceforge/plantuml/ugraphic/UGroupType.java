@@ -33,14 +33,9 @@
  * 
  *
  */
-package net.sourceforge.plantuml.sequencediagram.teoz;
+package net.sourceforge.plantuml.ugraphic;
 
-import net.sourceforge.plantuml.graphic.StringBounder;
-
-public interface TileWithUpdateStairs extends Tile {
-
-	public void updateStairs(StringBounder stringBounder, double y);
-
-	public double getYPoint(StringBounder stringBounder);
+public enum UGroupType {
+	ID, CLASS
 
 }
