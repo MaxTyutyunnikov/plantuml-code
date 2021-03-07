@@ -40,6 +40,7 @@ import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,12 +65,14 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import net.sourceforge.plantuml.FileUtils;
 import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.SignatureUtils;
 import net.sourceforge.plantuml.code.Base64Coder;
 import net.sourceforge.plantuml.security.ImageIO;
 import net.sourceforge.plantuml.security.SecurityUtils;
 import net.sourceforge.plantuml.tikz.TikzGraphics;
+import net.sourceforge.plantuml.ugraphic.UGroupType;
 import net.sourceforge.plantuml.ugraphic.UImageSvg;
 import net.sourceforge.plantuml.ugraphic.UPath;
 import net.sourceforge.plantuml.ugraphic.USegment;
@@ -120,6 +123,8 @@ public class SvgGraphics {
 	private final boolean svgDimensionStyle;
 	private final LengthAdjust lengthAdjust;
 
+	private final boolean INTERACTIVE = false;
+
 	final protected void ensureVisible(double x, double y) {
 		if (x > maxX) {
 			maxX = (int) (x + 1);
@@ -158,9 +163,52 @@ public class SvgGraphics {
 			if (hover != null) {
 				defs.appendChild(getPathHover(hover));
 			}
+
+			if (INTERACTIVE) {
+				final Element styles = getStylesForInteractiveMode();
+				if (styles != null) {
+					defs.appendChild(styles);
+				}
+				final Element script = getScriptForInteractiveMode();
+				if (script != null) {
+					defs.appendChild(script);
+				}
+			}
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			throw new IllegalStateException(e);
+		}
+	}
+
+	private Element getStylesForInteractiveMode() {
+		final Element style = simpleElement("style");
+		final String text = getData("default.css");
+		if (text == null) {
+			return null;
+		}
+		final CDATASection cdata = document.createCDATASection(text);
+		style.setAttribute("type", "text/css");
+		style.appendChild(cdata);
+		return style;
+	}
+
+	private Element getScriptForInteractiveMode() {
+		final Element script = document.createElement("script");
+		final String text = getData("default.js");
+		if (text == null) {
+			return null;
+		}
+		script.setTextContent(text);
+		return script;
+	}
+
+	private static String getData(final String name) {
+		try {
+			final InputStream is = SvgGraphics.class.getResourceAsStream("/svg/" + name);
+			return FileUtils.readText(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 
@@ -927,9 +975,14 @@ public class SvgGraphics {
 		}
 	}
 
-	public void startGroup(String groupId) {
-		pendingAction.add(0, (Element) document.createElement("g"));
-		pendingAction.get(0).setAttribute("id", groupId);
+	public void startGroup(UGroupType type, String ident) {
+		if (type == UGroupType.ID) {
+			pendingAction.add(0, (Element) document.createElement("g"));
+			pendingAction.get(0).setAttribute("id", ident);
+		} else if (INTERACTIVE && type == UGroupType.CLASS) {
+			pendingAction.add(0, (Element) document.createElement("g"));
+			pendingAction.get(0).setAttribute("class", ident);
+		}
 	}
 
 	public void closeGroup() {

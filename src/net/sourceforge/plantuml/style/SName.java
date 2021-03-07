@@ -46,6 +46,7 @@ public enum SName {
 	artifact, //
 	boundary, //
 	box, //
+	boxless, //
 	caption, //
 	card, //
 	circle, //
@@ -72,6 +73,7 @@ public enum SName {
 	ganttDiagram, //
 	group, //
 	groupHeader, //
+	highlight, //
 	header, //
 	interface_, //
 	jsonDiagram, //
@@ -105,7 +107,8 @@ public enum SName {
 	task, //
 	title, //
 	usecase, //
-	wbsDiagram; //
+	wbsDiagram, //
+	yamlDiagram; //
 
 	public static String depth(int level) {
 		return "depth(" + level + ")";
