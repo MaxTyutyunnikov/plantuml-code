@@ -34,7 +34,6 @@
  */
 package net.sourceforge.plantuml.sequencediagram;
 
-import java.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
@@ -53,7 +52,6 @@ import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.ISkinSimple;
 import net.sourceforge.plantuml.OptionFlags;
-import net.sourceforge.plantuml.Scale;
 import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.UmlDiagramType;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
@@ -68,6 +66,7 @@ import net.sourceforge.plantuml.sequencediagram.graphic.SequenceDiagramFileMaker
 import net.sourceforge.plantuml.sequencediagram.graphic.SequenceDiagramTxtMaker;
 import net.sourceforge.plantuml.sequencediagram.teoz.SequenceDiagramFileMakerTeoz;
 import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class SequenceDiagram extends UmlDiagram {
@@ -411,7 +410,8 @@ public class SequenceDiagram extends UmlDiagram {
 	@Override
 	public int getNbImages() {
 		try {
-			return getSequenceDiagramPngMaker(1, new FileFormatOption(FileFormat.PNG)).getNbPages();
+			// The DEBUG StringBounder is ok just to compute the number of pages here.
+			return getSequenceDiagramPngMaker(1, new FileFormatOption(FileFormat.DEBUG)).getNbPages();
 		} catch (Throwable t) {
 			t.printStackTrace();
 			return 1;
@@ -497,17 +497,6 @@ public class SequenceDiagram extends UmlDiagram {
 		return true;
 	}
 
-	public double getDpiFactor(FileFormatOption fileFormatOption, Dimension2D dim) {
-		final double dpiFactor;
-		final Scale scale = getScale();
-		if (scale == null) {
-			dpiFactor = getScaleCoef(fileFormatOption);
-		} else {
-			dpiFactor = scale.getScale(dim.getWidth(), dim.getHeight());
-		}
-		return dpiFactor;
-	}
-
 	@Override
 	public String checkFinalError() {
 		if (this.isHideUnlinkedData()) {
@@ -539,5 +528,12 @@ public class SequenceDiagram extends UmlDiagram {
 
 	public List<LinkAnchor> getLinkAnchors() {
 		return Collections.unmodifiableList(linkAnchors);
+	}
+
+	@Override
+	public ClockwiseTopRightBottomLeft getDefaultMargins() {
+		return modeTeoz()  // this is for backward compatibility
+				? ClockwiseTopRightBottomLeft.same(5)
+				: ClockwiseTopRightBottomLeft.topRightBottomLeft(5, 5, 5, 0);
 	}
 }

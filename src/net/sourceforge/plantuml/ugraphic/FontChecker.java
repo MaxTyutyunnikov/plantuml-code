@@ -105,7 +105,7 @@ public class FontChecker {
 	}
 
 	public String getCharDesc(char c) {
-		final TextLayout t = new TextLayout("" + c, font.getFont(), TextBlockUtils.getFontRenderContext());
+		final TextLayout t = new TextLayout("" + c, font.getUnderlayingFont(), TextBlockUtils.getFontRenderContext());
 		final Shape sh = t.getOutline(null);
 		final double current[] = new double[6];
 		final PathIterator it = sh.getPathIterator(null);
@@ -123,7 +123,7 @@ public class FontChecker {
 	}
 
 	public String getCharDescVerbose(char c) {
-		final TextLayout t = new TextLayout("" + c, font.getFont(), TextBlockUtils.getFontRenderContext());
+		final TextLayout t = new TextLayout("" + c, font.getUnderlayingFont(), TextBlockUtils.getFontRenderContext());
 		final Shape sh = t.getOutline(null);
 		final double current[] = new double[6];
 		final PathIterator it = sh.getPathIterator(null);
@@ -172,7 +172,7 @@ public class FontChecker {
 
 	public BufferedImage getBufferedImage(final char c) throws IOException {
 		assert c != '\t';
-		final ImageParameter imageParameter = new ImageParameter(new ColorMapperIdentity(), false, null, 1.0, null,
+		final ImageParameter imageParameter = new ImageParameter(new ColorMapperIdentity(), false, null, null,
 				null, ClockwiseTopRightBottomLeft.none(), null);
 		final ImageBuilder imageBuilder = ImageBuilder.build(imageParameter);
 		final double dim = 20;

@@ -44,11 +44,8 @@ import net.sourceforge.plantuml.AnnotatedWorker;
 import net.sourceforge.plantuml.Direction;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.Scale;
-import net.sourceforge.plantuml.SkinParam;
 import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
@@ -60,7 +57,6 @@ import net.sourceforge.plantuml.graphic.InnerStrategy;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.mindmap.IdeaShape;
-import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.style.NoStyleAvailableException;
 import net.sourceforge.plantuml.svek.TextBlockBackcolored;
 import net.sourceforge.plantuml.ugraphic.ImageBuilder;
@@ -82,24 +78,9 @@ public class WBSDiagram extends UmlDiagram {
 	@Override
 	protected ImageData exportDiagramInternal(OutputStream os, int index, FileFormatOption fileFormatOption)
 			throws IOException {
-		final Scale scale = getScale();
 
-		final double dpiFactor = scale == null ? getScaleCoef(fileFormatOption) : scale.getScale(100, 100);
 		final ISkinParam skinParam = getSkinParam();
-		final double margin1;
-		final double margin2;
-		if (UseStyle.useBetaStyle()) {
-			margin1 = SkinParam.zeroMargin(10);
-			margin2 = SkinParam.zeroMargin(10);
-		} else {
-			margin1 = 10;
-			margin2 = 10;
-		}
-		HColor backcolor = skinParam.getBackgroundColor(false);
-		final ClockwiseTopRightBottomLeft margins = ClockwiseTopRightBottomLeft.margin1margin2(margin1, margin2);
-		final String metadata = fileFormatOption.isWithMetadata() ? getMetadata() : null;
-		final ImageParameter imageParameter = new ImageParameter(skinParam.getColorMapper(), skinParam.handwritten(),
-				null, dpiFactor, metadata, "", margins, backcolor);
+		final ImageParameter imageParameter = new ImageParameter(this, fileFormatOption);
 
 		final ImageBuilder imageBuilder = ImageBuilder.build(imageParameter);
 		TextBlock result = getTextBlock();
@@ -108,7 +89,7 @@ public class WBSDiagram extends UmlDiagram {
 				.addAdd(result);
 		imageBuilder.setUDrawable(result);
 
-		return imageBuilder.writeImageTOBEMOVED(fileFormatOption, seed(), os);
+		return imageBuilder.writeImageTOBEMOVED(seed(), os);
 	}
 
 	private TextBlockBackcolored getTextBlock() {
@@ -162,7 +143,7 @@ public class WBSDiagram extends UmlDiagram {
 				if (root != null) {
 					return CommandExecutionResult.error("Error 44");
 				}
-				initRoot(backColor, label, stereotype);
+				initRoot(backColor, label, stereotype, shape);
 				return CommandExecutionResult.ok();
 			}
 			return add(backColor, level, label, stereotype, direction, shape);
@@ -175,9 +156,9 @@ public class WBSDiagram extends UmlDiagram {
 	private WElement root;
 	private WElement last;
 
-	private void initRoot(HColor backColor, String label, String stereotype) {
+	private void initRoot(HColor backColor, String label, String stereotype, IdeaShape shape) {
 		root = new WElement(backColor, Display.getWithNewlines(label), stereotype,
-				getSkinParam().getCurrentStyleBuilder());
+				getSkinParam().getCurrentStyleBuilder(), shape);
 		last = root;
 	}
 
