@@ -50,11 +50,7 @@ import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
-public class TimeHeaderWeekly extends TimeHeader {
-
-	private final LoadPlanable defaultPlan;
-	private final Map<Day, HColor> colorDays;
-	private final Map<DayOfWeek, HColor> colorDaysOfWeek;
+public class TimeHeaderWeekly extends TimeHeaderCalendar {
 
 	protected double getTimeHeaderHeight() {
 		return 16 + 13;
@@ -65,15 +61,14 @@ public class TimeHeaderWeekly extends TimeHeader {
 	}
 
 	public TimeHeaderWeekly(Day calendar, Day min, Day max, LoadPlanable defaultPlan, Map<Day, HColor> colorDays,
-			Map<DayOfWeek, HColor> colorDaysOfWeek, Map<Day, String> nameDays) {
-		super(min, max, new TimeScaleCompressed(calendar, PrintScale.WEEKLY.getCompress()));
-		this.defaultPlan = defaultPlan;
-		this.colorDays = colorDays;
-		this.colorDaysOfWeek = colorDaysOfWeek;
+			Map<DayOfWeek, HColor> colorDaysOfWeek) {
+		super(calendar, min, max, defaultPlan, colorDays, colorDaysOfWeek,
+				new TimeScaleCompressed(calendar, PrintScale.WEEKLY.getCompress()));
 	}
 
 	@Override
 	public void drawTimeHeader(final UGraphic ug, double totalHeightWithoutFooter) {
+		drawTextsBackground(ug, totalHeightWithoutFooter);
 		drawCalendar(ug, totalHeightWithoutFooter);
 		drawHline(ug, 0);
 		drawHline(ug, Y_POS_ROW16());
@@ -88,48 +83,9 @@ public class TimeHeaderWeekly extends TimeHeader {
 	}
 
 	private void drawCalendar(final UGraphic ug, double totalHeightWithoutFooter) {
-		drawTexts(ug, totalHeightWithoutFooter);
 		printDaysOfMonth(ug);
 		printSmallVbars(ug, totalHeightWithoutFooter);
 		printMonths(ug);
-	}
-
-	private void drawTexts(final UGraphic ug, double totalHeightWithoutFooter) {
-		final double height = totalHeightWithoutFooter - getFullHeaderHeight();
-		Day firstDay = null;
-		HColor lastColor = null;
-
-		for (Day wink = min; wink.compareTo(max) <= 0; wink = wink.increment()) {
-			HColor back = colorDays.get(wink);
-			// Day of week should be stronger than period of time (back color).
-			final HColor backDoW = colorDaysOfWeek.get(wink.getDayOfWeek());
-			if (backDoW != null) {
-				back = backDoW;
-			}
-			if (back == null && defaultPlan.getLoadAt(wink) == 0) {
-				back = veryLightGray;
-			}
-			if (back == null) {
-				if (lastColor != null)
-					drawBack(ug.apply(lastColor.bg()), firstDay, wink, height);
-				firstDay = null;
-				lastColor = null;
-			} else {
-				assert back != null;
-				if (lastColor != null && lastColor.equals(back) == false) {
-					drawBack(ug.apply(lastColor.bg()), firstDay, wink, height);
-				}
-				if (firstDay == null)
-					firstDay = wink;
-				lastColor = back;
-			}
-		}
-	}
-
-	private void drawBack(UGraphic ug, Day start, Day end, double height) {
-		final double x1 = getTimeScale().getStartingPosition(start);
-		final double x2 = getTimeScale().getStartingPosition(end);
-		drawRectangle(ug, height, x1, x2);
 	}
 
 	private void printMonths(final UGraphic ug) {

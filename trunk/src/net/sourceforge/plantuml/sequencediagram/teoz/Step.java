@@ -33,50 +33,42 @@
  * 
  *
  */
-package net.sourceforge.plantuml.cute;
+package net.sourceforge.plantuml.sequencediagram.teoz;
 
-import java.awt.geom.Point2D;
+import net.sourceforge.plantuml.graphic.SymbolContext;
 
-import net.sourceforge.plantuml.geom.AbstractLineSegment;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
+public class Step {
 
-public class InfiniteLine {
+	private final double value;
+	private final boolean destroy;
+	private final int indent;
+	private final SymbolContext color;
 
-	private final Point2D a;
-	private final Point2D b;
-
-	public InfiniteLine(Point2D a, Point2D b) {
-		this.a = a;
-		this.b = b;
+	public Step(double value, boolean destroy, int indent, SymbolContext color) {
+		if (indent < 0) {
+			throw new IllegalArgumentException();
+		}
+		this.indent = indent;
+		this.color = color;
+		this.value = value;
+		this.destroy = destroy;
 	}
 
-	public InfiniteLine(AbstractLineSegment segment) {
-		this(segment.getP1(), segment.getP2());
+	public double getValue() {
+		return value;
 	}
 
-	@Override
-	public String toString() {
-		return "{" + a + ";" + b + "}";
+	public boolean isDestroy() {
+		return destroy;
+	}
+	
+	public int getIndent() {
+		return indent;
 	}
 
-	public double getDeltaX() {
-		return b.getX() - a.getX();
+	public SymbolContext getColors() {
+		return color;
 	}
 
-	public double getDeltaY() {
-		return b.getY() - a.getY();
-	}
-
-	public double getDr() {
-		return a.distance(b);
-	}
-
-	public double getDiscriminant() {
-		return a.getX() * b.getY() - b.getX() * a.getY();
-	}
-
-	public InfiniteLine translate(UTranslate translate) {
-		return new InfiniteLine(translate.getTranslated(a), translate.getTranslated(b));
-	}
 
 }

@@ -64,7 +64,6 @@ import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignature;
@@ -82,8 +81,6 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 	private final List<Page> pages;
 	private final FileFormatOption fileFormatOption;
 	private final StringBounder stringBounder;
-
-	private double scale;
 
 	public SequenceDiagramFileMakerPuma2(SequenceDiagram diagram, Rose skin, FileFormatOption fileFormatOption) {
 		this.diagram = diagram;
@@ -189,28 +186,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 		final Dimension2D dimLegend = legendBlock.calculateDimension(stringBounder);
 		area.setLegend(dimLegend, isLegendTop(), diagram.getLegend().getHorizontalAlignment());
 
-		scale = getScale(area.getWidth(), area.getHeight());
-
-		final double dpiFactor = diagram.getScaleCoef(fileFormatOption);
-		// System.err.println("dpiFactor=" + dpiFactor);
-		// System.err.println("scale=" + scale);
-
-		final String metadata = fileFormatOption.isWithMetadata() ? diagram.getMetadata() : null;
-
-		final ClockwiseTopRightBottomLeft margins;
-		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignature.of(SName.root, SName.sequenceDiagram, SName.document)
-					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
-			// margins = style.getMargin();
-			margins = ClockwiseTopRightBottomLeft.topRightBottomLeft(5, 5, 5, 0);
-		} else {
-			margins = ClockwiseTopRightBottomLeft.topRightBottomLeft(5, 5, 5, 0);
-		}
-		ISkinParam skinParam = diagram.getSkinParam();
-		final HColor backcolor = skinParam.getBackgroundColor(false);
-		final double factor = oneOf(scale, dpiFactor);
-		final ImageParameter imageParameter = new ImageParameter(skinParam, diagram.getAnimation(), factor, metadata,
-				null, margins, backcolor);
+		final ImageParameter imageParameter = new ImageParameter(diagram, fileFormatOption);
 		final ImageBuilder imageBuilder = ImageBuilder.build(imageParameter);
 
 		imageBuilder.setUDrawable(new UDrawable() {
@@ -247,7 +223,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			}
 
 		});
-		return imageBuilder.writeImageTOBEMOVED(fileFormatOption, diagram.seed(), os);
+		return imageBuilder.writeImageTOBEMOVED(diagram.seed(), os);
 	}
 
 	private void drawFooter(SequenceDiagramArea area, UGraphic ug, int page) {
@@ -268,33 +244,6 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 		}
 		text.drawU(ug.apply(
 				new UTranslate(area.getHeaderX(diagram.getHeader().getHorizontalAlignment()), area.getHeaderY())));
-	}
-
-	private double oneOf(double a, double b) {
-		if (a == 1) {
-			return b;
-		}
-		return a;
-	}
-
-	private double getImageWidth(SequenceDiagramArea area, double dpiFactor, double legendWidth) {
-		final int minsize = diagram.getMinwidth();
-		final double w = Math.max(area.getWidth() * getScale(area.getWidth(), area.getHeight()) * dpiFactor,
-				legendWidth);
-		if (minsize == Integer.MAX_VALUE) {
-			return w;
-		}
-		if (w >= minsize) {
-			return w;
-		}
-		return minsize;
-	}
-
-	private double getScale(double width, double height) {
-		if (diagram.getScale() == null) {
-			return 1;
-		}
-		return diagram.getScale().getScale(width, height);
 	}
 
 	private PngTitler getPngTitler(final FontParam fontParam, int page) {

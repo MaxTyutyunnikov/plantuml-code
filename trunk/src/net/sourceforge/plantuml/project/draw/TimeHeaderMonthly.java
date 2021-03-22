@@ -50,7 +50,7 @@ import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
-public class TimeHeaderMonthly extends TimeHeader {
+public class TimeHeaderMonthly extends TimeHeaderCalendar {
 
 	protected double getTimeHeaderHeight() {
 		return 16 + 13;
@@ -61,12 +61,14 @@ public class TimeHeaderMonthly extends TimeHeader {
 	}
 
 	public TimeHeaderMonthly(Day calendar, Day min, Day max, LoadPlanable defaultPlan, Map<Day, HColor> colorDays,
-			Map<DayOfWeek, HColor> colorDaysOfWeek, Map<Day, String> nameDays) {
-		super(min, max, new TimeScaleCompressed(calendar, PrintScale.MONTHLY.getCompress()));
+			Map<DayOfWeek, HColor> colorDaysOfWeek) {
+		super(calendar, min, max, defaultPlan, colorDays, colorDaysOfWeek,
+				new TimeScaleCompressed(calendar, PrintScale.MONTHLY.getCompress()));
 	}
 
 	@Override
 	public void drawTimeHeader(final UGraphic ug, double totalHeightWithoutFooter) {
+		drawTextsBackground(ug, totalHeightWithoutFooter);
 		drawYears(ug);
 		drawMonths(ug.apply(UTranslate.dy(16)));
 		drawHline(ug, 0);

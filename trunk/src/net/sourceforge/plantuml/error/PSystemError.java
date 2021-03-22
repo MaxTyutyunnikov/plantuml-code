@@ -115,6 +115,10 @@ public abstract class PSystemError extends AbstractPSystem {
 		return Collections.singleton(singleError);
 	}
 
+	final public ErrorUml getFirstError() {
+		return singleError;
+	}
+
 	final public String getWarningOrError() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(getDescription());
@@ -156,7 +160,7 @@ public abstract class PSystemError extends AbstractPSystem {
 		return result;
 	}
 
-	private List<String> getPureAsciiFormatted() {
+	public List<String> getPureAsciiFormatted() {
 		final List<String> result = getTextFromStack();
 		result.addAll(getTextFullBody());
 		result.add("^^^^^");
@@ -227,7 +231,7 @@ public abstract class PSystemError extends AbstractPSystem {
 
 		TextBlock udrawable;
 		HColor backcolor = result.getBackcolor();
-		final ImageParameter imageParameter = new ImageParameter(new ColorMapperIdentity(), false, null, 1.0,
+		final ImageParameter imageParameter = new ImageParameter(new ColorMapperIdentity(), false, null,
 				getMetadata(), null, ClockwiseTopRightBottomLeft.none(), backcolor);
 		final ImageBuilder imageBuilder = ImageBuilder.build(imageParameter);
 		imageBuilder.setRandomPixel(true);
