@@ -29,7 +29,7 @@
  * USA.
  *
  *
- * Original Author:  Arnaud Roques
+ * Original Author:  Matthew Leather
  * 
  *
  */
@@ -51,13 +51,22 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.plantuml.AnimatedGifEncoder;
+import net.sourceforge.plantuml.AnnotatedWorker;
 import net.sourceforge.plantuml.CMapData;
+import net.sourceforge.plantuml.ColorParam;
+import net.sourceforge.plantuml.CornerParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.EmptyImageBuilder;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.FileUtils;
+import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.LineParam;
+import net.sourceforge.plantuml.Scale;
+import net.sourceforge.plantuml.SvgCharSizeHack;
+import net.sourceforge.plantuml.TitledDiagram;
 import net.sourceforge.plantuml.Url;
+import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.anim.AffineTransformation;
 import net.sourceforge.plantuml.anim.Animation;
 import net.sourceforge.plantuml.api.ImageDataComplex;
@@ -66,12 +75,21 @@ import net.sourceforge.plantuml.braille.UGraphicBraille;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.eps.EpsStrategy;
 import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.UDrawable;
 import net.sourceforge.plantuml.mjpeg.MJPEGGenerator;
 import net.sourceforge.plantuml.security.ImageIO;
 import net.sourceforge.plantuml.security.SFile;
+import net.sourceforge.plantuml.skin.rose.Rose;
+import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
+import net.sourceforge.plantuml.style.PName;
+import net.sourceforge.plantuml.style.SName;
+import net.sourceforge.plantuml.style.Style;
+import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.svek.TextBlockBackcolored;
 import net.sourceforge.plantuml.svg.LengthAdjust;
 import net.sourceforge.plantuml.ugraphic.color.ColorMapper;
+import net.sourceforge.plantuml.ugraphic.color.ColorMapperIdentity;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorBackground;
 import net.sourceforge.plantuml.ugraphic.color.HColorGradient;
@@ -87,93 +105,209 @@ import net.sourceforge.plantuml.ugraphic.tikz.UGraphicTikz;
 import net.sourceforge.plantuml.ugraphic.txt.UGraphicTxt;
 import net.sourceforge.plantuml.ugraphic.visio.UGraphicVdx;
 
+import static net.sourceforge.plantuml.SkinParam.DEFAULT_PRESERVE_ASPECT_RATIO;
+
 public class ImageBuilder {
 
-	private final ImageParameter param;
-
-	private final double top;
-	private final double right;
-	private final double bottom;
-	private final double left;
-
+	private Animation animation;
+	private boolean annotations;
+	private HColor backcolor = HColorUtils.WHITE;
+	private HColor borderColor;
+	private double borderCorner;
+	private UStroke borderStroke;
+	private ColorMapper colorMapper = new ColorMapperIdentity();
+	private Dimension2D dimension;
+	private int dpi = 96;
+	private final FileFormatOption fileFormatOption;
+	private boolean handwritten;
+	private String hoverPathColorRGB;
+	private LengthAdjust lengthAdjust = LengthAdjust.defaultValue();
 	private UDrawable udrawable;
+	private ClockwiseTopRightBottomLeft margin = ClockwiseTopRightBottomLeft.none();
+	private String metadata;
+	private String preserveAspectRatio;
+	private Scale scale;
+	private long seed = 42;
+	private int status = 0;
+	private SvgCharSizeHack svgCharSizeHack = SvgCharSizeHack.NO_HACK;
+	private boolean svgDimensionStyle = true;
+	private String svgLinkTarget;
+	private TitledDiagram titledDiagram;
 	private boolean randomPixel;
+	private String warningOrError;
 
-	public static ImageBuilder build(ImageParameter imageParameter) {
-		return new ImageBuilder(imageParameter);
+	public static ImageBuilder plainImageBuilder(UDrawable drawable, FileFormatOption fileFormatOption) {
+		return new ImageBuilder(drawable, fileFormatOption);
 	}
 
-	private ImageBuilder(ImageParameter imageParameter) {
-		this.param = imageParameter;
-
-		this.top = imageParameter.getMargins().getTop();
-		this.right = imageParameter.getMargins().getRight();
-		this.bottom = imageParameter.getMargins().getBottom();
-		this.left = imageParameter.getMargins().getLeft();
-
+	public static ImageBuilder plainPngBuilder(UDrawable drawable) {
+		return plainImageBuilder(drawable, new FileFormatOption(FileFormat.PNG));
 	}
 
-	public void setUDrawable(UDrawable udrawable) {
-		this.udrawable = udrawable;
+	// TODO do something with "index"
+	public static ImageBuilder styledImageBuilder(TitledDiagram diagram, UDrawable drawable, int index,
+												  FileFormatOption fileFormatOption) {
+		return new ImageBuilder(drawable, fileFormatOption)
+				.styled(diagram);
 	}
 
-	public ImageData writeImageTOBEMOVED(long seed, OutputStream os) throws IOException {
-		return writeImageTOBEMOVED(param.getFileFormatOption(), seed, os);
-	}
+	private ImageBuilder(UDrawable drawable, FileFormatOption fileFormatOption) {
+		this.udrawable = drawable;
+		this.fileFormatOption = fileFormatOption;
+		this.preserveAspectRatio = calculatePreserveAspectRatio(fileFormatOption, null);
 
-	public ImageData writeImageTOBEMOVED(FileFormatOption fileFormatOption, long seed, OutputStream os)
-			throws IOException {
-		final FileFormat fileFormat = fileFormatOption.getFileFormat();
-		if (fileFormat == FileFormat.MJPEG) {
-			return writeImageMjpeg(os, fileFormatOption.getDefaultStringBounder(param.getSvgCharSizeHack()));
-		} else if (fileFormat == FileFormat.ANIMATED_GIF) {
-			return writeImageAnimatedGif(os, fileFormatOption.getDefaultStringBounder(param.getSvgCharSizeHack()));
+		if (drawable instanceof TextBlockBackcolored) {
+			backcolor = ((TextBlockBackcolored) drawable).getBackcolor();
 		}
-		return writeImageInternal(fileFormatOption, seed, os, param.getAnimation());
 	}
 
-	private ImageData writeImageInternal(FileFormatOption fileFormatOption, long seed, OutputStream os,
+	public ImageBuilder annotations(boolean annotations) {
+		this.annotations = annotations;
+		return this;
+	}
+
+	public ImageBuilder backcolor(HColor backcolor) {
+		this.backcolor = backcolor;
+		return this;
+	}
+
+	public ImageBuilder blackBackcolor() {
+		return backcolor(HColorUtils.BLACK);
+	}
+
+	public ImageBuilder dimension(Dimension2D dimension) {
+		this.dimension = dimension;
+		return this;
+	}
+
+	public ImageBuilder margin(ClockwiseTopRightBottomLeft margin) {
+		this.margin = margin;
+		return this;
+	}
+
+	public ImageBuilder metadata(String metadata) {
+		this.metadata = metadata;
+		return this;
+	}
+
+	public String getPreserveAspectRatio() {
+		return preserveAspectRatio;
+	}
+
+	public ImageBuilder randomPixel() {
+		this.randomPixel = true;
+		return this;
+	}
+
+	public ImageBuilder seed(long seed) {
+		this.seed = seed;
+		return this;
+	}
+
+	public ImageBuilder status(int status) {
+		this.status = status;
+		return this;
+	}
+
+	public ImageBuilder warningOrError(String warningOrError) {
+		this.warningOrError = warningOrError;
+		return this;
+	}
+
+	private ImageBuilder styled(TitledDiagram diagram) {
+		final ISkinParam skinParam = diagram.getSkinParam();
+		animation = diagram.getAnimation();
+		annotations = true;
+		backcolor = calculateBackColor(diagram);
+		borderColor = new Rose().getHtmlColor(skinParam, ColorParam.diagramBorder);
+		borderCorner = skinParam.getRoundCorner(CornerParam.diagramBorder, null);
+		borderStroke = calculateBorderStroke(borderColor, skinParam);
+		colorMapper = skinParam.getColorMapper();
+		dpi = skinParam.getDpi();
+		handwritten = skinParam.handwritten();
+		hoverPathColorRGB = calculateHoverPathColor(skinParam);
+		lengthAdjust = skinParam.getlengthAdjust();
+		margin = calculateMargin(diagram);
+		metadata = fileFormatOption.isWithMetadata() ? diagram.getMetadata() : null;
+		preserveAspectRatio = calculatePreserveAspectRatio(fileFormatOption, skinParam);
+		scale = diagram.getScale();
+		seed = diagram.seed();
+		svgCharSizeHack = skinParam;
+		svgDimensionStyle = skinParam.svgDimensionStyle();
+		svgLinkTarget = (fileFormatOption.getSvgLinkTarget() != null)
+				? fileFormatOption.getSvgLinkTarget() : skinParam.getSvgLinkTarget();
+		titledDiagram = diagram;
+		warningOrError = diagram.getWarningOrError();
+		return this;
+	}
+
+	public ImageData write(OutputStream os) throws IOException {
+		if (annotations && titledDiagram != null) {
+			if (!(udrawable instanceof TextBlock)) throw new IllegalStateException("udrawable is not a TextBlock");
+			final ISkinParam skinParam = titledDiagram.getSkinParam();
+			final StringBounder stringBounder = fileFormatOption.getDefaultStringBounder(skinParam);
+			final AnnotatedWorker annotatedWorker = new AnnotatedWorker(titledDiagram, skinParam, stringBounder);
+			udrawable = annotatedWorker.addAdd((TextBlock) udrawable);
+		}
+
+		switch (fileFormatOption.getFileFormat()) {
+			case MJPEG:
+				return writeImageMjpeg(os);
+			case ANIMATED_GIF:
+				return writeImageAnimatedGif(os);
+			default:
+				return writeImageInternal(fileFormatOption, os, animation);
+		}
+	}
+
+	public byte[] writeByteArray() throws IOException {
+		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			write(baos);
+			return baos.toByteArray();
+		}
+	}
+
+	private ImageData writeImageInternal(FileFormatOption fileFormatOption, OutputStream os,
 			Animation animationArg) throws IOException {
-		Dimension2D dim = getFinalDimension(fileFormatOption.getDefaultStringBounder(param.getSvgCharSizeHack()));
+		Dimension2D dim = (dimension == null)
+				? getFinalDimension(fileFormatOption.getDefaultStringBounder(svgCharSizeHack)) : dimension;
 		double dx = 0;
 		double dy = 0;
 		if (animationArg != null) {
-			final MinMax minmax = param.getAnimation().getMinMax(dim);
+			final MinMax minmax = animationArg.getMinMax(dim);
 			animationArg.setDimension(dim);
 			dim = minmax.getDimension();
 			dx = -minmax.getMinX();
 			dy = -minmax.getMinY();
 		}
 
-		final UGraphic2 ug = createUGraphic(fileFormatOption, seed, dim, animationArg, dx, dy);
+		final UGraphic2 ug = createUGraphic(fileFormatOption, dim, animationArg, dx, dy);
 		UGraphic ug2 = ug;
 
-		final UStroke borderStroke = param.getBorderStroke();
 		if (borderStroke != null) {
-			final HColor color = param.getBorderColor() == null ? HColorUtils.BLACK : param.getBorderColor();
+			final HColor color = borderColor == null ? HColorUtils.BLACK : borderColor;
 			final double width = dim.getWidth() - borderStroke.getThickness();
 			final double height = dim.getHeight() - borderStroke.getThickness();
-			final URectangle shape = new URectangle(width, height).rounded(param.getBorderCorner());
+			final URectangle shape = new URectangle(width, height).rounded(borderCorner);
 			ug2.apply(color).apply(borderStroke).draw(shape);
 		}
 		if (randomPixel) {
 			drawRandomPoint(ug2);
 		}
-		ug2 = ug2.apply(new UTranslate(left, top));
-		final UGraphic ugDecored = handwritten(ug2);
-		udrawable.drawU(ugDecored);
-		ugDecored.flushUg();
-		ug.writeImageTOBEMOVED(os, param.getMetadata(), 96);
+		ug2 = handwritten(ug2.apply(new UTranslate(margin.getLeft(), margin.getTop())));
+		udrawable.drawU(ug2);
+		ug2.flushUg();
+		ug.writeImageTOBEMOVED(os, metadata, 96);
 		os.flush();
 
 		if (ug instanceof UGraphicG2d) {
 			final Set<Url> urls = ((UGraphicG2d) ug).getAllUrlsEncountered();
 			if (urls.size() > 0) {
-				final CMapData cmap = CMapData.cmapString(urls, param.getDpi());
-				return new ImageDataComplex(dim, cmap, param.getWarningOrError());
+				final CMapData cmap = CMapData.cmapString(urls, dpi);
+				return new ImageDataComplex(dim, cmap, warningOrError, status);
 			}
 		}
-		return new ImageDataSimple(dim);
+		return createImageData(dim);
 	}
 
 	private void drawRandomPoint(UGraphic ug2) {
@@ -184,21 +318,21 @@ public class ImageBuilder {
 		final Color c = new Color(red, green, blue);
 		final HColor color = new HColorSimple(c, false);
 		ug2.apply(color).apply(color.bg()).draw(new URectangle(1, 1));
-
 	}
 
-	public Dimension2D getFinalDimension(StringBounder stringBounder) {
-		final Dimension2D dim;
-
+	private Dimension2D getFinalDimension(StringBounder stringBounder) {
 		final LimitFinder limitFinder = new LimitFinder(stringBounder, true);
 		udrawable.drawU(limitFinder);
-		dim = new Dimension2DDouble(limitFinder.getMaxX(), limitFinder.getMaxY());
+		return new Dimension2DDouble(limitFinder.getMaxX() + 1 + margin.getLeft() + margin.getRight(),
+				limitFinder.getMaxY() + 1 + margin.getTop() + margin.getBottom());
+	}
 
-		return new Dimension2DDouble(dim.getWidth() + 1 + left + right, dim.getHeight() + 1 + top + bottom);
+	private Dimension2D getFinalDimension() {
+		return getFinalDimension(fileFormatOption.getDefaultStringBounder(svgCharSizeHack));
 	}
 
 	private UGraphic handwritten(UGraphic ug) {
-		if (param.isUseHandwritten()) {
+		if (handwritten) {
 			return new UGraphicHandwritten(ug);
 		}
 //		if (OptionFlags.OMEGA_CROSSING) {
@@ -208,12 +342,9 @@ public class ImageBuilder {
 //		}
 	}
 
-	private ImageData writeImageMjpeg(OutputStream os, StringBounder stringBounder) throws IOException {
+	private ImageData writeImageMjpeg(OutputStream os) throws IOException {
 
-		final LimitFinder limitFinder = new LimitFinder(stringBounder, true);
-		udrawable.drawU(limitFinder);
-		final Dimension2D dim = new Dimension2DDouble(limitFinder.getMaxX() + 1 + left + right,
-				limitFinder.getMaxY() + 1 + top + bottom);
+		final Dimension2D dim = getFinalDimension();
 
 		final SFile f = new SFile("c:/tmp.avi");
 
@@ -235,18 +366,14 @@ public class ImageBuilder {
 
 		FileUtils.copyToStream(f, os);
 
-		return new ImageDataSimple(dim);
-
+		return createImageData(dim);
 	}
 
-	private ImageData writeImageAnimatedGif(OutputStream os, StringBounder stringBounder) throws IOException {
+	private ImageData writeImageAnimatedGif(OutputStream os) throws IOException {
 
-		final LimitFinder limitFinder = new LimitFinder(stringBounder, true);
-		udrawable.drawU(limitFinder);
-		final Dimension2D dim = new Dimension2DDouble(limitFinder.getMaxX() + 1 + left + right,
-				limitFinder.getMaxY() + 1 + top + bottom);
+		final Dimension2D dim = getFinalDimension();
 
-		final MinMax minmax = param.getAnimation().getMinMax(dim);
+		final MinMax minmax = animation.getMinMax(dim);
 
 		final AnimatedGifEncoder e = new AnimatedGifEncoder();
 		// e.setQuality(1);
@@ -257,18 +384,17 @@ public class ImageBuilder {
 		e.setDelay(60); // 16 frame per sec
 		// e.setDelay(50); // 20 frame per sec
 
-		for (AffineTransformation at : param.getAnimation().getAll()) {
+		for (AffineTransformation at : animation.getAll()) {
 			final ImageIcon ii = new ImageIcon(getAviImage(at));
 			e.addFrame((BufferedImage) ii.getImage());
 		}
 		e.finish();
-		return new ImageDataSimple(dim);
-
+		return createImageData(dim);
 	}
 
 	private Image getAviImage(AffineTransformation affineTransform) throws IOException {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		writeImageInternal(new FileFormatOption(FileFormat.PNG), 42, baos, Animation.singleton(affineTransform));
+		writeImageInternal(new FileFormatOption(FileFormat.PNG), baos, Animation.singleton(affineTransform));
 		baos.close();
 
 		final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -277,19 +403,15 @@ public class ImageBuilder {
 		return im;
 	}
 
-	private UGraphic2 createUGraphic(FileFormatOption option, long seed, final Dimension2D dim, Animation animationArg,
+	private UGraphic2 createUGraphic(FileFormatOption option, final Dimension2D dim, Animation animationArg,
 			double dx, double dy) {
-		final ColorMapper colorMapper = param.getColorMapper();
-		final double scaleFactor = (param.getScale() == null ? 1
-				: param.getScale().getScale(dim.getWidth(), dim.getHeight())) * param.getDpi() / 96.0;
-		final FileFormat fileFormat = option.getFileFormat();
-		switch (fileFormat) {
+		final double scaleFactor = (scale == null ? 1 : scale.getScale(dim.getWidth(), dim.getHeight())) * dpi / 96.0;
+		switch (option.getFileFormat()) {
 		case PNG:
-			return createUGraphicPNG(colorMapper, scaleFactor, dim, param.getBackcolor(), animationArg, dx, dy,
+			return createUGraphicPNG(scaleFactor, dim, animationArg, dx, dy,
 					option.getWatermark());
 		case SVG:
-			return createUGraphicSVG(colorMapper, scaleFactor, dim, param.getBackcolor(), option.getSvgLinkTarget(),
-					option.getHoverColor(), seed, option.getPreserveAspectRatio(), param.getlengthAdjust());
+			return createUGraphicSVG(scaleFactor, dim);
 		case EPS:
 			return new UGraphicEps(colorMapper, EpsStrategy.getDefault2());
 		case EPS_TEXT:
@@ -303,48 +425,44 @@ public class ImageBuilder {
 		case LATEX_NO_PREAMBLE:
 			return new UGraphicTikz(colorMapper, scaleFactor, false, option.getTikzFontDistortion());
 		case BRAILLE_PNG:
-			return new UGraphicBraille(colorMapper, fileFormat);
+			return new UGraphicBraille(colorMapper);
 		case UTXT:
 		case ATXT:
 			return new UGraphicTxt();
 		case DEBUG:
-			return new UGraphicDebug();
+			return new UGraphicDebug(scaleFactor, dim, svgLinkTarget, hoverPathColorRGB, seed, preserveAspectRatio);
 		default:
-			throw new UnsupportedOperationException(fileFormat.toString());
+			throw new UnsupportedOperationException(option.getFileFormat().toString());
 		}
 	}
 
-	private UGraphic2 createUGraphicSVG(ColorMapper colorMapper, double scaleFactor, Dimension2D dim,
-			final HColor suggested, String svgLinkTarget, String hover, long seed, String preserveAspectRatio,
-			LengthAdjust lengthAdjust) {
-		HColor backColor = HColorUtils.WHITE;
-		if (suggested instanceof HColorSimple) {
-			backColor = suggested;
+	private UGraphic2 createUGraphicSVG(double scaleFactor, Dimension2D dim) {
+		HColor backColor = HColorUtils.WHITE; // TODO simplify backcolor some more in a future PR
+		if (this.backcolor instanceof HColorSimple) {
+			backColor = this.backcolor;
 		}
-		final boolean dimensionStyle = param.isSvgDimensionStyle();
 		final UGraphicSvg ug;
-		if (suggested instanceof HColorGradient) {
-			ug = new UGraphicSvg(dimensionStyle, dim, colorMapper, (HColorGradient) suggested, false, scaleFactor,
-					svgLinkTarget, hover, seed, preserveAspectRatio, param.getSvgCharSizeHack(),
-					param.getlengthAdjust());
+		if (this.backcolor instanceof HColorGradient) {
+			ug = new UGraphicSvg(svgDimensionStyle, dim, colorMapper, (HColorGradient) this.backcolor, false, scaleFactor,
+					svgLinkTarget, hoverPathColorRGB, seed, preserveAspectRatio, svgCharSizeHack, lengthAdjust);
 		} else if (backColor == null || colorMapper.toColor(backColor).equals(Color.WHITE)) {
-			ug = new UGraphicSvg(dimensionStyle, dim, colorMapper, false, scaleFactor, svgLinkTarget, hover, seed,
-					preserveAspectRatio, param.getSvgCharSizeHack(), param.getlengthAdjust());
+			ug = new UGraphicSvg(svgDimensionStyle, dim, colorMapper, false, scaleFactor, svgLinkTarget, hoverPathColorRGB, seed,
+					preserveAspectRatio, svgCharSizeHack, lengthAdjust);
 		} else {
 			final String tmp = colorMapper.toSvg(backColor);
-			ug = new UGraphicSvg(dimensionStyle, dim, colorMapper, tmp, false, scaleFactor, svgLinkTarget, hover, seed,
-					preserveAspectRatio, param.getSvgCharSizeHack(), param.getlengthAdjust());
+			ug = new UGraphicSvg(svgDimensionStyle, dim, colorMapper, tmp, false, scaleFactor, svgLinkTarget, hoverPathColorRGB, seed,
+					preserveAspectRatio, svgCharSizeHack, lengthAdjust);
 		}
 		return ug;
 
 	}
 
-	private UGraphic2 createUGraphicPNG(ColorMapper colorMapper, double scaleFactor, final Dimension2D dim,
-			HColor mybackcolor, Animation affineTransforms, double dx, double dy, String watermark) {
-		Color backColor = Color.WHITE;
-		if (mybackcolor instanceof HColorSimple) {
-			backColor = colorMapper.toColor(mybackcolor);
-		} else if (mybackcolor instanceof HColorBackground) {
+	private UGraphic2 createUGraphicPNG(double scaleFactor, final Dimension2D dim,
+			Animation affineTransforms, double dx, double dy, String watermark) {
+		Color backColor = Color.WHITE;  // TODO simplify backcolor some more in a future PR
+		if (this.backcolor instanceof HColorSimple) {
+			backColor = colorMapper.toColor(this.backcolor);
+		} else if (this.backcolor instanceof HColorBackground) {
 			backColor = null;
 		}
 
@@ -355,17 +473,67 @@ public class ImageBuilder {
 		final UGraphicG2d ug = new UGraphicG2d(colorMapper, graphics2D, scaleFactor,
 				affineTransforms == null ? null : affineTransforms.getFirst(), dx, dy);
 		ug.setBufferedImage(builder.getBufferedImage());
-		final BufferedImage im = ((UGraphicG2d) ug).getBufferedImage();
-		if (mybackcolor instanceof HColorGradient) {
-			ug.apply(mybackcolor.bg()).draw(new URectangle(im.getWidth() / scaleFactor, im.getHeight() / scaleFactor));
+		final BufferedImage im = ug.getBufferedImage();
+		if (this.backcolor instanceof HColorGradient) {
+			ug.apply(this.backcolor.bg()).draw(new URectangle(im.getWidth() / scaleFactor, im.getHeight() / scaleFactor));
 		}
 
 		return ug;
 	}
 
-	public void setRandomPixel(boolean randomPixel) {
-		this.randomPixel = randomPixel;
+	private static HColor calculateBackColor(TitledDiagram diagram) {
+		if (UseStyle.useBetaStyle()) {
+			final Style style = StyleSignature
+					.of(SName.root, SName.document, diagram.getUmlDiagramType().getStyleName())
+					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 
+			HColor backgroundColor = style.value(PName.BackGroundColor)
+					.asColor(diagram.getSkinParam().getIHtmlColorSet());
+			if (backgroundColor == null) {
+				backgroundColor = HColorUtils.transparent();
+			}
+			return backgroundColor;
+
+		}
+		return diagram.getSkinParam().getBackgroundColor(false);
+	}
+
+	private static UStroke calculateBorderStroke(HColor borderColor, ISkinParam skinParam) {
+		final UStroke thickness = skinParam.getThickness(LineParam.diagramBorder, null);
+		return (thickness == null && borderColor != null) ? new UStroke() : thickness;
+	}
+
+	private String calculateHoverPathColor(ISkinParam skinParam) {
+		if (fileFormatOption.getHoverColor() != null) {
+			return fileFormatOption.getHoverColor();
+		}
+		final HColor color = skinParam.hoverPathColor();
+		return color == null ? null : colorMapper.toRGB(color);
+	}
+
+	private static ClockwiseTopRightBottomLeft calculateMargin(TitledDiagram diagram) {
+		if (UseStyle.useBetaStyle()) {
+			final Style style = StyleSignature.of(SName.root, SName.document)
+					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
+			if (style.hasValue(PName.Margin)) {
+				return style.getMargin();
+			}
+		}
+		return diagram.getDefaultMargins();
+	}
+
+	private static String calculatePreserveAspectRatio(FileFormatOption fileFormatOption, ISkinParam skinParam) {
+		if (fileFormatOption.getPreserveAspectRatio() != null) {
+			return fileFormatOption.getPreserveAspectRatio();
+		} else if (skinParam != null) {
+			return skinParam.getPreserveAspectRatio();
+		} else {
+			return DEFAULT_PRESERVE_ASPECT_RATIO;
+		}
+	}
+
+	private ImageDataSimple createImageData(Dimension2D dim) {
+		return new ImageDataSimple(dim, status);
 	}
 
 }

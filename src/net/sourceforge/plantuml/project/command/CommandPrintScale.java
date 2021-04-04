@@ -41,7 +41,9 @@ import net.sourceforge.plantuml.command.SingleLineCommand2;
 import net.sourceforge.plantuml.command.regex.IRegex;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
+import net.sourceforge.plantuml.command.regex.RegexOptional;
 import net.sourceforge.plantuml.command.regex.RegexOr;
+import net.sourceforge.plantuml.command.regex.RegexPartialMatch;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.project.GanttDiagram;
 import net.sourceforge.plantuml.project.core.PrintScale;
@@ -59,9 +61,16 @@ public class CommandPrintScale extends SingleLineCommand2<GanttDiagram> {
 						new RegexLeaf("printscale")), //
 				RegexLeaf.spaceOneOrMore(), //
 				new RegexOr("SCALE", //
+						new RegexLeaf("yearly"), //
+						new RegexLeaf("quarterly"), //
 						new RegexLeaf("monthly"), //
 						new RegexLeaf("daily"), //
 						new RegexLeaf("weekly")), //
+				new RegexOptional(new RegexConcat( //
+						RegexLeaf.spaceOneOrMore(), //
+						new RegexLeaf("compress"), //
+						RegexLeaf.spaceOneOrMore(), //
+						new RegexLeaf("COMPRESS", "(\\d+)"))), //
 				RegexLeaf.end()); //
 	}
 
@@ -70,6 +79,11 @@ public class CommandPrintScale extends SingleLineCommand2<GanttDiagram> {
 		final String scaleString = arg.get("SCALE", 0);
 		final PrintScale scale = PrintScale.fromString(scaleString);
 		diagram.setPrintScale(scale);
+		
+		final RegexPartialMatch compress = arg.get("COMPRESS");
+		if (compress.size() > 0 && compress.get(0) != null) {
+			diagram.setCompress(Integer.parseInt(compress.get(0)));
+		}
 		return CommandExecutionResult.ok();
 	}
 

@@ -89,6 +89,9 @@ import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 
 public class SkinParam implements ISkinParam {
 
+	// TODO not clear whether SkinParam or ImageBuilder is responsible for defaults
+	public static final String DEFAULT_PRESERVE_ASPECT_RATIO = "none";
+
 	// private String skin = "debug.skin";
 
 	private String skin = "plantuml.skin";
@@ -493,22 +496,12 @@ public class SkinParam implements ISkinParam {
 	}
 
 	public int getCircledCharacterRadius() {
-		final String value = getValue("circledcharacterradius");
-		if (value != null && value.matches("\\d+")) {
-			return Integer.parseInt(value);
-		}
-		// return 11;
-		// Log.println("SIZE1="+getFontSize(FontParam.CIRCLED_CHARACTER));
-		// Log.println("SIZE1="+getFontSize(FontParam.CIRCLED_CHARACTER)/3);
-		return getFontSize(null, FontParam.CIRCLED_CHARACTER) / 3 + 6;
+		final int value = getAsInt("circledCharacterRadius", -1);
+		return value == -1 ? getFontSize(null, FontParam.CIRCLED_CHARACTER) / 3 + 6 : value;
 	}
 
 	public int classAttributeIconSize() {
-		final String value = getValue("classAttributeIconSize");
-		if (value != null && value.matches("\\d+")) {
-			return Integer.parseInt(value);
-		}
-		return 10;
+		return getAsInt("classAttributeIconSize", 10);
 	}
 
 	public static Collection<String> getPossibleValues() {
@@ -594,11 +587,7 @@ public class SkinParam implements ISkinParam {
 	}
 
 	public int getDpi() {
-		final String value = getValue("dpi");
-		if (value != null && value.matches("\\d+")) {
-			return Integer.parseInt(value);
-		}
-		return 96;
+		return getAsInt("dpi", 96);
 	}
 
 	public DotSplines getDotSplines() {
@@ -850,19 +839,13 @@ public class SkinParam implements ISkinParam {
 	}
 
 	public double getNodesep() {
-		final String value = getValue("nodesep");
-		if (value != null && value.matches("\\d+")) {
-			return Double.parseDouble(value);
-		}
-		return 0;
+		// TODO strange, this returns a double but only accepts integer values
+		return getAsInt("nodesep", 0);
 	}
 
 	public double getRanksep() {
-		final String value = getValue("ranksep");
-		if (value != null && value.matches("\\d+")) {
-			return Double.parseDouble(value);
-		}
-		return 0;
+		// TODO strange, this returns a double but only accepts integer values
+		return getAsInt("ranksep", 0);
 	}
 
 	public double getDiagonalCorner(CornerParam param, Stereotype stereotype) {
@@ -1000,11 +983,7 @@ public class SkinParam implements ISkinParam {
 	}
 
 	public double minClassWidth() {
-		final String value = getValue("minclasswidth");
-		if (value != null && value.matches("\\d+")) {
-			return Integer.parseInt(value);
-		}
-		return 0;
+		return getAsInt("minclasswidth", 0);
 	}
 
 	public boolean sameClassWidth() {
@@ -1052,15 +1031,8 @@ public class SkinParam implements ISkinParam {
 	}
 
 	public int groupInheritance() {
-		final String value = getValue("groupinheritance");
-		int result = Integer.MAX_VALUE;
-		if (value != null && value.matches("\\d+")) {
-			result = Integer.parseInt(value);
-		}
-		if (result <= 1) {
-			result = Integer.MAX_VALUE;
-		}
-		return result;
+		final int value = getAsInt("groupinheritance", Integer.MAX_VALUE);
+		return value <= 1 ? Integer.MAX_VALUE : value;
 	}
 
 	public Guillemet guillemet() {
@@ -1087,7 +1059,7 @@ public class SkinParam implements ISkinParam {
 	public String getPreserveAspectRatio() {
 		final String value = getValue("preserveaspectratio");
 		if (value == null) {
-			return "none";
+			return DEFAULT_PRESERVE_ASPECT_RATIO;
 		}
 		return value;
 	}
@@ -1101,41 +1073,23 @@ public class SkinParam implements ISkinParam {
 	}
 
 	public int getTabSize() {
-		final String value = getValue("tabsize");
-		if (value != null && value.matches("\\d+")) {
-			return Integer.parseInt(value);
-		}
-		return 8;
+		return getAsInt("tabsize", 8);
 	}
 
 	public int maxAsciiMessageLength() {
-		final String value = getValue("maxasciimessagelength");
-		if (value != null && value.matches("\\d+")) {
-			return Integer.parseInt(value);
-		}
-		return -1;
+		return getAsInt("maxasciimessagelength", -1);
 	}
 
 	public int colorArrowSeparationSpace() {
-		final String value = getValue("colorarrowseparationspace");
-		if (value != null && value.matches("\\d+")) {
-			return Integer.parseInt(value);
-		}
-		return 0;
+		return getAsInt("colorarrowseparationspace", 0);
 	}
 
 	public SplitParam getSplitParam() {
 		final String border = getValue("pageBorderColor");
 		final String external = getValue("pageExternalColor");
-
-		final String marginString = getValue("pageMargin");
-		int margin = 0;
-		if (marginString != null && marginString.matches("\\d+")) {
-			margin = Integer.parseInt(marginString);
-		}
-
 		final HColor borderColor = border == null ? null : getIHtmlColorSet().getColorOrWhite(border);
 		final HColor externalColor = external == null ? null : getIHtmlColorSet().getColorOrWhite(external);
+		int margin = getAsInt("pageMargin", 0);
 		return new SplitParam(borderColor, externalColor, margin);
 	}
 
@@ -1178,6 +1132,14 @@ public class SkinParam implements ISkinParam {
 			return Double.parseDouble(value);
 		}
 		return 0;
+	}
+
+	private int getAsInt(String key, int defaultValue) {
+		final String value = getValue(key);
+		if (value != null && value.matches("\\d+")) {
+			return Integer.parseInt(value);
+		}
+		return defaultValue;
 	}
 
 	public boolean useRankSame() {

@@ -50,6 +50,7 @@ import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.VerticalAlignment;
 import net.sourceforge.plantuml.stats.StatsUtilsIncrement;
+import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 import net.sourceforge.plantuml.version.License;
 import net.sourceforge.plantuml.version.Version;
@@ -142,7 +143,7 @@ public abstract class AbstractPSystem implements Diagram {
 			throws IOException {
 		final long now = System.currentTimeMillis();
 		try {
-			return exportDiagramNow(os, index, fileFormatOption, seed());
+			return exportDiagramNow(os, index, fileFormatOption);
 		} finally {
 			if (OptionFlags.getInstance().isEnableStats()) {
 				StatsUtilsIncrement.onceMoreGenerate(System.currentTimeMillis() - now, getClass(),
@@ -159,7 +160,11 @@ public abstract class AbstractPSystem implements Diagram {
 		return scale;
 	}
 
-	protected abstract ImageData exportDiagramNow(OutputStream os, int index, FileFormatOption fileFormatOption,
-			long seed) throws IOException;
+	protected abstract ImageData exportDiagramNow(OutputStream os, int index, FileFormatOption fileFormatOption
+			) throws IOException;
+
+	public ClockwiseTopRightBottomLeft getDefaultMargins() {
+		return ClockwiseTopRightBottomLeft.same(0);
+	}
 
 }

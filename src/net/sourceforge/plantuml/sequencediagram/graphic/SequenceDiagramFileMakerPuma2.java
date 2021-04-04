@@ -67,11 +67,11 @@ import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignature;
-import net.sourceforge.plantuml.ugraphic.ImageBuilder;
-import net.sourceforge.plantuml.ugraphic.ImageParameter;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
+
+import static net.sourceforge.plantuml.ugraphic.ImageBuilder.styledImageBuilder;
 
 public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 
@@ -154,7 +154,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			compTitle = null;
 		} else {
 			if (UseStyle.useBetaStyle()) {
-				final Style style = StyleSignature.of(SName.root, SName.title)
+				final Style style = StyleSignature.of(SName.root, SName.document, SName.title)
 						.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 				compTitle = style.createTextBlockBordered(page.getTitle(), diagram.getSkinParam().getIHtmlColorSet(),
 						diagram.getSkinParam());
@@ -175,7 +175,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			legendBlock = TextBlockUtils.empty(0, 0);
 		} else {
 			if (UseStyle.useBetaStyle()) {
-				final Style style = StyleSignature.of(SName.root, SName.legend)
+				final Style style = StyleSignature.of(SName.root, SName.document, SName.legend)
 						.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 				legendBlock = style.createTextBlockBordered(diagram.getLegend().getDisplay(),
 						diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam());
@@ -186,10 +186,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 		final Dimension2D dimLegend = legendBlock.calculateDimension(stringBounder);
 		area.setLegend(dimLegend, isLegendTop(), diagram.getLegend().getHorizontalAlignment());
 
-		final ImageParameter imageParameter = new ImageParameter(diagram, fileFormatOption);
-		final ImageBuilder imageBuilder = ImageBuilder.build(imageParameter);
-
-		imageBuilder.setUDrawable(new UDrawable() {
+		final UDrawable drawable = new UDrawable() {
 			public void drawU(UGraphic ug) {
 
 				double delta = 0;
@@ -222,8 +219,10 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 				}
 			}
 
-		});
-		return imageBuilder.writeImageTOBEMOVED(diagram.seed(), os);
+		};
+		return styledImageBuilder(diagram, drawable, index, fileFormatOption)
+				.annotations(false)  // they are managed above
+				.write(os);
 	}
 
 	private void drawFooter(SequenceDiagramArea area, UGraphic ug, int page) {

@@ -125,6 +125,10 @@ public class Style {
 			if (line != null) {
 				result = result.eventuallyOverride(PName.LineColor, line);
 			}
+			final HColor text = colors.getColor(ColorType.TEXT);
+			if (text != null) {
+				result = result.eventuallyOverride(PName.FontColor, text);
+			}
 		}
 		return result;
 	}
@@ -184,6 +188,14 @@ public class Style {
 		}
 	}
 
+	public UStroke getStroke(Colors colors) {
+		final UStroke stroke = colors.getSpecificLineStroke();
+		if (stroke == null) {
+			return getStroke();
+		}
+		return stroke;
+	}
+
 	public LineBreakStrategy wrapWidth() {
 		final String value = value(PName.MaximumWidth).asString();
 		return new LineBreakStrategy(value);
@@ -210,18 +222,17 @@ public class Style {
 	}
 
 	public TextBlock createTextBlockBordered(Display note, HColorSet set, ISkinSimple spriteContainer) {
-		// final HorizontalAlignment alignment = HorizontalAlignment.LEFT;
 		final HorizontalAlignment alignment = this.getHorizontalAlignment();
 		final TextBlock textBlock = this.createTextBlockInternal(note, set, spriteContainer, alignment);
 
-		final HColor legendBackgroundColor = this.value(PName.BackGroundColor).asColor(set);
-		final HColor legendColor = this.value(PName.LineColor).asColor(set);
+		final HColor backgroundColor = this.value(PName.BackGroundColor).asColor(set);
+		final HColor lineColor = this.value(PName.LineColor).asColor(set);
 		final UStroke stroke = this.getStroke();
 		final int cornersize = this.value(PName.RoundCorner).asInt();
 		final ClockwiseTopRightBottomLeft margin = this.getMargin();
 		final ClockwiseTopRightBottomLeft padding = this.getPadding();
-		final TextBlock result = TextBlockUtils.bordered(textBlock, stroke, legendColor, legendBackgroundColor,
-				cornersize, padding);
+		final TextBlock result = TextBlockUtils.bordered(textBlock, stroke, lineColor, backgroundColor, cornersize,
+				padding);
 		return TextBlockUtils.withMargin(result, margin);
 	}
 
