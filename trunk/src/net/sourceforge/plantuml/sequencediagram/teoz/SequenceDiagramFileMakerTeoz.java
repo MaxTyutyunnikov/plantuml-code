@@ -35,6 +35,8 @@
  */
 package net.sourceforge.plantuml.sequencediagram.teoz;
 
+import static net.sourceforge.plantuml.ugraphic.ImageBuilder.styledImageBuilder;
+
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -68,8 +70,6 @@ import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleSignature;
-import net.sourceforge.plantuml.ugraphic.ImageBuilder;
-import net.sourceforge.plantuml.ugraphic.ImageParameter;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
@@ -139,13 +139,9 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 		if (this.index != index) {
 			throw new IllegalStateException();
 		}
-		final ImageParameter imageParameter = new ImageParameter(diagram, fileFormatOption);
-
-		final ImageBuilder imageBuilder = ImageBuilder.build(imageParameter);
-
-		imageBuilder.setUDrawable(new Foo(index));
-		return imageBuilder.writeImageTOBEMOVED(diagram.seed(), os);
-
+		return styledImageBuilder(diagram, new Foo(index), index, fileFormatOption) //
+				.annotations(false) // they are managed in drawInternal()
+				.write(os);
 	}
 
 	class Foo implements UDrawable {
@@ -219,7 +215,7 @@ public class SequenceDiagramFileMakerTeoz implements FileMaker {
 		}
 		final TextBlock compTitle;
 		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignature.of(SName.root, SName.title)
+			final Style style = StyleSignature.of(SName.root, SName.document, SName.title)
 					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 			compTitle = style.createTextBlockBordered(diagram.getTitle().getDisplay(),
 					diagram.getSkinParam().getIHtmlColorSet(), diagram.getSkinParam());

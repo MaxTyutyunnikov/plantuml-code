@@ -48,12 +48,9 @@ import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.graphic.GraphicStrings;
 import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.security.SFile;
-import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.svek.TextBlockBackcolored;
-import net.sourceforge.plantuml.ugraphic.ImageBuilder;
-import net.sourceforge.plantuml.ugraphic.ImageParameter;
-import net.sourceforge.plantuml.ugraphic.color.ColorMapperIdentity;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+
+import static net.sourceforge.plantuml.ugraphic.ImageBuilder.plainImageBuilder;
 
 public class SourceStringReader {
 
@@ -149,7 +146,7 @@ public class SourceStringReader {
 	public DiagramDescription outputImage(OutputStream os, int numImage, FileFormatOption fileFormatOption)
 			throws IOException {
 		if (blocks.size() == 0) {
-			noStartumlFound(os, fileFormatOption, 42);
+			noStartumlFound(os, fileFormatOption);
 			return null;
 		}
 		for (BlockUml b : blocks) {
@@ -225,15 +222,12 @@ public class SourceStringReader {
 
 	}
 
-	public ImageData noStartumlFound(OutputStream os, FileFormatOption fileFormatOption, long seed) throws IOException {
+	public ImageData noStartumlFound(OutputStream os, FileFormatOption fileFormatOption) throws IOException {
 		final TextBlockBackcolored error = GraphicStrings.createForError(Arrays.asList("No @startuml/@enduml found"),
 				fileFormatOption.isUseRedForError());
-		HColor backcolor = error.getBackcolor();
-		final ImageParameter imageParameter = new ImageParameter(new ColorMapperIdentity(), false, null, null,
-				null, ClockwiseTopRightBottomLeft.none(), backcolor);
-		final ImageBuilder imageBuilder = ImageBuilder.build(imageParameter);
-		imageBuilder.setUDrawable(error);
-		return imageBuilder.writeImageTOBEMOVED(fileFormatOption, seed, os);
+
+		return plainImageBuilder(error, fileFormatOption)
+				.write(os);
 	}
 
 	public final List<BlockUml> getBlocks() {
