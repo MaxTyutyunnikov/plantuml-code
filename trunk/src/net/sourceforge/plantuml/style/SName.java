@@ -54,6 +54,7 @@ public enum SName {
 	class_, //
 	clickable, //
 	cloud, //
+	closed, //
 	collection, //
 	collections, //
 	component, //
@@ -107,6 +108,7 @@ public enum SName {
 	storage, //
 	swimlane, //
 	task, //
+	timeline, //
 	title, //
 	usecase, //
 	wbsDiagram, //

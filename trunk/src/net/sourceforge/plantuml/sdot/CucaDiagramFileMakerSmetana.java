@@ -42,7 +42,6 @@ import static gen.lib.cgraph.node__c.agnode;
 import static gen.lib.cgraph.subg__c.agsubg;
 import static gen.lib.gvc.gvc__c.gvContext;
 import static gen.lib.gvc.gvlayout__c.gvLayoutJobs;
-import static net.sourceforge.plantuml.ugraphic.ImageBuilder.styledImageBuilder;
 
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
@@ -195,7 +194,7 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 		this.stringBounder = stringBounder;
 		this.dotStringFactory = new DotStringFactory(stringBounder, diagram);
 
-		printGroups(diagram.getRootGroup());
+		printAllSubgroups(diagram.getRootGroup());
 		printEntities(getUnpackagedEntities());
 
 	}
@@ -228,7 +227,7 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 		}
 	}
 
-	private void printGroups(IGroup parent) {
+	private void printAllSubgroups(IGroup parent) {
 		for (IGroup g : diagram.getChildrenGroups(parent)) {
 			if (g.isRemoved()) {
 				continue;
@@ -239,12 +238,12 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 				final ILeaf folder = entityFactory.createLeafForEmptyGroup(g, skinParam);
 				printEntityNew(folder);
 			} else {
-				printGroup(g);
+				printSingleGroup(g);
 			}
 		}
 	}
 
-	private void printGroup(IGroup g) {
+	private void printSingleGroup(IGroup g) {
 		if (g.getGroupType() == GroupType.CONCURRENT_STATE) {
 			return;
 		}
@@ -275,7 +274,7 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 		dotStringFactory.openCluster(titleAndAttributeWidth, titleAndAttributeHeight, title, stereo, g);
 		this.printEntities(g.getLeafsDirect());
 
-		printGroups(g);
+		printAllSubgroups(g);
 
 		dotStringFactory.closeCluster();
 	}
@@ -285,8 +284,8 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 				.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 	}
 
-	private void printEntities(Collection<ILeaf> entities2) {
-		for (ILeaf ent : entities2) {
+	private void printEntities(Collection<ILeaf> entities) {
+		for (ILeaf ent : entities) {
 			if (ent.isRemoved()) {
 				continue;
 			}
@@ -294,8 +293,8 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 		}
 	}
 
-	private void exportEntities(ST_Agraph_s g, Collection<ILeaf> entities2) {
-		for (ILeaf ent : entities2) {
+	private void exportEntities(ST_Agraph_s g, Collection<ILeaf> entities) {
+		for (ILeaf ent : entities) {
 			if (ent.isRemoved()) {
 				continue;
 			}
@@ -450,7 +449,8 @@ public class CucaDiagramFileMakerSmetana implements CucaDiagramFileMaker {
 
 			// imageBuilder.setUDrawable(new Drawing(new YMirror(dim.getHeight())));
 			final TextBlock drawable = new Drawing(new YMirror(minMax.getMaxY()), minMax);
-			return styledImageBuilder(diagram, drawable, 1, fileFormatOption)
+			return diagram.createImageBuilder(fileFormatOption)
+					.drawable(drawable)
 					.write(os);
 		} catch (Throwable e) {
 			SmetanaDebug.printMe();

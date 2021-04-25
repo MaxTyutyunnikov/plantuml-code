@@ -51,10 +51,12 @@ import net.sourceforge.plantuml.graphic.VerticalAlignment;
 import net.sourceforge.plantuml.sprite.Sprite;
 import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.style.StyleBuilder;
+import net.sourceforge.plantuml.ugraphic.ImageBuilder;
 
 public abstract class TitledDiagram extends AbstractPSystem implements Diagram, Annotated {
 
 	public static boolean FORCE_SMETANA = false;
+	public static boolean FORCE_ELK = false;
 
 	private DisplayPositionned title = DisplayPositionned.none(HorizontalAlignment.CENTER, VerticalAlignment.TOP);
 
@@ -201,9 +203,20 @@ public abstract class TitledDiagram extends AbstractPSystem implements Diagram, 
 	}
 
 	private boolean useSmetana;
+	private boolean useElk;
 
 	public void setUseSmetana(boolean useSmetana) {
 		this.useSmetana = useSmetana;
+	}
+
+	public void setUseElk(boolean useElk) {
+		this.useElk = useElk;
+	}
+
+	public boolean isUseElk() {
+		if (FORCE_ELK)
+			return true;
+		return this.useElk;
 	}
 
 	public boolean isUseSmetana() {
@@ -229,5 +242,10 @@ public abstract class TitledDiagram extends AbstractPSystem implements Diagram, 
 
 	final public Animation getAnimation() {
 		return animation;
+	}
+
+	@Override
+	public ImageBuilder createImageBuilder(FileFormatOption fileFormatOption) throws IOException {
+		return super.createImageBuilder(fileFormatOption).styled(this);
 	}
 }

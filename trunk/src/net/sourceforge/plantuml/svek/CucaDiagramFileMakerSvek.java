@@ -35,8 +35,6 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import static net.sourceforge.plantuml.ugraphic.ImageBuilder.styledImageBuilder;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -120,8 +118,9 @@ public final class CucaDiagramFileMakerSvek implements CucaDiagramFileMaker {
 		// Sorry about this hack. There is a side effect in SvekResult::calculateDimension()
 		result.calculateDimension(stringBounder);  // Ensure text near the margins is not cut off
 
-		return styledImageBuilder(diagram, result, 1, fileFormatOption)
+		return diagram.createImageBuilder(fileFormatOption)
 				.annotations(false)  // backwards compatibility (AnnotatedWorker is used above)
+				.drawable(result)
 				.status(result instanceof GraphvizCrash ? 503 : 0)
 				.warningOrError(warningOrError)
 				.write(os);
