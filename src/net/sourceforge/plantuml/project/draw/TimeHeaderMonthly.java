@@ -39,20 +39,21 @@ import java.util.Map;
 
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.project.LoadPlanable;
-import net.sourceforge.plantuml.project.core.PrintScale;
 import net.sourceforge.plantuml.project.time.Day;
 import net.sourceforge.plantuml.project.time.DayOfWeek;
 import net.sourceforge.plantuml.project.time.MonthYear;
 import net.sourceforge.plantuml.project.timescale.TimeScaleCompressed;
+import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.ULine;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.ugraphic.color.HColorSet;
 import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class TimeHeaderMonthly extends TimeHeaderCalendar {
 
-	protected double getTimeHeaderHeight() {
+	public double getTimeHeaderHeight() {
 		return 16 + 13;
 	}
 
@@ -60,10 +61,10 @@ public class TimeHeaderMonthly extends TimeHeaderCalendar {
 		return 16 + 13 - 1;
 	}
 
-	public TimeHeaderMonthly(Day calendar, Day min, Day max, LoadPlanable defaultPlan, Map<Day, HColor> colorDays,
-			Map<DayOfWeek, HColor> colorDaysOfWeek, int compress) {
+	public TimeHeaderMonthly(double scale, Day calendar, Day min, Day max, LoadPlanable defaultPlan, Map<Day, HColor> colorDays,
+			Map<DayOfWeek, HColor> colorDaysOfWeek, Style style, HColorSet colorSet) {
 		super(calendar, min, max, defaultPlan, colorDays, colorDaysOfWeek,
-				new TimeScaleCompressed(calendar, compress));
+				new TimeScaleCompressed(calendar, scale), style, colorSet);
 	}
 
 	@Override
@@ -130,13 +131,13 @@ public class TimeHeaderMonthly extends TimeHeaderCalendar {
 
 	private void printYear(UGraphic ug, MonthYear monthYear, double start, double end) {
 		final TextBlock small = getTextBlock("" + monthYear.year(), 12, true, HColorUtils.BLACK);
-		printCentered(ug, start, end, small);
+		printCentered(ug, false, start, end, small);
 	}
 
 	private void printMonth(UGraphic ug, MonthYear monthYear, double start, double end) {
 		final TextBlock small = getTextBlock(monthYear.shortName(), 10, false, HColorUtils.BLACK);
 		final TextBlock big = getTextBlock(monthYear.longName(), 10, false, HColorUtils.BLACK);
-		printCentered(ug, start, end, small, big);
+		printCentered(ug, false, start, end, small, big);
 	}
 
 	private void drawVbar(UGraphic ug, double x, double y1, double y2) {

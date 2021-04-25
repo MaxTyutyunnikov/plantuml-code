@@ -35,38 +35,38 @@
  */
 package net.sourceforge.plantuml.dedication;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.math.BigInteger;
 
-import net.sourceforge.plantuml.utils.MTRandom;
+public class RBlock {
 
-public class NoisyInputStream extends InputStream {
+	private final byte[] buffer;
 
-	private final MTRandom rnd;
-	private final InputStream source;
-
-	public NoisyInputStream(InputStream source, byte[] pass) {
-		this.source = source;
-		this.rnd = new MTRandom(pass);
+	private RBlock(final byte[] init) {
+		this.buffer = new byte[init.length + 1];
+		System.arraycopy(init, 0, buffer, 1, init.length);
 	}
 
-	private byte getNextByte() {
-		return (byte) rnd.nextInt();
+	public RBlock(final byte[] init, int start, int size) {
+		this.buffer = new byte[size + 1];
+		if (start + size < init.length)
+			System.arraycopy(init, start, buffer, 1, size);
+		else
+			System.arraycopy(init, start, buffer, 1, init.length - start);
 	}
 
-	@Override
-	public void close() throws IOException {
-		source.close();
+	public RBlock change(BigInteger E, BigInteger N) {
+		final BigInteger big = new BigInteger(buffer);
+		final BigInteger changed = big.modPow(E, N);
+		return new RBlock(changed.toByteArray());
 	}
 
-	@Override
-	public int read() throws IOException {
-		int b = source.read();
-		if (b == -1) {
-			return -1;
+	public byte[] getData(int size) {
+		if (buffer.length == size) {
+			return buffer;
 		}
-		b = (b ^ getNextByte()) & 0xFF;
-		return b;
+		final byte[] result = new byte[size];
+		System.arraycopy(buffer, buffer.length - size, result, 0, size);
+		return result;
 	}
 
 }

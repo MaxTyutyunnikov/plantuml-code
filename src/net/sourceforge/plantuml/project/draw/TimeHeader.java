@@ -42,6 +42,8 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.project.time.Day;
 import net.sourceforge.plantuml.project.timescale.TimeScale;
+import net.sourceforge.plantuml.style.PName;
+import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.ULine;
@@ -62,20 +64,33 @@ public abstract class TimeHeader {
 		return 28;
 	}
 
-	protected final HColor veryLightGray = HColorSet.instance().getColorOrWhite("#E0E8E8");
-	protected final HColor lightGray = HColorSet.instance().getColorOrWhite("#909898");
-
 	private final TimeScale timeScale;
+	private final Style style;
+	private final HColorSet colorSet;
+
 	protected final Day min;
 	protected final Day max;
 
-	public TimeHeader(Day min, Day max, TimeScale timeScale) {
+	public TimeHeader(Day min, Day max, TimeScale timeScale, Style style, HColorSet colorSet) {
+		if (style == null) {
+			throw new IllegalArgumentException();
+		}
 		this.timeScale = timeScale;
 		this.min = min;
 		this.max = max;
+		this.style = style;
+		this.colorSet = colorSet;
 	}
 
-	protected abstract double getTimeHeaderHeight();
+	protected final HColor closedBackgroundColor() {
+		return style.value(PName.BackGroundColor).asColor(colorSet);
+	}
+
+	protected final HColor closedFontColor() {
+		return style.value(PName.FontColor).asColor(colorSet);
+	}
+
+	public abstract double getTimeHeaderHeight();
 
 	public abstract double getTimeFooterHeight();
 
@@ -116,12 +131,13 @@ public abstract class TimeHeader {
 		text.drawU(ug.apply(UTranslate.dx(start + diff / 2)));
 	}
 
-	protected final void printCentered(UGraphic ug, double start, double end, TextBlock... texts) {
+	protected final void printCentered(UGraphic ug, boolean hideIfTooBig, double start, double end,
+			TextBlock... texts) {
 		final double available = end - start;
 		for (int i = texts.length - 1; i >= 0; i--) {
 			final TextBlock text = texts[i];
 			final double width = text.calculateDimension(ug.getStringBounder()).getWidth();
-			if (i == 0 || width <= available) {
+			if ((i == 0 && hideIfTooBig == false) || width <= available) {
 				final double diff = Math.max(0, available - width);
 				text.drawU(ug.apply(UTranslate.dx(start + diff / 2)));
 				return;
