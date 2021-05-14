@@ -74,7 +74,6 @@ import net.sourceforge.plantuml.style.StyleBuilder;
 import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class VCompactFactory implements FtileFactory {
 
@@ -104,7 +103,7 @@ public class VCompactFactory implements FtileFactory {
 		Style style = null;
 		if (UseStyle.useBetaStyle()) {
 			style = getDefaultStyleDefinitionCircle().getMergedStyle(skinParam.getCurrentStyleBuilder());
-			color = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
+			color = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
 		} else {
 			color = rose.getHtmlColor(skinParam, ColorParam.activityStart);
 		}
@@ -117,8 +116,9 @@ public class VCompactFactory implements FtileFactory {
 		final HColor backgroundColor;
 		if (UseStyle.useBetaStyle()) {
 			style = getDefaultStyleDefinitionCircle().getMergedStyle(skinParam.getCurrentStyleBuilder());
-			borderColor = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
-			// backgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
+			borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
+			// backgroundColor =
+			// style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
 			backgroundColor = skinParam.getBackgroundColor(false);
 		} else {
 			borderColor = rose.getHtmlColor(skinParam, ColorParam.activityEnd);
@@ -140,8 +140,9 @@ public class VCompactFactory implements FtileFactory {
 		final HColor backgroundColor;
 		if (UseStyle.useBetaStyle()) {
 			style = getDefaultStyleDefinitionCircle().getMergedStyle(skinParam.getCurrentStyleBuilder());
-			borderColor = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
-			// backgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
+			borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
+			// backgroundColor =
+			// style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
 			backgroundColor = skinParam.getBackgroundColor(false);
 		} else {
 			borderColor = rose.getHtmlColor(skinParam, ColorParam.activityEnd);
@@ -180,7 +181,7 @@ public class VCompactFactory implements FtileFactory {
 
 	public Ftile createIf(Swimlane swimlane, List<Branch> thens, Branch elseBranch, LinkRendering afterEndwhile,
 			LinkRendering topInlinkRendering, Url url) {
-		final List<Ftile> ftiles = new ArrayList<Ftile>();
+		final List<Ftile> ftiles = new ArrayList<>();
 		for (Branch branch : thens) {
 			ftiles.add(branch.getFtile());
 		}
@@ -190,7 +191,7 @@ public class VCompactFactory implements FtileFactory {
 
 	public Ftile createSwitch(Swimlane swimlane, List<Branch> branches, LinkRendering afterEndwhile,
 			LinkRendering topInlinkRendering, Display labelTest) {
-		final List<Ftile> ftiles = new ArrayList<Ftile>();
+		final List<Ftile> ftiles = new ArrayList<>();
 		for (Branch branch : branches) {
 			ftiles.add(branch.getFtile());
 		}

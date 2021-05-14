@@ -41,6 +41,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.Direction;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
@@ -65,10 +66,7 @@ public class Snake implements UShape {
 		private final HorizontalAlignment horizontalAlignment;
 
 		Text(TextBlock textBlock, VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment) {
-			if (textBlock == null) {
-				throw new IllegalArgumentException();
-			}
-			this.textBlock = textBlock;
+			this.textBlock = Objects.requireNonNull(textBlock);
 			this.verticalAlignment = verticalAlignment;
 			this.horizontalAlignment = horizontalAlignment;
 		}
@@ -161,17 +159,11 @@ public class Snake implements UShape {
 	private Snake(UPolygon startDecoration, Rainbow color, UPolygon endDecoration, Worm worm, MergeStrategy mergeable,
 			Direction emphasizeDirection, List<Text> texts) {
 
-		if (color == null) {
-			throw new IllegalArgumentException();
-		}
-		if (color.size() == 0) {
-			throw new IllegalArgumentException();
-		}
-		if (texts == null) {
+		if (Objects.requireNonNull(color).size() == 0) {
 			throw new IllegalArgumentException();
 		}
 		this.worm = worm;
-		this.texts = texts;
+		this.texts = Objects.requireNonNull(texts);
 		this.emphasizeDirection = emphasizeDirection;
 		this.startDecoration = startDecoration;
 		this.endDecoration = endDecoration;
@@ -213,7 +205,7 @@ public class Snake implements UShape {
 		final double move = 2 + colorArrowSeparationSpace;
 		final WormMutation mutation = WormMutation.create(worm, move);
 		if (mutation.isDxNegative()) {
-			colors = new ArrayList<HtmlColorAndStyle>(colors);
+			colors = new ArrayList<>(colors);
 			Collections.reverse(colors);
 		}
 		final double globalMove = -1.0 * (colors.size() - 1) / 2.0;
@@ -278,7 +270,7 @@ public class Snake implements UShape {
 	}
 
 	public List<Line2D> getHorizontalLines() {
-		final List<Line2D> result = new ArrayList<Line2D>();
+		final List<Line2D> result = new ArrayList<>();
 		for (int i = 0; i < worm.size() - 1; i++) {
 			final Point2D pt1 = worm.get(i);
 			final Point2D pt2 = worm.get(i + 1);

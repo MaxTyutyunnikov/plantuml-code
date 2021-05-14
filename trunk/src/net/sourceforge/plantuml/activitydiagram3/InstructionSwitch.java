@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import net.sourceforge.plantuml.ISkinParam;
@@ -50,7 +51,7 @@ import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class InstructionSwitch extends WithNote implements Instruction, InstructionCollection {
 
-	private final List<Branch> branches = new ArrayList<Branch>();
+	private final List<Branch> branches = new ArrayList<>();
 	private final ISkinParam skinParam;
 
 	private final Instruction parent;
@@ -73,13 +74,10 @@ public class InstructionSwitch extends WithNote implements Instruction, Instruct
 
 	public InstructionSwitch(Swimlane swimlane, Instruction parent, Display labelTest, LinkRendering inlinkRendering,
 			HColor color, ISkinParam skinParam) {
-		this.topInlinkRendering = inlinkRendering;
+		this.topInlinkRendering = Objects.requireNonNull(inlinkRendering);
 		this.parent = parent;
 		this.skinParam = skinParam;
 		this.labelTest = labelTest;
-		if (inlinkRendering == null) {
-			throw new IllegalArgumentException();
-		}
 		this.swimlane = swimlane;
 	}
 
@@ -96,7 +94,7 @@ public class InstructionSwitch extends WithNote implements Instruction, Instruct
 		// result = FtileWithNoteOpale.create(result, getPositionedNotes(), skinParam,
 		// false);
 		// }
-		// final List<WeldingPoint> weldingPoints = new ArrayList<WeldingPoint>();
+		// final List<WeldingPoint> weldingPoints = new ArrayList<>();
 		// for (Branch branch : branches) {
 		// weldingPoints.addAll(branch.getWeldingPoints());
 		// }
@@ -115,7 +113,7 @@ public class InstructionSwitch extends WithNote implements Instruction, Instruct
 	}
 
 	public Set<Swimlane> getSwimlanes() {
-		final Set<Swimlane> result = new HashSet<Swimlane>();
+		final Set<Swimlane> result = new HashSet<>();
 		if (swimlane != null) {
 			result.add(swimlane);
 		}

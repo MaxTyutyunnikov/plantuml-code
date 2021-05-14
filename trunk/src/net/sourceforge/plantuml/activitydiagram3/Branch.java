@@ -36,6 +36,7 @@
 package net.sourceforge.plantuml.activitydiagram3;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.UseStyle;
@@ -84,28 +85,20 @@ public class Branch {
 
 	public Branch(StyleBuilder styleBuilder, Swimlane swimlane, LinkRendering labelPositive, Display labelTest,
 			HColor color, LinkRendering inlabel) {
-		if (labelPositive == null) {
-			throw new IllegalArgumentException();
-		}
-		if (labelTest == null) {
-			throw new IllegalArgumentException();
-		}
-		if (inlabel == null) {
-			throw new IllegalArgumentException();
-		}
+		this.inlabel = Objects.requireNonNull(inlabel);
+		this.labelTest = Objects.requireNonNull(labelTest);
+		this.labelPositive = Objects.requireNonNull(labelPositive);
 		if (UseStyle.useBetaStyle()) {
 			final Style style = getDefaultStyleDefinitionDiamond().getMergedStyle(styleBuilder);
 			this.color = color == null
-					? style.value(PName.BackGroundColor).asColor(styleBuilder.getSkinParam().getIHtmlColorSet())
+					? style.value(PName.BackGroundColor).asColor(styleBuilder.getSkinParam().getThemeStyle(),
+							styleBuilder.getSkinParam().getIHtmlColorSet())
 					: color;
 		} else {
 			this.color = color;
 		}
 
-		this.inlabel = inlabel;
 		this.list = new InstructionList(swimlane);
-		this.labelTest = labelTest;
-		this.labelPositive = labelPositive;
 	}
 
 	public Collection<WeldingPoint> getWeldingPoints() {
@@ -125,10 +118,7 @@ public class Branch {
 	}
 
 	public final void setInlinkRendering(LinkRendering inlinkRendering) {
-		if (inlinkRendering == null) {
-			throw new IllegalArgumentException();
-		}
-		this.inlinkRendering = inlinkRendering;
+		this.inlinkRendering = Objects.requireNonNull(inlinkRendering);
 	}
 
 	public void updateFtile(FtileFactory factory) {

@@ -38,6 +38,7 @@ package net.sourceforge.plantuml.svek.image;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.CornerParam;
@@ -56,7 +57,6 @@ import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graph2.GeomUtils;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.StringBounder;
@@ -107,11 +107,13 @@ public class EntityImageNote extends AbstractEntityImage implements Stencil {
 		if (UseStyle.useBetaStyle()) {
 			final Style style = getDefaultStyleDefinition().getMergedStyle(skinParam.getCurrentStyleBuilder());
 			if (entity.getColors(getSkinParam()).getColor(ColorType.BACK) == null) {
-				this.noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
+				this.noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
+						skinParam.getIHtmlColorSet());
 			} else {
 				this.noteBackgroundColor = entity.getColors(getSkinParam()).getColor(ColorType.BACK);
 			}
-			this.borderColor = style.value(PName.LineColor).asColor(skinParam.getIHtmlColorSet());
+			this.borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
+					skinParam.getIHtmlColorSet());
 			this.shadowing = style.value(PName.Shadowing).asDouble();
 		} else {
 			this.shadowing = skinParam.shadowing(getEntity().getStereotype()) ? 4 : 0;
@@ -276,10 +278,10 @@ public class EntityImageNote extends AbstractEntityImage implements Stencil {
 	}
 
 	private Direction getOpaleStrategy(double width, double height, Point2D pt) {
-		final double d1 = GeomUtils.getOrthoDistance(new Line2D.Double(width, 0, width, height), pt);
-		final double d2 = GeomUtils.getOrthoDistance(new Line2D.Double(0, height, width, height), pt);
-		final double d3 = GeomUtils.getOrthoDistance(new Line2D.Double(0, 0, 0, height), pt);
-		final double d4 = GeomUtils.getOrthoDistance(new Line2D.Double(0, 0, width, 0), pt);
+		final double d1 = getOrthoDistance(new Line2D.Double(width, 0, width, height), pt);
+		final double d2 = getOrthoDistance(new Line2D.Double(0, height, width, height), pt);
+		final double d3 = getOrthoDistance(new Line2D.Double(0, 0, 0, height), pt);
+		final double d4 = getOrthoDistance(new Line2D.Double(0, 0, width, 0), pt);
 		if (d3 <= d1 && d3 <= d2 && d3 <= d4) {
 			return Direction.LEFT;
 		}
@@ -295,6 +297,26 @@ public class EntityImageNote extends AbstractEntityImage implements Stencil {
 		return null;
 
 	}
+	
+	private static double getOrthoDistance(Line2D.Double seg, Point2D pt) {
+		if (isHorizontal(seg)) {
+			return Math.abs(seg.getP1().getY() - pt.getY());
+		}
+		if (isVertical(seg)) {
+			return Math.abs(seg.getP1().getX() - pt.getX());
+		}
+		throw new IllegalArgumentException();
+	}
+	
+	private static boolean isHorizontal(Line2D.Double seg) {
+		return seg.getP1().getY() == seg.getP2().getY();
+	}
+
+	private static boolean isVertical(Line2D.Double seg) {
+		return seg.getP1().getX() == seg.getP2().getX();
+	}
+
+
 
 	public ShapeType getShapeType() {
 		return ShapeType.RECTANGLE;
@@ -305,12 +327,9 @@ public class EntityImageNote extends AbstractEntityImage implements Stencil {
 	private SvekNode other;
 
 	public void setOpaleLine(SvekLine line, SvekNode node, SvekNode other) {
-		if (other == null) {
-			throw new IllegalArgumentException();
-		}
 		this.opaleLine = line;
 		this.node = node;
-		this.other = other;
+		this.other = Objects.requireNonNull(other);
 	}
 
 	public double getStartingX(StringBounder stringBounder, double y) {

@@ -35,6 +35,8 @@
  */
 package net.sourceforge.plantuml.ugraphic;
 
+import static net.sourceforge.plantuml.ugraphic.ImageBuilder.plainPngBuilder;
+
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Shape;
@@ -61,12 +63,10 @@ import net.sourceforge.plantuml.svg.LengthAdjust;
 import net.sourceforge.plantuml.svg.SvgGraphics;
 import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
-import static net.sourceforge.plantuml.ugraphic.ImageBuilder.plainPngBuilder;
-
 public class FontChecker {
 
 	final private UFont font;
-	private static final Set<String> SQUARE = new HashSet<String>(
+	private static final Set<String> SQUARE = new HashSet<>(
 			Arrays.asList("MI=I=XM=I=IX", "MI=I=XM=I=IXMI=I=XM=I=IX"));
 
 	public FontChecker(UFont font) {
@@ -158,7 +158,7 @@ public class FontChecker {
 	}
 
 	private String getSvgImage(char c) throws IOException, TransformerException {
-		final SvgGraphics svg = new SvgGraphics(true, new Dimension2DDouble(0, 0), 1.0, null, 42, "none",
+		final SvgGraphics svg = new SvgGraphics(null, true, new Dimension2DDouble(0, 0), 1.0, null, 42, "none",
 				LengthAdjust.defaultValue());
 		svg.setStrokeColor("black");
 		svg.svgImage(getBufferedImage(c), 0, 0);

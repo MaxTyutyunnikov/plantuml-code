@@ -38,6 +38,7 @@ package net.sourceforge.plantuml.cucadiagram;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import net.sourceforge.plantuml.FontParam;
@@ -54,7 +55,7 @@ import net.sourceforge.plantuml.style.Style;
 
 public class BodierLikeClassOrObject implements Bodier {
 
-	private final List<CharSequence> rawBody = new ArrayList<CharSequence>();
+	private final List<CharSequence> rawBody = new ArrayList<>();
 	private final Set<VisibilityModifier> hides;
 	private LeafType type;
 	private List<Member> methodsToDisplay;
@@ -71,19 +72,13 @@ public class BodierLikeClassOrObject implements Bodier {
 		if (type == LeafType.MAP) {
 			throw new IllegalArgumentException();
 		}
-		if (type == null) {
-			throw new IllegalArgumentException();
-		}
+		this.type = Objects.requireNonNull(type);
 		assert type.isLikeClass() || type == LeafType.OBJECT;
 		this.hides = hides;
-		this.type = type;
 	}
 
 	public void setLeaf(ILeaf leaf) {
-		if (leaf == null) {
-			throw new IllegalArgumentException();
-		}
-		this.leaf = leaf;
+		this.leaf = Objects.requireNonNull(leaf);
 
 	}
 
@@ -116,7 +111,7 @@ public class BodierLikeClassOrObject implements Bodier {
 
 	public Display getMethodsToDisplay() {
 		if (methodsToDisplay == null) {
-			methodsToDisplay = new ArrayList<Member>();
+			methodsToDisplay = new ArrayList<>();
 			for (int i = 0; i < rawBody.size(); i++) {
 				final CharSequence s = rawBody.get(i);
 				if (isMethod(i, rawBody) == false) {
@@ -145,7 +140,7 @@ public class BodierLikeClassOrObject implements Bodier {
 
 	public Display getFieldsToDisplay() {
 		if (fieldsToDisplay == null) {
-			fieldsToDisplay = new ArrayList<Member>();
+			fieldsToDisplay = new ArrayList<>();
 			for (CharSequence s : rawBody) {
 				if (isMethod(s) == true) {
 					continue;
@@ -186,7 +181,7 @@ public class BodierLikeClassOrObject implements Bodier {
 	}
 
 	private List<CharSequence> rawBodyWithoutHidden() {
-		final List<CharSequence> result = new ArrayList<CharSequence>();
+		final List<CharSequence> result = new ArrayList<>();
 		for (CharSequence s : rawBody) {
 			final Member m;
 			if (isMethod(s)) {

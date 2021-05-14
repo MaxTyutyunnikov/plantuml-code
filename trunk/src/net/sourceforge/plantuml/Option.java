@@ -57,8 +57,8 @@ import net.sourceforge.plantuml.stats.StatsUtils;
 
 public class Option {
 
-	private final List<String> excludes = new ArrayList<String>();
-	private final List<String> config = new ArrayList<String>();
+	private final List<String> excludes = new ArrayList<>();
+	private final List<String> config = new ArrayList<>();
 	private final Map<String, String> defines = new LinkedHashMap<String, String>();
 	private String charset;
 	private boolean computeurl = false;
@@ -85,12 +85,13 @@ public class Option {
 	private boolean checkMetadata = false;
 	private int stdrpt = 0;
 	private int imageIndex = 0;
+	private String fileDir;
 
 	private File outputDir = null;
 	private File outputFile = null;
 	private String filename;
 
-	private final List<String> result = new ArrayList<String>();
+	private final List<String> result = new ArrayList<>();
 
 	public Option() {
 	}
@@ -188,6 +189,12 @@ public class Option {
 					continue;
 				}
 				filename = StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(arg[i]);
+			} else if (s.equalsIgnoreCase("-filedir")) {
+				i++;
+				if (i == arg.length) {
+					continue;
+				}
+				fileDir = StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(arg[i]);
 			} else if (s.startsWith("-o") && s.length() > 3) {
 				s = s.substring(2);
 				outputDir = new File(StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(s));
@@ -223,6 +230,12 @@ public class Option {
 				this.failfast2 = true;
 			} else if (s.equalsIgnoreCase("-checkonly")) {
 				this.checkOnly = true;
+			} else if (s.equalsIgnoreCase("-theme")) {
+				i++;
+				if (i == arg.length) {
+					continue;
+				}
+				this.config.add(0, "!theme " + arg[i]);
 			} else if (s.equalsIgnoreCase("-config")) {
 				i++;
 				if (i == arg.length) {
@@ -664,4 +677,7 @@ public class Option {
 	// this.preprocessorOutput = preprocessorOutput;
 	// }
 
+	public String getFileDir() {
+		return fileDir;
+	}
 }

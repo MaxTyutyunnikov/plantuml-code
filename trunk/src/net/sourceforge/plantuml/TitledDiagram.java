@@ -37,8 +37,6 @@ package net.sourceforge.plantuml;
 
 import java.io.IOException;
 
-import javax.script.ScriptException;
-
 import net.sourceforge.plantuml.anim.Animation;
 import net.sourceforge.plantuml.anim.AnimationDecoder;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
@@ -50,8 +48,14 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.VerticalAlignment;
 import net.sourceforge.plantuml.sprite.Sprite;
 import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
+import net.sourceforge.plantuml.style.PName;
+import net.sourceforge.plantuml.style.SName;
+import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
+import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.ugraphic.ImageBuilder;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public abstract class TitledDiagram extends AbstractPSystem implements Diagram, Annotated {
 
@@ -231,13 +235,12 @@ public abstract class TitledDiagram extends AbstractPSystem implements Diagram, 
 	}
 
 	final public void setAnimation(Iterable<CharSequence> animationData) {
-		try {
-			final AnimationDecoder animationDecoder = new AnimationDecoder(animationData);
-			this.animation = Animation.create(animationDecoder.decode());
-		} catch (ScriptException e) {
-			e.printStackTrace();
-		}
-
+//		try {
+		final AnimationDecoder animationDecoder = new AnimationDecoder(animationData);
+		this.animation = Animation.create(animationDecoder.decode());
+//		} catch (ScriptException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	final public Animation getAnimation() {
@@ -248,4 +251,21 @@ public abstract class TitledDiagram extends AbstractPSystem implements Diagram, 
 	public ImageBuilder createImageBuilder(FileFormatOption fileFormatOption) throws IOException {
 		return super.createImageBuilder(fileFormatOption).styled(this);
 	}
+
+	public HColor calculateBackColor() {
+		if (UseStyle.useBetaStyle()) {
+			final Style style = StyleSignature.of(SName.root, SName.document, this.getUmlDiagramType().getStyleName())
+					.getMergedStyle(this.getSkinParam().getCurrentStyleBuilder());
+
+			HColor backgroundColor = style.value(PName.BackGroundColor).asColor(this.getSkinParam().getThemeStyle(),
+					this.getSkinParam().getIHtmlColorSet());
+			if (backgroundColor == null) {
+				backgroundColor = HColorUtils.transparent();
+			}
+			return backgroundColor;
+
+		}
+		return this.getSkinParam().getBackgroundColor(false);
+	}
+
 }

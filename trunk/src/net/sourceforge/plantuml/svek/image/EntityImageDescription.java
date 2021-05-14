@@ -39,6 +39,7 @@ package net.sourceforge.plantuml.svek.image;
 import java.awt.geom.Dimension2D;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
@@ -147,16 +148,19 @@ public class EntityImageDescription extends AbstractEntityImage {
 			style = style.eventuallyOverride(colors);
 			final Style styleStereo = tmp.withStereotype(stereotype)
 					.getMergedStyle(getSkinParam().getCurrentStyleBuilder());
-			forecolor = style.value(PName.LineColor).asColor(getSkinParam().getIHtmlColorSet());
+			forecolor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+					getSkinParam().getIHtmlColorSet());
 			if (backcolor == null) {
-				backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getIHtmlColorSet());
+				backcolor = style.value(PName.BackGroundColor).asColor(getSkinParam().getThemeStyle(),
+						getSkinParam().getIHtmlColorSet());
 			}
 			roundCorner = style.value(PName.RoundCorner).asDouble();
 			diagonalCorner = style.value(PName.DiagonalCorner).asDouble();
 			deltaShadow = style.value(PName.Shadowing).asDouble();
 			stroke = style.getStroke(colors);
-			fcTitle = style.getFontConfiguration(getSkinParam().getIHtmlColorSet());
-			fcStereo = styleStereo.getFontConfiguration(getSkinParam().getIHtmlColorSet());
+			fcTitle = style.getFontConfiguration(getSkinParam().getThemeStyle(), getSkinParam().getIHtmlColorSet());
+			fcStereo = styleStereo.getFontConfiguration(getSkinParam().getThemeStyle(),
+					getSkinParam().getIHtmlColorSet());
 			defaultAlign = style.getHorizontalAlignment();
 		} else {
 			forecolor = SkinParamUtils.getColor(getSkinParam(), stereotype, symbol.getColorParamBorder());
@@ -212,10 +216,7 @@ public class EntityImageDescription extends AbstractEntityImage {
 	private USymbol getUSymbol(ILeaf entity) {
 		final USymbol result = entity.getUSymbol() == null ? getSkinParam().componentStyle().toUSymbol()
 				: entity.getUSymbol();
-		if (result == null) {
-			throw new IllegalArgumentException();
-		}
-		return result;
+		return Objects.requireNonNull(result);
 	}
 
 	public Dimension2D getNameDimension(StringBounder stringBounder) {
@@ -268,7 +269,7 @@ public class EntityImageDescription extends AbstractEntityImage {
 	}
 
 	private boolean isThereADoubleLink(ILeaf leaf, Collection<Link> links) {
-		final Set<IEntity> others = new HashSet<IEntity>();
+		final Set<IEntity> others = new HashSet<>();
 		for (Link link : links) {
 			if (link.contains(leaf)) {
 				final IEntity other = link.getOther(leaf);

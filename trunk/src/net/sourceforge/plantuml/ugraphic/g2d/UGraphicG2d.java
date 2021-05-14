@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import net.sourceforge.plantuml.EnsureVisible;
@@ -74,6 +75,7 @@ import net.sourceforge.plantuml.ugraphic.UPolygon;
 import net.sourceforge.plantuml.ugraphic.URectangle;
 import net.sourceforge.plantuml.ugraphic.UText;
 import net.sourceforge.plantuml.ugraphic.color.ColorMapper;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureVisible, UGraphic2 {
 
@@ -83,8 +85,8 @@ public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureV
 
 	private UAntiAliasing antiAliasing = UAntiAliasing.ANTI_ALIASING_ON;
 
-	private/* final */List<Url> urls = new ArrayList<Url>();
-	private Set<Url> allUrls = new HashSet<Url>();
+	private/* final */List<Url> urls = new ArrayList<>();
+	private Set<Url> allUrls = new HashSet<>();
 
 	private final boolean hasAffineTransform;
 
@@ -117,13 +119,13 @@ public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureV
 		register(dpiFactor);
 	}
 
-	public UGraphicG2d(ColorMapper colorMapper, Graphics2D g2d, double dpiFactor) {
-		this(colorMapper, g2d, dpiFactor, null, 0, 0);
+	public UGraphicG2d(HColor defaultBackground, ColorMapper colorMapper, Graphics2D g2d, double dpiFactor) {
+		this(defaultBackground, colorMapper, g2d, dpiFactor, null, 0, 0);
 	}
 
-	public UGraphicG2d(ColorMapper colorMapper, Graphics2D g2d, double dpiFactor, AffineTransformation affineTransform,
-			double dx, double dy) {
-		super(colorMapper, g2d);
+	public UGraphicG2d(HColor defaultBackground, ColorMapper colorMapper, Graphics2D g2d, double dpiFactor,
+			AffineTransformation affineTransform, double dx, double dy) {
+		super(defaultBackground, colorMapper, g2d);
 		this.hasAffineTransform = affineTransform != null;
 		this.dpiFactor = dpiFactor;
 		if (dpiFactor != 1.0) {
@@ -185,10 +187,7 @@ public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureV
 	}
 
 	public void startUrl(Url url) {
-		if (url == null) {
-			throw new IllegalArgumentException();
-		}
-		urls.add(url);
+		urls.add(Objects.requireNonNull(url));
 		allUrls.add(url);
 	}
 

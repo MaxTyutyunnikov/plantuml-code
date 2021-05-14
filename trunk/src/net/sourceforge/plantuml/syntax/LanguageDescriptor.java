@@ -47,9 +47,9 @@ import net.sourceforge.plantuml.utils.Cypher;
 
 public class LanguageDescriptor {
 
-	private final Set<String> type = new TreeSet<String>();
-	private final Set<String> keyword = new TreeSet<String>();
-	private final Set<String> preproc = new TreeSet<String>();
+	private final Set<String> type = new TreeSet<>();
+	private final Set<String> keyword = new TreeSet<>();
+	private final Set<String> preproc = new TreeSet<>();
 
 	public LanguageDescriptor() {
 
@@ -184,6 +184,7 @@ public class LanguageDescriptor {
 
 		preproc.add("!exit");
 		preproc.add("!include");
+		preproc.add("!theme");
 		preproc.add("!pragma");
 		preproc.add("!define");
 		preproc.add("!undef");

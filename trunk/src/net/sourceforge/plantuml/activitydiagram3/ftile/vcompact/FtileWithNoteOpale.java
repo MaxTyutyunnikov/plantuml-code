@@ -95,7 +95,7 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 
 	public Set<Swimlane> getSwimlanes() {
 		if (swimlaneNote != null) {
-			final Set<Swimlane> result = new HashSet<Swimlane>(tile.getSwimlanes());
+			final Set<Swimlane> result = new HashSet<>(tile.getSwimlanes());
 			result.add(swimlaneNote);
 			return Collections.unmodifiableSet(result);
 		}
@@ -148,9 +148,10 @@ public class FtileWithNoteOpale extends AbstractFtile implements Stencil, Stylea
 		if (UseStyle.useBetaStyle()) {
 			final Style style = getDefaultStyleDefinition().getMergedStyle(skinParam.getCurrentStyleBuilder())
 					.eventuallyOverride(note.getColors());
-			noteBackgroundColor = style.value(PName.BackGroundColor).asColor(getIHtmlColorSet());
-			borderColor = style.value(PName.LineColor).asColor(getIHtmlColorSet());
-			fc = style.getFontConfiguration(getIHtmlColorSet());
+			noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
+					getIHtmlColorSet());
+			borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
+			fc = style.getFontConfiguration(skinParam.getThemeStyle(), getIHtmlColorSet());
 			shadowing = style.value(PName.Shadowing).asDouble();
 			wrapWidth = style.wrapWidth();
 		} else {

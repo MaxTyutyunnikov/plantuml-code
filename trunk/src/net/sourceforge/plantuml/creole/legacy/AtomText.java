@@ -59,6 +59,7 @@ import net.sourceforge.plantuml.ugraphic.UText;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorAutomatic;
+import net.sourceforge.plantuml.ugraphic.color.HColorAutomaticLegacy;
 import net.sourceforge.plantuml.ugraphic.color.HColorSimple;
 import net.sourceforge.plantuml.utils.CharHidder;
 
@@ -144,8 +145,16 @@ public final class AtomText extends AbstractAtom implements Atom {
 			}
 			HColor textColor = fontConfiguration.getColor();
 			FontConfiguration useFontConfiguration = fontConfiguration;
-			if (textColor instanceof HColorAutomatic && ug.getParam().getBackcolor() != null) {
+			if (textColor instanceof HColorAutomaticLegacy && ug.getParam().getBackcolor() != null) {
 				textColor = ((HColorSimple) ug.getParam().getBackcolor()).opposite();
+				useFontConfiguration = fontConfiguration.changeColor(textColor);
+			}
+			if (textColor instanceof HColorAutomatic) {
+				HColor backcolor = ug.getParam().getBackcolor();
+				if (backcolor == null) {
+					backcolor = ug.getDefaultBackground();
+				}
+				textColor = ((HColorAutomatic) textColor).getAppropriateColor(backcolor);
 				useFontConfiguration = fontConfiguration.changeColor(textColor);
 			}
 			if (marginLeft != AtomTextUtils.ZERO) {
@@ -216,7 +225,7 @@ public final class AtomText extends AbstractAtom implements Atom {
 	}
 
 	private final Collection<String> splitted() {
-		final List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 		for (int i = 0; i < text.length(); i++) {
 			final char ch = text.charAt(i);
 			if (isOfWord(ch)) {
@@ -239,7 +248,7 @@ public final class AtomText extends AbstractAtom implements Atom {
 		if (maxWidth == 0) {
 			throw new IllegalStateException();
 		}
-		final List<Atom> result = new ArrayList<Atom>();
+		final List<Atom> result = new ArrayList<>();
 		final StringTokenizer st = new StringTokenizer(text, " ", true);
 		final StringBuilder currentLine = new StringBuilder();
 		while (st.hasMoreTokens()) {

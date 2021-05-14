@@ -225,6 +225,7 @@ public abstract class PSystemCommandFactory extends PSystemAbstractFactory {
 	final protected void addCommonCommands2(List<Command> cmds) {
 		cmds.add(new CommandNope());
 		cmds.add(new CommandPragma());
+		cmds.add(new CommandAssumeTransparent());
 
 		cmds.add(new CommandSkinParam());
 		cmds.add(new CommandSkinParamMultilines());
@@ -273,7 +274,7 @@ public abstract class PSystemCommandFactory extends PSystemAbstractFactory {
 	}
 
 	final public List<String> getDescription() {
-		final List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 		for (Command cmd : createCommands()) {
 			result.addAll(Arrays.asList(cmd.getDescription()));
 		}

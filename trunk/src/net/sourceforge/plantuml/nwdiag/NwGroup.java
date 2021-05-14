@@ -57,7 +57,7 @@ public class NwGroup {
 
 	private final String name;
 	private final Network network;
-	private final Set<String> elements = new HashSet<String>();
+	private final Set<String> elements = new HashSet<>();
 	private HColor color;
 	private String description;
 
@@ -114,7 +114,7 @@ public class NwGroup {
 		}
 		HColor color = getColor();
 		if (color == null) {
-			color = colors.getColorOrWhite("#AAA");
+			color = colors.getColorOrWhite(skinParam.getThemeStyle(), "#AAA");
 		}
 		size.draw(ug, color);
 

@@ -342,7 +342,7 @@ public enum License {
 	}
 
 	public List<String> getJavaHeader(List<String> contributors) {
-		final List<String> h = new ArrayList<String>();
+		final List<String> h = new ArrayList<>();
 		h.add("/* ========================================================================");
 		h.add(" * PlantUML : a free UML diagram generator");
 		h.add(" * ========================================================================");
@@ -478,7 +478,7 @@ public enum License {
 
 	public List<String> getTextFull() {
 		final LicenseInfo licenseInfo = LicenseInfo.retrieveQuick();
-		final List<String> text = new ArrayList<String>();
+		final List<String> text = new ArrayList<>();
 		header1(text, licenseInfo);
 		header2(text, licenseInfo, false);
 		end3(text, licenseInfo);
@@ -486,13 +486,13 @@ public enum License {
 	}
 
 	public List<String> getText1(LicenseInfo licenseInfo) {
-		final List<String> text = new ArrayList<String>();
+		final List<String> text = new ArrayList<>();
 		header1(text, licenseInfo);
 		return text;
 	}
 
 	public List<String> getText2(LicenseInfo licenseInfo) {
-		final List<String> text = new ArrayList<String>();
+		final List<String> text = new ArrayList<>();
 		header2(text, licenseInfo, true);
 		end3(text, licenseInfo);
 		return text;
@@ -539,6 +539,7 @@ public enum License {
 		text.add("ASCIIMathML (c) David Lippman http://www.pierce.ctc.edu/dlippman");
 		text.add("CafeUndZopfli ported by Eugene Klyuchnikov https://github.com/eustas/CafeUndZopfli");
 		text.add("Brotli (c) by the Brotli Authors https://github.com/google/brotli");
+		text.add("Themes (c) by Brett Schwarz https://github.com/bschwarz/puml-themes");
 		text.add(" ");
 	}
 }

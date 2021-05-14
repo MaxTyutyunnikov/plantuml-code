@@ -38,6 +38,7 @@ package net.sourceforge.plantuml.cucadiagram;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
@@ -48,7 +49,7 @@ import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 
 public class BodierSimple implements Bodier {
 
-	private final List<CharSequence> rawBody = new ArrayList<CharSequence>();
+	private final List<CharSequence> rawBody = new ArrayList<>();
 	private ILeaf leaf;
 
 	public void muteClassToObject() {
@@ -59,10 +60,7 @@ public class BodierSimple implements Bodier {
 	}
 
 	public void setLeaf(ILeaf leaf) {
-		if (leaf == null) {
-			throw new IllegalArgumentException();
-		}
-		this.leaf = leaf;
+		this.leaf = Objects.requireNonNull(leaf);
 	}
 
 	public void addFieldOrMethod(String s) throws NoSuchColorException {

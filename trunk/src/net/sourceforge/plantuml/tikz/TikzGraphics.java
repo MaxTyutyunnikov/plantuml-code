@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.Url;
@@ -59,7 +60,7 @@ public class TikzGraphics {
 	// https://www.sharelatex.com/blog/2013/08/27/tikz-series-pt1.html
 	// http://cremeronline.com/LaTeX/minimaltikz.pdf
 
-	private final List<String> cmd = new ArrayList<String>();
+	private final List<String> cmd = new ArrayList<>();
 	private final boolean withPreamble;
 
 	private Color color = Color.BLACK;
@@ -108,10 +109,7 @@ public class TikzGraphics {
 			return "black";
 		}
 		final String result = colornames.get(c);
-		if (result == null) {
-			throw new IllegalArgumentException();
-		}
-		return result;
+		return Objects.requireNonNull(result);
 	}
 
 	public void createData(OutputStream os) throws IOException {
@@ -316,9 +314,7 @@ public class TikzGraphics {
 	}
 
 	public void appendRaw(double x, double y, String formula) {
-		if (formula == null) {
-			throw new IllegalArgumentException();
-		}
+		Objects.requireNonNull(formula);
 		final StringBuilder sb = new StringBuilder("\\node at " + couple(x, y));
 		sb.append("[below right");
 		sb.append("]{");
@@ -603,9 +599,7 @@ public class TikzGraphics {
 	}
 
 	public void setStrokeColor(Color c) {
-		// if (c == null) {
-		// throw new IllegalArgumentException();
-		// }
+		// Objects.requireNonNull(c);
 		this.color = c;
 		addColor(c);
 	}
@@ -631,12 +625,9 @@ public class TikzGraphics {
 	private boolean hasUrl = false;
 
 	public void openLink(String url, String title) {
-		if (url == null) {
-			throw new IllegalArgumentException();
-		}
 		this.hasUrl = true;
 		this.urlIgnoreText = false;
-		this.pendingUrl = url;
+		this.pendingUrl = Objects.requireNonNull(url);
 		//
 		// if (pendingLink2.size() > 0) {
 		// closeLink();

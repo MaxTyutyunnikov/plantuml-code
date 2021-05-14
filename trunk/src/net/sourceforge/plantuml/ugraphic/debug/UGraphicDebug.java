@@ -66,6 +66,7 @@ import net.sourceforge.plantuml.ugraphic.color.ColorMapperIdentity;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorMiddle;
 import net.sourceforge.plantuml.ugraphic.color.HColorSimple;
+import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class UGraphicDebug extends AbstractCommonUGraphic implements ClipContainer, UGraphic2 {
 
@@ -97,8 +98,8 @@ public class UGraphicDebug extends AbstractCommonUGraphic implements ClipContain
 
 	public UGraphicDebug(double scaleFactor, Dimension2D dim, String svgLinkTarget, String hoverPathColorRGB, long seed,
 			String preserveAspectRatio) {
-		super(new ColorMapperIdentity());
-		this.output = new ArrayList<String>();
+		super(HColorUtils.WHITE, new ColorMapperIdentity());
+		this.output = new ArrayList<>();
 		this.scaleFactor = scaleFactor;
 		this.dim = dim;
 		this.svgLinkTarget = svgLinkTarget;

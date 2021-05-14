@@ -44,6 +44,7 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.project.LabelStrategy;
 import net.sourceforge.plantuml.project.core.Task;
 import net.sourceforge.plantuml.project.core.TaskAttribute;
 import net.sourceforge.plantuml.project.lang.CenterBorderColor;
@@ -84,12 +85,25 @@ public class TaskDrawSeparator implements TaskDraw {
 		this.max = max;
 	}
 
-	public void drawTitle(UGraphic ug) {
+	@Override
+	public void drawTitle(UGraphic ug, LabelStrategy labelStrategy, double colTitles, double colBars) {
 		final ClockwiseTopRightBottomLeft padding = getStyle().getPadding();
 		final ClockwiseTopRightBottomLeft margin = getStyle().getMargin();
 		final double dx = margin.getLeft() + padding.getLeft();
 		final double dy = margin.getTop() + padding.getTop();
-		getTitle().drawU(ug.apply(new UTranslate(dx, dy)));
+		final double x;
+		if (labelStrategy.titleInFirstColumn()) {
+			x = colTitles;
+		} else {
+			x = 0;
+		}
+		getTitle().drawU(ug.apply(new UTranslate(x + dx, dy)));
+	}
+
+	@Override
+	public double getTitleWidth(StringBounder stringBounder) {
+		// Never used in first column
+		return 0;
 	}
 
 	private StyleSignature getStyleSignature() {
@@ -109,7 +123,7 @@ public class TaskDrawSeparator implements TaskDraw {
 	}
 
 	private FontConfiguration getFontConfiguration() {
-		return getStyle().getFontConfiguration(colorSet);
+		return getStyle().getFontConfiguration(styleBuilder.getSkinParam().getThemeStyle(), colorSet);
 	}
 
 	public void drawU(UGraphic ug) {
@@ -123,7 +137,8 @@ public class TaskDrawSeparator implements TaskDraw {
 		final ClockwiseTopRightBottomLeft margin = getStyle().getMargin();
 		ug = ug.apply(new UTranslate(0, margin.getTop()));
 
-		final HColor backColor = getStyle().value(PName.BackGroundColor).asColor(colorSet);
+		final HColor backColor = getStyle().value(PName.BackGroundColor)
+				.asColor(styleBuilder.getSkinParam().getThemeStyle(), colorSet);
 
 		if (HColorUtils.isTransparent(backColor) == false) {
 			final double height = padding.getTop() + getTextHeight(stringBounder) + padding.getBottom();
@@ -133,7 +148,8 @@ public class TaskDrawSeparator implements TaskDraw {
 			}
 		}
 
-		final HColor lineColor = getStyle().value(PName.LineColor).asColor(colorSet);
+		final HColor lineColor = getStyle().value(PName.LineColor).asColor(styleBuilder.getSkinParam().getThemeStyle(),
+				colorSet);
 		ug = ug.apply(lineColor);
 		ug = ug.apply(UTranslate.dy(padding.getTop() + getTextHeight(stringBounder) / 2));
 
