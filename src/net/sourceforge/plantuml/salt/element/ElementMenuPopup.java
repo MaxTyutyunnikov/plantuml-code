@@ -51,7 +51,7 @@ import net.sourceforge.plantuml.ugraphic.color.HColorSet;
 
 public class ElementMenuPopup extends AbstractElement {
 
-	private final Collection<ElementMenuEntry> entries = new ArrayList<ElementMenuEntry>();
+	private final Collection<ElementMenuEntry> entries = new ArrayList<>();
 	private final UFont font;
 	private final ISkinSimple spriteContainer;
 
@@ -79,7 +79,7 @@ public class ElementMenuPopup extends AbstractElement {
 		if (zIndex != 1) {
 			return;
 		}
-		ug.apply(HColorSet.instance().getColorOrWhite("#DDDDDD").bg()).draw(
+		ug.apply(HColorSet.instance().getColorOrWhite(getThemeStyle(), "#DDDDDD").bg()).draw(
 				new URectangle(dimToUse.getWidth(), dimToUse.getHeight()));
 
 		double y1 = 0;

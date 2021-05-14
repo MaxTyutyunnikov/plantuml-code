@@ -44,6 +44,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
@@ -72,9 +73,9 @@ import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class SequenceDiagram extends UmlDiagram {
 
-	private final List<Participant> participantsList = new ArrayList<Participant>();
+	private final List<Participant> participantsList = new ArrayList<>();
 
-	private final List<Event> events = new ArrayList<Event>();
+	private final List<Event> events = new ArrayList<>();
 
 	private final Map<Participant, ParticipantEnglober> participantEnglobers2 = new HashMap<Participant, ParticipantEnglober>();
 
@@ -246,8 +247,8 @@ public class SequenceDiagram extends UmlDiagram {
 	}
 
 	public ImageBuilder createImageBuilder(FileFormatOption fileFormatOption) throws IOException {
-		return super.createImageBuilder(fileFormatOption)
-				.annotations(false);  // they are managed in the SequenceDiagramFileMaker* classes
+		return super.createImageBuilder(fileFormatOption).annotations(false); // they are managed in the
+																				// SequenceDiagramFileMaker* classes
 	}
 
 	@Override
@@ -258,7 +259,7 @@ public class SequenceDiagram extends UmlDiagram {
 	}
 
 	// support for CommandReturn
-	private final Stack<AbstractMessage> activationState = new Stack<AbstractMessage>();
+	private final Stack<AbstractMessage> activationState = new Stack<>();
 
 	public AbstractMessage getActivatingMessage() {
 		if (activationState.empty()) {
@@ -308,7 +309,7 @@ public class SequenceDiagram extends UmlDiagram {
 		return "Activate/Deactivate already done on " + p.getCode();
 	}
 
-	private final List<GroupingStart> openGroupings = new ArrayList<GroupingStart>();
+	private final List<GroupingStart> openGroupings = new ArrayList<>();
 
 	public boolean grouping(String title, String comment, GroupingType type, HColor backColorGeneral,
 			HColor backColorElement, boolean parallel) {
@@ -425,7 +426,7 @@ public class SequenceDiagram extends UmlDiagram {
 	}
 
 	public void removeHiddenParticipants() {
-		for (Participant p : new ArrayList<Participant>(participantsList)) {
+		for (Participant p : new ArrayList<>(participantsList)) {
 			if (isAlone(p)) {
 				remove(p);
 			}
@@ -450,10 +451,7 @@ public class SequenceDiagram extends UmlDiagram {
 	}
 
 	public void putParticipantInLast(String code) {
-		final Participant p = participantsget(code);
-		if (p == null) {
-			throw new IllegalArgumentException(code);
-		}
+		final Participant p = Objects.requireNonNull(participantsget(code), code);
 		final boolean ok = participantsList.remove(p);
 		assert ok;
 		addWithOrder(p);
@@ -525,7 +523,7 @@ public class SequenceDiagram extends UmlDiagram {
 		return labels.replace("%autonumber%", autoNumber.getCurrentMessageNumber(false));
 	}
 
-	private final List<LinkAnchor> linkAnchors = new ArrayList<LinkAnchor>();
+	private final List<LinkAnchor> linkAnchors = new ArrayList<>();
 
 	public CommandExecutionResult linkAnchor(String anchor1, String anchor2, String message) {
 		this.linkAnchors.add(new LinkAnchor(anchor1, anchor2, message));
@@ -538,7 +536,7 @@ public class SequenceDiagram extends UmlDiagram {
 
 	@Override
 	public ClockwiseTopRightBottomLeft getDefaultMargins() {
-		return modeTeoz()  // this is for backward compatibility
+		return modeTeoz() // this is for backward compatibility
 				? ClockwiseTopRightBottomLeft.same(5)
 				: ClockwiseTopRightBottomLeft.topRightBottomLeft(5, 5, 5, 0);
 	}

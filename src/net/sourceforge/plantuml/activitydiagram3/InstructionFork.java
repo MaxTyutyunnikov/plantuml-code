@@ -38,6 +38,7 @@ package net.sourceforge.plantuml.activitydiagram3;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import net.sourceforge.plantuml.ISkinParam;
@@ -52,7 +53,7 @@ import net.sourceforge.plantuml.sequencediagram.NoteType;
 
 public class InstructionFork extends WithNote implements Instruction {
 
-	private final List<InstructionList> forks = new ArrayList<InstructionList>();
+	private final List<InstructionList> forks = new ArrayList<>();
 	private final Instruction parent;
 	private final LinkRendering inlinkRendering;
 	private final ISkinParam skinParam;
@@ -73,14 +74,11 @@ public class InstructionFork extends WithNote implements Instruction {
 
 	public InstructionFork(Instruction parent, LinkRendering inlinkRendering, ISkinParam skinParam, Swimlane swimlane) {
 		this.parent = parent;
-		this.inlinkRendering = inlinkRendering;
+		this.inlinkRendering = Objects.requireNonNull(inlinkRendering);
 		this.skinParam = skinParam;
 		this.swimlaneIn = swimlane;
 		this.swimlaneOut = swimlane;
 		this.forks.add(new InstructionList());
-		if (inlinkRendering == null) {
-			throw new IllegalArgumentException();
-		}
 	}
 
 	private InstructionList getLastList() {
@@ -92,7 +90,7 @@ public class InstructionFork extends WithNote implements Instruction {
 	}
 
 	public Ftile createFtile(FtileFactory factory) {
-		final List<Ftile> all = new ArrayList<Ftile>();
+		final List<Ftile> all = new ArrayList<>();
 		for (InstructionList list : forks) {
 			all.add(list.createFtile(factory));
 		}
@@ -132,7 +130,7 @@ public class InstructionFork extends WithNote implements Instruction {
 	}
 
 	public Set<Swimlane> getSwimlanes() {
-		final Set<Swimlane> result = new HashSet<Swimlane>(InstructionList.getSwimlanes2(forks));
+		final Set<Swimlane> result = new HashSet<>(InstructionList.getSwimlanes2(forks));
 		result.add(swimlaneIn);
 		result.add(swimlaneOut);
 		return result;

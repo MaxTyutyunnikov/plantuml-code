@@ -58,7 +58,7 @@ import net.sourceforge.plantuml.version.Version;
 public class OptionPrint {
 
 	static public void printTestDot() throws InterruptedException {
-		final List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 		final int errorCode = GraphvizUtils.addDotStatus(result, false);
 		for (String s : result) {
 			if (errorCode == 0) {
@@ -108,6 +108,7 @@ public class OptionPrint {
 				+ "file\tTo include file as if '!include file' were used");
 		System.out.println(
 				"    -I" + separator + "path" + separator + "to" + separator + "*.puml\tTo include files with pattern");
+		System.out.println("    -theme xxx\\t\\tTo use a specific theme");
 		System.out.println("    -charset xxx\tTo use a specific charset (default is " + charset + ")");
 		System.out.println("    -e[x]clude pattern\tTo exclude files that match the provided pattern");
 		System.out.println("    -metadata\t\tTo retrieve PlantUML sources from PNG images");
@@ -152,6 +153,7 @@ public class OptionPrint {
 		System.out.println("    -pipeimageindex N\tTo generate the Nth image with pipe option");
 		System.out.println("    -stdlib\t\tTo print standard library info");
 		System.out.println("    -extractstdlib\tTo extract PlantUML Standard Library into stdlib folder");
+		System.out.println("    -filedir xxx\tTo behave as if the PlantUML source is in this dir (only affects '-pipe' and PicoWeb 'POST /render')");
 		System.out.println("    -filename \"example.puml\"\tTo override %filename% variable");
 		System.out.println("    -preproc\t\tTo output preprocessor text of diagrams");
 		System.out.println("    -cypher\t\tTo cypher texts of diagrams so that you can share them");
@@ -185,7 +187,7 @@ public class OptionPrint {
 			System.out.println(v);
 		}
 		System.out.println();
-		final List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 		final int errorCode = GraphvizUtils.addDotStatus(result, false);
 		for (String s : result) {
 			System.out.println(s);
@@ -211,7 +213,7 @@ public class OptionPrint {
 			all = Arrays.asList("java.runtime.name", "Java Runtime", "java.vm.name", "JVM", "file.encoding",
 					"Default Encoding", "user.language", "Language", "user.country", "Country");
 		}
-		final List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 		for (int i = 0; i < all.size(); i += 2) {
 			result.add(all.get(i + 1) + ": " + p.getProperty(all.get(i)));
 		}
@@ -219,7 +221,7 @@ public class OptionPrint {
 	}
 
 	public static Collection<String> interestingValues() {
-		final List<String> strings = new ArrayList<String>();
+		final List<String> strings = new ArrayList<>();
 //		if (withIp() == false) {
 //			strings.add("Machine: " + getHostName());
 //		}

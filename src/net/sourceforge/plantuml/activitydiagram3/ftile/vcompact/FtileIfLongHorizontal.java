@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
@@ -80,7 +81,7 @@ class FtileIfLongHorizontal extends AbstractFtile {
 	private final List<Ftile> tiles;
 	private final Ftile tile2;
 	private final List<Ftile> diamonds;
-	private final List<Ftile> couples = new ArrayList<Ftile>();
+	private final List<Ftile> couples = new ArrayList<>();
 
 	private final Rainbow arrowColor;
 
@@ -96,8 +97,8 @@ class FtileIfLongHorizontal extends AbstractFtile {
 			couples.add(FtileUtils.addHorizontalMargin(tmp, inlabelSizes.get(i), 0));
 		}
 		this.tile2 = tile2;
-		this.diamonds = new ArrayList<Ftile>(diamonds);
-		this.tiles = new ArrayList<Ftile>(tiles);
+		this.diamonds = new ArrayList<>(diamonds);
+		this.tiles = new ArrayList<>(tiles);
 
 		this.arrowColor = arrowColor;
 
@@ -108,7 +109,7 @@ class FtileIfLongHorizontal extends AbstractFtile {
 		for (Ftile diamond : diamonds) {
 			maxOutY = Math.max(maxOutY, diamond.calculateDimension(stringBounder).getOutY());
 		}
-		final List<Ftile> result = new ArrayList<Ftile>();
+		final List<Ftile> result = new ArrayList<>();
 		for (int i = 0; i < diamonds.size(); i++) {
 			Ftile diamond = diamonds.get(i);
 			final double missing = maxOutY - diamond.calculateDimension(stringBounder).getOutY();
@@ -120,7 +121,7 @@ class FtileIfLongHorizontal extends AbstractFtile {
 	}
 
 	public Set<Swimlane> getSwimlanes() {
-		final Set<Swimlane> result = new HashSet<Swimlane>();
+		final Set<Swimlane> result = new HashSet<>();
 		if (getSwimlaneIn() != null) {
 			result.add(getSwimlaneIn());
 		}
@@ -143,10 +144,8 @@ class FtileIfLongHorizontal extends AbstractFtile {
 			FtileFactory ftileFactory, ConditionStyle conditionStyle, List<Branch> thens, Branch branch2,
 			FontConfiguration fcArrow, LinkRendering topInlinkRendering, LinkRendering afterEndwhile,
 			FontConfiguration fcTest) {
-		if (afterEndwhile == null) {
-			throw new IllegalArgumentException();
-		}
-		final List<Ftile> tiles = new ArrayList<Ftile>();
+		Objects.requireNonNull(afterEndwhile);
+		final List<Ftile> tiles = new ArrayList<>();
 
 		for (Branch branch : thens) {
 			tiles.add(new FtileMinWidthCentered(branch.getFtile(), 30));
@@ -154,8 +153,8 @@ class FtileIfLongHorizontal extends AbstractFtile {
 
 		final Ftile tile2 = new FtileMinWidthCentered(branch2.getFtile(), 30);
 
-		List<Ftile> diamonds = new ArrayList<Ftile>();
-		List<Double> inlabelSizes = new ArrayList<Double>();
+		List<Ftile> diamonds = new ArrayList<>();
+		List<Double> inlabelSizes = new ArrayList<>();
 		for (Branch branch : thens) {
 			final TextBlock tb1 = branch.getLabelPositive().create(fcArrow, HorizontalAlignment.LEFT,
 					ftileFactory.skinParam());
@@ -187,7 +186,7 @@ class FtileIfLongHorizontal extends AbstractFtile {
 
 		final FtileIfLongHorizontal result = new FtileIfLongHorizontal(diamonds, inlabelSizes, tiles, tile2,
 				arrowColor);
-		final List<Connection> conns = new ArrayList<Connection>();
+		final List<Connection> conns = new ArrayList<>();
 
 		int nbOut = 0;
 
@@ -471,7 +470,7 @@ class FtileIfLongHorizontal extends AbstractFtile {
 			final StringBounder stringBounder = ug.getStringBounder();
 			final Dimension2D totalDim = calculateDimensionInternal(stringBounder);
 
-			final List<Ftile> allTiles = new ArrayList<Ftile>(couples);
+			final List<Ftile> allTiles = new ArrayList<>(couples);
 			allTiles.add(tile2);
 
 			final double[] minmax;
@@ -590,7 +589,7 @@ class FtileIfLongHorizontal extends AbstractFtile {
 
 	@Override
 	public Collection<Ftile> getMyChildren() {
-		final List<Ftile> result = new ArrayList<Ftile>(tiles);
+		final List<Ftile> result = new ArrayList<>(tiles);
 		result.add(tile2);
 		return Collections.unmodifiableList(result);
 	}
@@ -690,7 +689,7 @@ class FtileIfLongHorizontal extends AbstractFtile {
 	protected FtileGeometry calculateDimensionFtile(StringBounder stringBounder) {
 		final Dimension2D dimTotal = calculateDimensionInternal(stringBounder);
 
-		final List<Ftile> all = new ArrayList<Ftile>(tiles);
+		final List<Ftile> all = new ArrayList<>(tiles);
 		all.add(tile2);
 		for (Ftile tmp : all) {
 			if (tmp.calculateDimension(stringBounder).hasPointOut()) {

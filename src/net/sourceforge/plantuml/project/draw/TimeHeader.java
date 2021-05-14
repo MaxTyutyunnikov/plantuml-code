@@ -35,7 +35,10 @@
  */
 package net.sourceforge.plantuml.project.draw;
 
+import java.util.Objects;
+
 import net.sourceforge.plantuml.SpriteContainerEmpty;
+import net.sourceforge.plantuml.ThemeStyle;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
@@ -67,27 +70,26 @@ public abstract class TimeHeader {
 	private final TimeScale timeScale;
 	private final Style style;
 	private final HColorSet colorSet;
+	private final ThemeStyle themeStyle;
 
 	protected final Day min;
 	protected final Day max;
 
-	public TimeHeader(Day min, Day max, TimeScale timeScale, Style style, HColorSet colorSet) {
-		if (style == null) {
-			throw new IllegalArgumentException();
-		}
+	public TimeHeader(Day min, Day max, TimeScale timeScale, Style style, HColorSet colorSet, ThemeStyle themeStyle) {
 		this.timeScale = timeScale;
 		this.min = min;
 		this.max = max;
-		this.style = style;
+		this.style = Objects.requireNonNull(style);
 		this.colorSet = colorSet;
+		this.themeStyle = themeStyle;
 	}
 
 	protected final HColor closedBackgroundColor() {
-		return style.value(PName.BackGroundColor).asColor(colorSet);
+		return style.value(PName.BackGroundColor).asColor(themeStyle, colorSet);
 	}
 
 	protected final HColor closedFontColor() {
-		return style.value(PName.FontColor).asColor(colorSet);
+		return style.value(PName.FontColor).asColor(themeStyle, colorSet);
 	}
 
 	public abstract double getTimeHeaderHeight();

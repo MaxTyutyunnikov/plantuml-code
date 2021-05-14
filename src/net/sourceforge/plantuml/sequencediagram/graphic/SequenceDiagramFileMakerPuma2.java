@@ -107,7 +107,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			// }
 		}
 		drawableSet = initializer.createDrawableSet(stringBounder);
-		final List<Newpage> newpages = new ArrayList<Newpage>();
+		final List<Newpage> newpages = new ArrayList<>();
 		for (Event ev : drawableSet.getAllEvents()) {
 			if (ev instanceof Newpage) {
 				newpages.add((Newpage) ev);
@@ -196,7 +196,8 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 				}
 
 				if (compTitle != null) {
-					compTitle.drawU(ug.apply(new UTranslate(area.getTitleX(), area.getTitleY())));
+					final HColor back = diagram.calculateBackColor();
+					compTitle.drawU(ug.apply(back.bg()).apply(new UTranslate(area.getTitleX(), area.getTitleY())));
 				}
 				caption.drawU(ug.apply(new UTranslate(area.getCaptionX(), area.getCaptionY())));
 
@@ -218,9 +219,7 @@ public class SequenceDiagramFileMakerPuma2 implements FileMaker {
 			}
 
 		};
-		return diagram.createImageBuilder(fileFormatOption)
-				.drawable(drawable)
-				.write(os);
+		return diagram.createImageBuilder(fileFormatOption).drawable(drawable).write(os);
 	}
 
 	private void drawFooter(SequenceDiagramArea area, UGraphic ug, int page) {

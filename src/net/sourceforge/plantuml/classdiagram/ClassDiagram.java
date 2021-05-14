@@ -37,6 +37,7 @@ package net.sourceforge.plantuml.classdiagram;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.ISkinSimple;
@@ -64,10 +65,7 @@ public class ClassDiagram extends AbstractClassOrObjectDiagram {
 	}
 
 	private Code getShortName1972(Code code) {
-		final String separator = getNamespaceSeparator();
-		if (separator == null) {
-			throw new IllegalArgumentException();
-		}
+		final String separator = Objects.requireNonNull(getNamespaceSeparator());
 		final String codeString = code.getName();
 		final String namespace = getNamespace1972(code, getNamespaceSeparator());
 		if (namespace == null) {
@@ -78,7 +76,7 @@ public class ClassDiagram extends AbstractClassOrObjectDiagram {
 
 	@Override
 	public ILeaf getOrCreateLeaf(Ident ident, Code code, LeafType type, USymbol symbol) {
-		checkNotNull(ident);
+		Objects.requireNonNull(ident);
 		if (this.V1972()) {
 			if (type == null) {
 				type = LeafType.CLASS;
@@ -109,7 +107,7 @@ public class ClassDiagram extends AbstractClassOrObjectDiagram {
 
 	@Override
 	public ILeaf createLeaf(Ident idNewLong, Code code, Display display, LeafType type, USymbol symbol) {
-		checkNotNull(idNewLong);
+		Objects.requireNonNull(idNewLong);
 		if (type != LeafType.ABSTRACT_CLASS && type != LeafType.ANNOTATION && type != LeafType.CLASS
 				&& type != LeafType.INTERFACE && type != LeafType.ENUM && type != LeafType.LOLLIPOP_FULL
 				&& type != LeafType.LOLLIPOP_HALF && type != LeafType.NOTE) {
@@ -132,7 +130,7 @@ public class ClassDiagram extends AbstractClassOrObjectDiagram {
 			USymbol symbol) {
 		if (this.V1972())
 			throw new UnsupportedOperationException();
-		checkNotNull(id);
+		Objects.requireNonNull(id);
 		final IGroup backupCurrentGroup = getCurrentGroup();
 		final IGroup group = backupCurrentGroup;
 		final String namespaceString = getNamespace1972(fullyCode, getNamespaceSeparator());

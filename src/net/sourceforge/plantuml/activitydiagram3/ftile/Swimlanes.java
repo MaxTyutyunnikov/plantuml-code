@@ -39,6 +39,7 @@ import java.awt.geom.Dimension2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.FontParam;
@@ -92,9 +93,9 @@ public class Swimlanes extends AbstractTextBlock implements TextBlock, Styleable
 	private final ISkinParam skinParam;;
 	private final Pragma pragma;
 
-	private final List<Swimlane> swimlanesRaw = new ArrayList<Swimlane>();
-	private final List<Swimlane> swimlanesSpecial = new ArrayList<Swimlane>();
-	private final List<LaneDivider> dividers = new ArrayList<LaneDivider>();
+	private final List<Swimlane> swimlanesRaw = new ArrayList<>();
+	private final List<Swimlane> swimlanesSpecial = new ArrayList<>();
+	private final List<LaneDivider> dividers = new ArrayList<>();
 	private Swimlane currentSwimlane = null;
 
 	private final Instruction root = new InstructionList();
@@ -229,7 +230,8 @@ public class Swimlanes extends AbstractTextBlock implements TextBlock, Styleable
 		final HorizontalAlignment horizontalAlignment = HorizontalAlignment.LEFT;
 		FontConfiguration fontConfiguration = new FontConfiguration(skinParam, FontParam.SWIMLANE_TITLE, null);
 		if (UseStyle.useBetaStyle()) {
-			fontConfiguration = getStyle().getFontConfiguration(skinParam.getIHtmlColorSet());
+			fontConfiguration = getStyle().getFontConfiguration(skinParam.getThemeStyle(),
+					skinParam.getIHtmlColorSet());
 		}
 		LineBreakStrategy wrap = getWrap();
 		if (wrap.isAuto()) {
@@ -303,7 +305,8 @@ public class Swimlanes extends AbstractTextBlock implements TextBlock, Styleable
 	private void drawTitlesBackground(UGraphic ug) {
 		HColor color = skinParam.getHtmlColor(ColorParam.swimlaneTitleBackground, null, false);
 		if (UseStyle.useBetaStyle()) {
-			color = getStyle().value(PName.BackGroundColor).asColor(skinParam.getIHtmlColorSet());
+			color = getStyle().value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
+					skinParam.getIHtmlColorSet());
 		}
 		if (color != null) {
 			final double titleHeight = getTitlesHeight(ug.getStringBounder());
@@ -411,10 +414,7 @@ public class Swimlanes extends AbstractTextBlock implements TextBlock, Styleable
 	}
 
 	public void setNextLinkRenderer(LinkRendering link) {
-		if (link == null) {
-			throw new IllegalArgumentException();
-		}
-		this.nextLinkRenderer = link;
+		this.nextLinkRenderer = Objects.requireNonNull(link);
 	}
 
 	public Swimlane getCurrentSwimlane() {

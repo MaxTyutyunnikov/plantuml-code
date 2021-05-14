@@ -48,6 +48,7 @@ import net.sourceforge.plantuml.project.command.CommandColorTask;
 import net.sourceforge.plantuml.project.command.CommandFootbox;
 import net.sourceforge.plantuml.project.command.CommandGanttArrow;
 import net.sourceforge.plantuml.project.command.CommandGanttArrow2;
+import net.sourceforge.plantuml.project.command.CommandLabelOnColumn;
 import net.sourceforge.plantuml.project.command.CommandNoteBottom;
 import net.sourceforge.plantuml.project.command.CommandPage;
 import net.sourceforge.plantuml.project.command.CommandPrintBetween;
@@ -82,7 +83,7 @@ public class GanttDiagramFactory extends PSystemCommandFactory {
 
 	@Override
 	protected List<Command> createCommands() {
-		final List<Command> cmds = new ArrayList<Command>();
+		final List<Command> cmds = new ArrayList<>();
 		addTitleCommands(cmds);
 		addCommonCommands2(cmds);
 
@@ -105,6 +106,7 @@ public class GanttDiagramFactory extends PSystemCommandFactory {
 		cmds.add(new CommandPage());
 		cmds.add(new CommandNoteBottom());
 		cmds.add(new CommandFootbox());
+		cmds.add(new CommandLabelOnColumn());
 
 		// cmds.add(new CommandScaleWidthAndHeight());
 		// cmds.add(new CommandScaleWidthOrHeight());
@@ -115,7 +117,7 @@ public class GanttDiagramFactory extends PSystemCommandFactory {
 		return cmds;
 	}
 
-	static private final Collection<Command> cache = new ArrayList<Command>();
+	static private final Collection<Command> cache = new ArrayList<>();
 
 	private static Collection<Command> getLanguageCommands() {
 		synchronized (cache) {

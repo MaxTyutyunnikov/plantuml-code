@@ -69,28 +69,28 @@ public class PSystemDonors extends PlainDiagram {
 	private static final int COLS = 6;
 	private static final int FREE_LINES = 6;
 
-	public static final String DONORS = "6sWD0AmFkBap0wp4H6CjU-RENbb-8cPf4i7oFA4uiOZJNK3y0UwT7lSRwI-YAxltJJEYrckJSaPHV13q"
-			+ "W7UtXVQXzBy-27EYV0Z-tGWU80D4ITH6jIptfDXjcof3Il3lEr_v9UWTth51eZbAgyMHwq-_8GFlEsFp"
-			+ "x3GsNZsQe2y2FmRsrVzTJelBGo7Cqcm5Hc3KQOHRtMF_7mLLrwXs9rN3JZ-cKxagXgkYAh7PzgQ8LjBS"
-			+ "CIlKjVDHeyb5CMafKjoja8RRw4neoCdi4sI31eqVweVmPdE5fOmpWJZQ4A7hwxqT-quilr3YWyWHOe7X"
-			+ "WJcGSbWMKUBSKD1m262ecqKrjgHopnCZAFpGGjxyeP5KF5BEd0uN3QS7GE3s32gGz44Dcd1sw6v0nP5i"
-			+ "qM69gwwC6qlpTLYUoXv9myt4mic2La0DGVu7NU3fiSP7KsVR38wadYPvdROIzMVYxRJD1NsZQvE4zRMr"
-			+ "QQQFAqLP8jMrZS_HNlC8mDrIAw_uCkQ8vm3DVlEg8giVBP0VWUwh2LloPzdlB2GXh6tO1-ewLnyULOHZ"
-			+ "CcIQMCVlPjjhsIzq1IORaB02BEdlXgyhJN2mXQvS7W6Uq2gcMUS3XRIqUh_eyMNjFk6QOebxuwBtCS9I"
-			+ "-kzNVPWPYWDqeCmiw9e5Yt8rhTgBBOXWZz2f0JU5P2ESLzVbkFguI1_v2O2ta16GmuRG2F7yaahNKGZL"
-			+ "aQbhqbm0p9zMsgBXieH1kNP1DwDAB5HMgprELsVwiZ5td_J1yrQ3COfZEgcniDozAjB3i5WrchDtQqTf"
-			+ "Ji4p-JZEgzvpC5S1hYsyHtnmppyo46TwPI1ISiXZtuT_PEbMOJ6BDjVDgdHNzOE3Xsu-S3UBPZ6ZJ1wo"
-			+ "B1WSJqHB_KhafoN3tq78PlbhTR5Fi3bTfuO8CxBWzjBacfeSqt2OpdAix2A4HorUSIeeN4ImbwKbsSAc"
-			+ "K7d6wb58oE-OJo9IMHPA0zQMkmBFf7iKvE6y1rOjgrjJIIwWYcmcY4aBLhLKSQIl1J9mhQ9dfdLY-zC2"
-			+ "2-hI7cFY38VYAoRQgjoGWIamCqJuXK4afW-afVIIaqG4_kVFNUgbrphuyPqnV38EaZqa4L15ndJgYMgc"
-			+ "xdOC6yPwYRzVB-Nc8_ZphptQvDHez_mCGRGE4W8mmWkubFk54JmD_7Ksz08EiKA8DXAkNBNqB92mO3FU"
-			+ "kObwS9jHlOd9ScDoqIloGnN_DfMeS38swBY8fJXQBAdIoyrgK0Ljt_okmqqEYh-BAaCYkUpDpcGaR1Ig"
-			+ "E3V7RcqOch4P0tXG7RK9jDtrsscMLuqvNv5K6Pu6vDiDEPNg4LfOKzFoiH1OBSRjlQNzbDFZFnde5zGw"
-			+ "-zYhXuQ3N5tVRgBXMnUadp6I62vITaJGMsfEBF3mJGHvKIsKZgLjC-pimGhv3RoC5n8EsS47abfUfQno"
-			+ "GmxTGlQEQfIVAAA6i40kB5ReAcAXbEE154d1dDKoaI7be2_OrnE0KnGSx-yj29UTQ7v6i_RsZ48obsxk"
-			+ "9XL4DfoVHMAJagqUER2VbhbiyuhSZbgamuvzExxZVFiZwkQB2382CIq9NgiBVNTZbraQDjEUwpGuZilS"
-			+ "F9Zy0dP5EqyPs1ecMv2bR0OgdWGWTiYWmenNyglvY6lE1VBl_KOf33JXUU8qkl5S2rQHhJOY9GrekSaI"
-			+ "klRzZfkS72YSM6nmOOcvqSC4YawlKsq_QRCiWqeKBXLVsCEiPbEgV6JOGNFPQkVLzWG0";
+	public static final String DONORS = "6wOD0AmFjCllA6nYeh4EstErPvQF9MScYM1vdb2SMCJfBY3-0FTEZ_kDz1VHbTtxfXbHwxL9EOEeFWXw"
+			+ "mBlRGljG-byVX3bBNWHtfWGNa0AYEBf4VgGRsKwVL1bIWcUfwEzlcRYztJekL2Q9lX7AWU9-EMJWRVfi"
+			+ "dft6eD4BL1_-zf1sN_s_gRDrUIY4MRfRWH4O5OrmN5ycSw__erfKE0KxXnfs-Z6Tkg0w7AfLYSssDqMq"
+			+ "akQEMQ6-dOzQJIwAaLAa-6iZ3RyOJ6ZCoUoJv9T-qVYbRiA7rkeQOjm1n3bJEhfkw-ryF8Zb5qby2F84"
+			+ "Nr2im1n8ET8lejcvwK73mu6XVXVLsDB2FKzI894DBUJDFugaq7k8iylWfk5L0GA_Tr21P0ngr8Ip0tS3"
+			+ "Akd15fqQkEfYVs5fMOVbAJsJXgSH2oyBQW4r14aCUa5dz9LRfkvvA1m9UKhYEMqLwi-2Tz0s5_IDBIK1"
+			+ "wslxgLcIF-AKhOSq7RdF-LTd1xnhoChLRyOSaPoWAIzpGPblBL0_0Zqq9so9xrNkBCGXr4VgfW-TQmwr"
+			+ "Yd12BYaLw-Hbjhsc_w4hPx914PuE5laz-UjYKnnieQibDS0RMYKqwtm2IGtrzvSyNZhV1TUKIDmR4Mr4"
+			+ "TWtHVp-tD3CK1-ZWDBEXcoPO1gkqwYYs888zGiS7t2Ga1-5ycbpsf-MNw2q_0V1c4a5ts0WqWT-_k3Ba"
+			+ "o8KqaAbhqrm0R3sjr8k6poCCAdG8kXLLmkbjxleP9erjoyQMPT8kdhSRZ94Vqt75XUKobyW8mnArQDOV"
+			+ "rWxHBi5LFaxoglTCSXNWKk4zQkFUlsJ0pZ1d859ikkFnIDjY6UgmcCMUwwKkkgVRoS53jnoucqLpc54c"
+			+ "3va6WoE9gActYFhGOFYRG5Qprnfqds1hkCuC7cQamUkfoGqrEQRXiPtbEDaYH8QvUCKf8bnGi9Tb9pcw"
+			+ "bf1onEfnICZlH9z4f4fVA8tOkTnLU4RsACZ3UO-iUjIFAPXSG9KnJH2M5gmvGz0UjXR8m5f5psmRnEwN"
+			+ "TYoOs_pan8f3yHKJRJTkK305PeOmRXX4eZBGAAKNdoGYyDqVTwidrpgiuxjxMZ4EaXQI2AX2cSxyGJLJ"
+			+ "Jpr2qrYlyVzjhRqiEt_-jKSsEJNPQ-yXYDP1J00Yl42NSdyGmLFWwys6cO1Jh62Y9mbNhbbw6aXOi8K-"
+			+ "k8awsMOqRxnORbmkMdj-g9AVvdQuc0s-8ST5E6YVVOaghRtKWuhOlkLTXviS1lukgWoBvB9NpsGaT1Ag"
+			+ "EBV7RZCLpLXbW1NCWTe4zkx-h4pZAMFkLo1LXYj0ljkG8QdHGmjhQbeH5m9hf7DxRsuRuep-BnZeHxJM"
+			+ "pxrwQ3p9rVKN4uLlHmZZd4ZYSf5u8CAufUP4Wnw-2I8VL0jbO6d733jti49-Wp_66mb7xE03JZtceZpj"
+			+ "XHnZ2zaxPu4_8NWFeO4iB5RgLSH2ASS3APA2EQjbB4FQILjmLcy0dQ9W_F_UXd1wela5cLtcrHl9N8wv"
+			+ "brGGwN1_5ebDIxO6vC2-bBbiwuhSphb8Xvtu7_YEyvsFg5iN4IY1A2N1QpCXtztOfzh4flHShy5nNER5"
+			+ "mUGNiYlQ-PA1hR7OWYndCr3m902rWqA5oglmg_qJrvmpvDzxzr8OQCBpr6rquxaNJ8iLI_2KDA3c9alW"
+			+ "slTxRh8uK3ZHsE32KdEZXqazMkPJxRXfivuCAf6xL4pq2BERbgZo4rrFgiiXKxTUKBCajAux4tJosnRa" + "qhLppmip9EnB2W00";
 
 	/*
 	 * Special thanks to our sponsors and donors:
@@ -126,7 +126,7 @@ public class PSystemDonors extends PlainDiagram {
 	}
 
 	public static List<TextBlock> getCols(List<String> lines, final int nbCol, final int reserved) throws IOException {
-		final List<TextBlock> result = new ArrayList<TextBlock>();
+		final List<TextBlock> result = new ArrayList<>();
 		final int maxLine = (lines.size() + (nbCol - 1) + reserved) / nbCol;
 		for (int i = 0; i < lines.size(); i += maxLine) {
 			final List<String> current = lines.subList(i, Math.min(lines.size(), i + maxLine));
@@ -136,7 +136,7 @@ public class PSystemDonors extends PlainDiagram {
 	}
 
 	private List<String> getDonors() throws IOException {
-		final List<String> lines = new ArrayList<String>();
+		final List<String> lines = new ArrayList<>();
 		final Transcoder t = TranscoderImpl.utf8(new AsciiEncoder(), new StringCompressorNone(),
 				new CompressionBrotli());
 		try {

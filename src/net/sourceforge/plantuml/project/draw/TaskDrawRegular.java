@@ -53,6 +53,7 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.project.GanttConstraint;
+import net.sourceforge.plantuml.project.LabelStrategy;
 import net.sourceforge.plantuml.project.ToTaskDraw;
 import net.sourceforge.plantuml.project.core.Task;
 import net.sourceforge.plantuml.project.core.TaskAttribute;
@@ -97,7 +98,7 @@ public class TaskDrawRegular extends AbstractTaskDraw {
 		this.end = end;
 		this.oddStart = oddStart;
 		this.oddEnd = oddEnd;
-		this.paused = new TreeSet<Day>(((TaskImpl) task).getAllPaused());
+		this.paused = new TreeSet<>(((TaskImpl) task).getAllPaused());
 		for (Day tmp = start; tmp.compareTo(end) <= 0; tmp = tmp.increment()) {
 			final int load = toTaskDraw.getDefaultPlan().getLoadAt(tmp);
 			if (load == 0) {
@@ -111,18 +112,31 @@ public class TaskDrawRegular extends AbstractTaskDraw {
 	protected double getShapeHeight(StringBounder stringBounder) {
 		final Style style = getStyle();
 		final ClockwiseTopRightBottomLeft padding = style.getPadding();
-		return padding.getTop() + getTextBlock().calculateDimension(stringBounder).getHeight() + padding.getBottom();
+		return padding.getTop() + getTitle().calculateDimension(stringBounder).getHeight() + padding.getBottom();
 	}
 
-	public void drawTitle(UGraphic ug) {
-		final TextBlock title = getTextBlock();
+	@Override
+	public void drawTitle(UGraphic ug, LabelStrategy labelStrategy, double colTitles, double colBars) {
+		final TextBlock title = getTitle();
 		final StringBounder stringBounder = ug.getStringBounder();
 		final Dimension2D dim = title.calculateDimension(stringBounder);
 
 		final Style style = getStyleSignature().getMergedStyle(getStyleBuilder());
 		final ClockwiseTopRightBottomLeft margin = style.getMargin();
 		final ClockwiseTopRightBottomLeft padding = style.getPadding();
+
 		ug = ug.apply(UTranslate.dy(margin.getTop() + padding.getTop()));
+
+		if (labelStrategy.titleInFirstColumn()) {
+			if (labelStrategy.rightAligned())
+				title.drawU(ug.apply(UTranslate.dx(colTitles - dim.getWidth() - margin.getRight())));
+			else
+				title.drawU(ug.apply(UTranslate.dx(margin.getLeft())));
+			return;
+		} else if (labelStrategy.titleInLastColumn()) {
+			title.drawU(ug.apply(UTranslate.dx(colBars + margin.getLeft())));
+			return;
+		}
 
 		final double pos1 = timeScale.getStartingPosition(start) + 6;
 		final double pos2 = timeScale.getEndingPosition(end) - 6;
@@ -134,7 +148,8 @@ public class TaskDrawRegular extends AbstractTaskDraw {
 		title.drawU(ug.apply(UTranslate.dx(pos)));
 	}
 
-	private TextBlock getTextBlock() {
+	@Override
+	protected TextBlock getTitle() {
 		return Display.getWithNewlines(prettyDisplay).create(getFontConfiguration(), HorizontalAlignment.LEFT,
 				new SpriteContainerEmpty());
 	}
@@ -193,15 +208,16 @@ public class TaskDrawRegular extends AbstractTaskDraw {
 		final Style style = StyleSignature.of(SName.root, SName.element, SName.ganttDiagram, SName.note)
 				.getMergedStyle(getStyleBuilder());
 
-		final FontConfiguration fc = style.getFontConfiguration(getColorSet());
+		final FontConfiguration fc = style.getFontConfiguration(skinParam.getThemeStyle(), getColorSet());
 
 		final HorizontalAlignment horizontalAlignment = style.value(PName.HorizontalAlignment).asHorizontalAlignment();
 		final Sheet sheet = Parser.build(fc, horizontalAlignment, skinParam, CreoleMode.FULL).createSheet(note);
 		final double padding = style.value(PName.Padding).asDouble();
 		final SheetBlock1 sheet1 = new SheetBlock1(sheet, LineBreakStrategy.NONE, padding);
 
-		final HColor noteBackgroundColor = style.value(PName.BackGroundColor).asColor(getColorSet());
-		final HColor borderColor = style.value(PName.LineColor).asColor(getColorSet());
+		final HColor noteBackgroundColor = style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
+				getColorSet());
+		final HColor borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getColorSet());
 		final double shadowing = style.value(PName.Shadowing).asDouble();
 
 		return new Opale(shadowing, borderColor, noteBackgroundColor, sheet1, false);
@@ -265,7 +281,7 @@ public class TaskDrawRegular extends AbstractTaskDraw {
 
 		final double round = style.value(PName.RoundCorner).asDouble();
 
-		final Collection<Segment> off = new ArrayList<Segment>();
+		final Collection<Segment> off = new ArrayList<>();
 		for (Day pause : paused) {
 			final double x1 = timeScale.getStartingPosition(pause);
 			final double x2 = timeScale.getEndingPosition(pause);
@@ -273,7 +289,8 @@ public class TaskDrawRegular extends AbstractTaskDraw {
 		}
 
 		final HColor back2 = StyleSignature.of(SName.root, SName.document, SName.ganttDiagram)
-				.getMergedStyle(getStyleBuilder()).value(PName.BackGroundColor).asColor(getColorSet());
+				.getMergedStyle(getStyleBuilder()).value(PName.BackGroundColor)
+				.asColor(skinParam.getThemeStyle(), getColorSet());
 
 		final RectangleTask rectangleTask = new RectangleTask(startPos, endPos, round, completion, off);
 

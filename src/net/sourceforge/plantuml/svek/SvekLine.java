@@ -40,6 +40,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import net.sourceforge.plantuml.AlignmentParam;
@@ -208,9 +209,7 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 	public SvekLine(Link link, ColorSequence colorSequence, ISkinParam skinParam, StringBounder stringBounder,
 			FontConfiguration font, Bibliotekon bibliotekon, Pragma pragma) {
 
-		if (link == null) {
-			throw new IllegalArgumentException();
-		}
+		this.link = Objects.requireNonNull(link);
 		this.skinParam = skinParam;
 		// this.umlType = link.getUmlDiagramType();
 		this.useRankSame = skinParam.useRankSame();
@@ -239,7 +238,6 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 		this.pragma = pragma;
 		this.bibliotekon = bibliotekon;
 		this.stringBounder = stringBounder;
-		this.link = link;
 		this.ltail = ltail;
 		this.lhead = lhead;
 
@@ -769,7 +767,7 @@ public class SvekLine implements Moveable, Hideable, GuideLine {
 	}
 
 	private List<Point2D> getSquare(double x, double y) {
-		final List<Point2D> result = new ArrayList<Point2D>();
+		final List<Point2D> result = new ArrayList<>();
 		result.add(new Point2D.Double(x, y));
 		result.add(new Point2D.Double(x + 5, y));
 		result.add(new Point2D.Double(x + 10, y));

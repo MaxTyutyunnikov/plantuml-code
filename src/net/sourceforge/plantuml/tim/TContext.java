@@ -64,6 +64,7 @@ import net.sourceforge.plantuml.preproc2.PreprocessorIncludeStrategy;
 import net.sourceforge.plantuml.preproc2.PreprocessorUtils;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.security.SURL;
+import net.sourceforge.plantuml.theme.ThemeUtils;
 import net.sourceforge.plantuml.tim.expression.Knowledge;
 import net.sourceforge.plantuml.tim.expression.TValue;
 import net.sourceforge.plantuml.tim.iterator.CodeIterator;
@@ -82,8 +83,10 @@ import net.sourceforge.plantuml.tim.iterator.CodeIteratorWhile;
 import net.sourceforge.plantuml.tim.stdlib.AlwaysFalse;
 import net.sourceforge.plantuml.tim.stdlib.AlwaysTrue;
 import net.sourceforge.plantuml.tim.stdlib.CallUserFunction;
+import net.sourceforge.plantuml.tim.stdlib.Darken;
 import net.sourceforge.plantuml.tim.stdlib.DateFunction;
 import net.sourceforge.plantuml.tim.stdlib.Dirpath;
+import net.sourceforge.plantuml.tim.stdlib.Feature;
 import net.sourceforge.plantuml.tim.stdlib.FileExists;
 import net.sourceforge.plantuml.tim.stdlib.Filename;
 import net.sourceforge.plantuml.tim.stdlib.FunctionExists;
@@ -92,6 +95,9 @@ import net.sourceforge.plantuml.tim.stdlib.GetVersion;
 import net.sourceforge.plantuml.tim.stdlib.Getenv;
 import net.sourceforge.plantuml.tim.stdlib.IntVal;
 import net.sourceforge.plantuml.tim.stdlib.InvokeProcedure;
+import net.sourceforge.plantuml.tim.stdlib.IsDark;
+import net.sourceforge.plantuml.tim.stdlib.IsLight;
+import net.sourceforge.plantuml.tim.stdlib.Lighten;
 import net.sourceforge.plantuml.tim.stdlib.LogicalNot;
 import net.sourceforge.plantuml.tim.stdlib.Lower;
 import net.sourceforge.plantuml.tim.stdlib.Newline;
@@ -106,8 +112,8 @@ import net.sourceforge.plantuml.tim.stdlib.VariableExists;
 
 public class TContext {
 
-	private final List<StringLocated> resultList = new ArrayList<StringLocated>();
-	private final List<StringLocated> debug = new ArrayList<StringLocated>();
+	private final List<StringLocated> resultList = new ArrayList<>();
+	private final List<StringLocated> debug = new ArrayList<>();
 
 	public final FunctionsSet functionsSet = new FunctionsSet();
 
@@ -117,8 +123,8 @@ public class TContext {
 	private final Map<String, Sub> subs = new HashMap<String, Sub>();
 	private final DefinitionsContainer definitionsContainer;
 
-	// private final Set<FileWithSuffix> usedFiles = new HashSet<FileWithSuffix>();
-	private final Set<FileWithSuffix> filesUsedCurrent = new HashSet<FileWithSuffix>();
+	// private final Set<FileWithSuffix> usedFiles = new HashSet<>();
+	private final Set<FileWithSuffix> filesUsedCurrent = new HashSet<>();
 
 	public Set<FileWithSuffix> getFilesUsedCurrent() {
 		return Collections.unmodifiableSet(filesUsedCurrent);
@@ -149,15 +155,20 @@ public class TContext {
 		functionsSet.addFunction(new Lower());
 		functionsSet.addFunction(new StringFunction());
 		functionsSet.addFunction(new Newline());
+		functionsSet.addFunction(new Feature());
+		functionsSet.addFunction(new Lighten());
+		functionsSet.addFunction(new Darken());
+		functionsSet.addFunction(new IsDark());
+		functionsSet.addFunction(new IsLight());
+		// %standard_exists_function
+		// %str_replace
 		// !exit
 		// !log
 		// %min
 		// %max
 		// Regexp
-		// %plantuml_version
 		// %time
 		// %trim
-		// %str_replace
 	}
 
 	public TContext(ImportedFiles importedFiles, Defines defines, String charset,
@@ -267,6 +278,9 @@ public class TContext {
 
 		if (type == TLineType.INCLUDESUB) {
 			this.executeIncludesub(memory, s);
+			return null;
+		} else if (type == TLineType.THEME) {
+			this.executeTheme(memory, s);
 			return null;
 		} else if (type == TLineType.INCLUDE) {
 			this.executeInclude(memory, s);
@@ -466,6 +480,13 @@ public class TContext {
 		log.analyze(this, memory);
 	}
 
+	public FileWithSuffix getFileWithSuffix(String from, String realName) throws IOException {
+		final String s = ThemeUtils.getFullPath(from, realName);
+		final FileWithSuffix file = importedFiles.getFile(s, null);
+		return file;
+
+	}
+
 	private void executeIncludesub(TMemory memory, StringLocated s) throws EaterException, EaterExceptionLocated {
 		ImportedFiles saveImportedFiles = null;
 		try {
@@ -521,7 +542,7 @@ public class TContext {
 		final ReadLine reader2 = new ReadLineList(definition, s.getLocation());
 
 		try {
-			final List<StringLocated> body = new ArrayList<StringLocated>();
+			final List<StringLocated> body = new ArrayList<>();
 			do {
 				final StringLocated sl = reader2.readLine();
 				if (sl == null) {
@@ -542,6 +563,35 @@ public class TContext {
 		}
 	}
 
+	private void executeTheme(TMemory memory, StringLocated s) throws EaterException, EaterExceptionLocated {
+		final EaterTheme eater = new EaterTheme(s.getTrimmed());
+		eater.analyze(this, memory);
+		final ReadLine reader = eater.getTheme();
+		if (reader == null) {
+			throw EaterException.located("No such theme " + eater.getName());
+		}
+		try {
+			final List<StringLocated> body = new ArrayList<>();
+			do {
+				final StringLocated sl = reader.readLine();
+				if (sl == null) {
+					executeLines(memory, body, null, false);
+					return;
+				}
+				body.add(sl);
+			} while (true);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw EaterException.located("Error reading theme " + e);
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private void executeInclude(TMemory memory, StringLocated s) throws EaterException, EaterExceptionLocated {
 		final EaterInclude include = new EaterInclude(s.getTrimmed());
 		include.analyze(this, memory);
@@ -554,7 +604,7 @@ public class TContext {
 			location = location.substring(0, idx);
 		}
 
-		ReadLine reader2 = null;
+		ReadLine reader = null;
 		ImportedFiles saveImportedFiles = null;
 		try {
 			if (location.startsWith("http://") || location.startsWith("https://")) {
@@ -562,9 +612,9 @@ public class TContext {
 				if (url == null) {
 					throw EaterException.located("Cannot open URL");
 				}
-				reader2 = PreprocessorUtils.getReaderIncludeUrl2(url, s, suf, charset);
+				reader = PreprocessorUtils.getReaderIncludeUrl(url, s, suf, charset);
 			} else if (location.startsWith("<") && location.endsWith(">")) {
-				reader2 = PreprocessorUtils.getReaderStdlibInclude(s, location.substring(1, location.length() - 1));
+				reader = PreprocessorUtils.getReaderStdlibInclude(s, location.substring(1, location.length() - 1));
 			} else {
 				final FileWithSuffix f2 = importedFiles.getFile(location, suf);
 				if (f2.fileOk()) {
@@ -576,25 +626,25 @@ public class TContext {
 					}
 
 					if (StartDiagramExtractReader.containsStartDiagram(f2, s, charset)) {
-						reader2 = StartDiagramExtractReader.build(f2, s, charset);
+						reader = StartDiagramExtractReader.build(f2, s, charset);
 					} else {
-						final Reader reader = f2.getReader(charset);
-						if (reader == null) {
+						final Reader tmp = f2.getReader(charset);
+						if (tmp == null) {
 							throw EaterException.located("Cannot include file");
 						}
-						reader2 = ReadLineReader.create(reader, location, s.getLocation());
+						reader = ReadLineReader.create(tmp, location, s.getLocation());
 					}
 					saveImportedFiles = this.importedFiles;
 					this.importedFiles = this.importedFiles.withCurrentDir(f2.getParentFile());
-					assert reader2 != null;
+					assert reader != null;
 					filesUsedCurrent.add(f2);
 				}
 			}
-			if (reader2 != null) {
+			if (reader != null) {
 				try {
-					final List<StringLocated> body = new ArrayList<StringLocated>();
+					final List<StringLocated> body = new ArrayList<>();
 					do {
-						final StringLocated sl = reader2.readLine();
+						final StringLocated sl = reader.readLine();
 						if (sl == null) {
 							executeLines(memory, body, null, false);
 							return;
@@ -611,9 +661,9 @@ public class TContext {
 			e.printStackTrace();
 			throw EaterException.located("cannot include " + e);
 		} finally {
-			if (reader2 != null) {
+			if (reader != null) {
 				try {
-					reader2.close();
+					reader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

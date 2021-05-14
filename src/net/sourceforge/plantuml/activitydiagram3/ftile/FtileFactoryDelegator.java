@@ -37,6 +37,7 @@ package net.sourceforge.plantuml.activitydiagram3.ftile;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
@@ -88,7 +89,7 @@ public class FtileFactoryDelegator implements FtileFactory {
 			if (UseStyle.useBetaStyle()) {
 				final Style style = getDefaultStyleDefinitionArrow()
 						.getMergedStyle(skinParam().getCurrentStyleBuilder());
-				return Rainbow.build(style, skinParam().getIHtmlColorSet());
+				return Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
 			} else {
 				color = Rainbow.build(skinParam());
 			}
@@ -99,7 +100,7 @@ public class FtileFactoryDelegator implements FtileFactory {
 			if (UseStyle.useBetaStyle()) {
 				final Style style = getDefaultStyleDefinitionArrow()
 						.getMergedStyle(skinParam().getCurrentStyleBuilder());
-				return Rainbow.build(style, skinParam().getIHtmlColorSet());
+				return Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
 			} else {
 				color = Rainbow.build(skinParam());
 			}
@@ -115,7 +116,7 @@ public class FtileFactoryDelegator implements FtileFactory {
 		final FontConfiguration fontConfiguration;
 		if (UseStyle.useBetaStyle()) {
 			final Style style = getDefaultStyleDefinitionArrow().getMergedStyle(skinParam().getCurrentStyleBuilder());
-			fontConfiguration = style.getFontConfiguration(skinParam().getIHtmlColorSet());
+			fontConfiguration = style.getFontConfiguration(skinParam().getThemeStyle(), skinParam().getIHtmlColorSet());
 		} else {
 			fontConfiguration = new FontConfiguration(skinParam(), FontParam.ARROW, null);
 		}
@@ -163,17 +164,11 @@ public class FtileFactoryDelegator implements FtileFactory {
 	}
 
 	public Ftile decorateIn(Ftile ftile, LinkRendering linkRendering) {
-		if (linkRendering == null) {
-			throw new IllegalArgumentException();
-		}
-		return factory.decorateIn(ftile, linkRendering);
+		return factory.decorateIn(ftile, Objects.requireNonNull(linkRendering));
 	}
 
 	public Ftile decorateOut(Ftile ftile, LinkRendering linkRendering) {
-		if (linkRendering == null) {
-			throw new IllegalArgumentException();
-		}
-		return factory.decorateOut(ftile, linkRendering);
+		return factory.decorateOut(ftile, Objects.requireNonNull(linkRendering));
 	}
 
 	public Ftile assembly(Ftile tile1, Ftile tile2) {

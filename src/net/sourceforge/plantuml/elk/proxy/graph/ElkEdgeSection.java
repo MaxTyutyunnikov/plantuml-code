@@ -3,6 +3,7 @@ package net.sourceforge.plantuml.elk.proxy.graph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import net.sourceforge.plantuml.elk.proxy.Reflect;
 
@@ -11,10 +12,7 @@ public class ElkEdgeSection {
 	public final Object obj;
 
 	public ElkEdgeSection(Object obj) {
-		if (obj == null) {
-			throw new IllegalArgumentException();
-		}
-		this.obj = obj;
+		this.obj = Objects.requireNonNull(obj);
 	}
 
 	@Override
@@ -44,7 +42,7 @@ public class ElkEdgeSection {
 	}
 
 	public Collection<ElkBendPoint> getBendPoints() {
-		final List<ElkBendPoint> result = new ArrayList<ElkBendPoint>();
+		final List<ElkBendPoint> result = new ArrayList<>();
 		Collection internal = (Collection) Reflect.call(obj, "getBendPoints");
 		for (Object element : internal) {
 			result.add(new ElkBendPoint(element));
