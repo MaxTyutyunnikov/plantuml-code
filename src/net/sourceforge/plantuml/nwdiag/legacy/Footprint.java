@@ -32,7 +32,7 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.nwdiag.legacy;
 
 public class Footprint {
 
