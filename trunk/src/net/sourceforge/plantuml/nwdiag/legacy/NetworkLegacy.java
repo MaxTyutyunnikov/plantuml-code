@@ -32,91 +32,51 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.nwdiag.legacy;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.nwdiag.core.Network;
+import net.sourceforge.plantuml.nwdiag.next.NStage;
 
-public class Network {
+public class NetworkLegacy extends Network {
 
-	private final String name;
-	private final Map<Square, String> localSquare = new LinkedHashMap<Square, String>();
-	private HColor color;
-	private boolean visible = true;
-	private String ownAdress;
-	private boolean fullWidth;
+	private final Map<NServerLegacy, String> localServers = new LinkedHashMap<NServerLegacy, String>();
 	private final int stage;
 
 	@Override
 	public String toString() {
-		return name + "(" + stage + ")";
+		return super.toString() + "(" + stage + ")";
 	}
 
-	public Network(String name, int stage) {
-		this.name = name;
+	public NetworkLegacy(NStage nstage, String name, int stage) {
+		super(nstage, name);
 		this.stage = stage;
 	}
 
-	public String getAdress(Square element) {
-		return localSquare.get(element);
+	public String getAdress(NServerLegacy server) {
+		return localServers.get(server);
 	}
 
-	public void addSquare(Square square, Map<String, String> props) {
+	public void addServer(NServerLegacy server, Map<String, String> props) {
 		String address = props.get("address");
 		if (address == null) {
 			address = "";
 		}
-		if (address.length() == 0 && localSquare.containsKey(square)) {
+		if (address.length() == 0 && localServers.containsKey(server)) {
 			return;
 		}
-		localSquare.put(square, address);
+		localServers.put(server, address);
 	}
 
 	public boolean constainsLocally(String name) {
-		for (Square square : localSquare.keySet()) {
-			if (square.getName().equals(name)) {
+		for (NServerLegacy server : localServers.keySet()) {
+			if (server.getName().equals(name)) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	public final String getOwnAdress() {
-		return ownAdress;
-	}
-
-	public final void setOwnAdress(String ownAdress) {
-		this.ownAdress = ownAdress;
-	}
-
-	public final String getName() {
-		return name;
-	}
-
-	public final HColor getColor() {
-		return color;
-	}
-
-	public final void setColor(HColor color) {
-		this.color = color;
-	}
-
-	public void goInvisible() {
-		this.visible = false;
-	}
-
-	public final boolean isVisible() {
-		return visible;
-	}
-
-	public void setFullWidth(boolean fullWidth) {
-		this.fullWidth = fullWidth;
-	}
-
-	public final boolean isFullWidth() {
-		return fullWidth;
 	}
 
 	public final int getStage() {
@@ -125,12 +85,10 @@ public class Network {
 
 	private double xmin;
 	private double xmax;
-	private double y;
 
 	public void setMinMax(double xmin, double xmax) {
 		this.xmin = xmin;
 		this.xmax = xmax;
-
 	}
 
 	public final double getXmin() {
@@ -139,14 +97,6 @@ public class Network {
 
 	public final double getXmax() {
 		return xmax;
-	}
-
-	public final double getY() {
-		return y;
-	}
-
-	public final void setY(double y) {
-		this.y = y;
 	}
 
 }

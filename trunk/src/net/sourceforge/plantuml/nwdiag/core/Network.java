@@ -32,60 +32,77 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.nwdiag;
+package net.sourceforge.plantuml.nwdiag.core;
 
-public class NwArray {
+import net.sourceforge.plantuml.nwdiag.next.NStage;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-	private final LinkedElement data[][];
+public class Network {
 
-	public NwArray(int lines, int cols) {
-		this.data = new LinkedElement[lines][cols];
+	private final String name;
+	private HColor color;
+	private boolean visible = true;
+	private String ownAdress;
+	private double y;
+	private boolean fullWidth;
+	private final NStage nstage;
+
+	@Override
+	public String toString() {
+		return name;
 	}
 
-	public int getNbLines() {
-		return data.length;
+	public Network(NStage nstage, String name) {
+		this.name = name;
+		this.nstage = nstage;
 	}
 
-	public int getNbCols() {
-		return data[0].length;
+	public final String getOwnAdress() {
+		return ownAdress;
 	}
 
-	public LinkedElement get(int i, int j) {
-		return data[i][j];
+	public final void setOwnAdress(String ownAdress) {
+		this.ownAdress = ownAdress;
 	}
 
-	public LinkedElement[] getLine(int i) {
-		return data[i];
+	public final String getName() {
+		return name;
 	}
 
-	public void set(int i, int j, LinkedElement value) {
-		data[i][j] = value;
+	public final HColor getColor() {
+		return color;
 	}
 
-	public void swapCols(int col1, int col2) {
-		if (col1 == col2) {
-			throw new IllegalArgumentException();
-		}
-		for (int i = 0; i < getNbLines(); i++) {
-			final LinkedElement tmp = data[i][col1];
-			data[i][col1] = data[i][col2];
-			data[i][col2] = tmp;
-		}
-
+	public final void setColor(HColor color) {
+		this.color = color;
 	}
 
-	public Footprint getFootprint(NwGroup group) {
-		int min = Integer.MAX_VALUE;
-		int max = Integer.MIN_VALUE;
-		for (int i = 0; i < getNbLines(); i++) {
-			for (int j = 0; j < getNbCols(); j++) {
-				if (data[i][j] != null && group.matches(data[i][j])) {
-					min = Math.min(min, j);
-					max = Math.max(max, j);
-				}
-			}
-		}
-		return new Footprint(min, max);
+	public final void goInvisible() {
+		this.visible = false;
+	}
+
+	public final boolean isVisible() {
+		return visible;
+	}
+
+	public final double getY() {
+		return y;
+	}
+
+	public final void setY(double y) {
+		this.y = y;
+	}
+
+	public void setFullWidth(boolean fullWidth) {
+		this.fullWidth = fullWidth;
+	}
+
+	public final boolean isFullWidth() {
+		return fullWidth;
+	}
+
+	public final NStage getNstage() {
+		return nstage;
 	}
 
 }
