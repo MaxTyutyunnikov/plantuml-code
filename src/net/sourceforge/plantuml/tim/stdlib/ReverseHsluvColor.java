@@ -52,7 +52,7 @@ import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 public class ReverseHsluvColor extends SimpleReturnFunction {
 
 	public TFunctionSignature getSignature() {
-		return new TFunctionSignature("%reverse_hsluv_color", 2);
+		return new TFunctionSignature("%reverse_hsluv_color", 1);
 	}
 
 	public boolean canCover(int nbArg, Set<String> namedArgument) {
