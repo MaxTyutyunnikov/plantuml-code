@@ -5,12 +5,12 @@
  * (C) Copyright 2009-2020, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
- * 
+ *
  * http://plantuml.com/patreon (only 1$ per month!)
  * http://plantuml.com/paypal
- * 
+ *
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -30,53 +30,38 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
  *
  */
-package net.sourceforge.plantuml.project.core;
+package net.sourceforge.plantuml.tim.stdlib;
 
-import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.project.Load;
-import net.sourceforge.plantuml.project.lang.CenterBorderColor;
-import net.sourceforge.plantuml.project.time.Day;
-import net.sourceforge.plantuml.project.time.DayOfWeek;
-import net.sourceforge.plantuml.style.StyleBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public interface Task extends Moment {
+import net.sourceforge.plantuml.LineLocation;
+import net.sourceforge.plantuml.tim.EaterException;
+import net.sourceforge.plantuml.tim.EaterExceptionLocated;
+import net.sourceforge.plantuml.tim.TContext;
+import net.sourceforge.plantuml.tim.TFunctionSignature;
+import net.sourceforge.plantuml.tim.TMemory;
+import net.sourceforge.plantuml.tim.expression.TValue;
 
-	public TaskCode getCode();
+public class Dec2hex extends SimpleReturnFunction {
 
-	public Load getLoad();
+	public TFunctionSignature getSignature() {
+		return new TFunctionSignature("%dec2hex", 1);
+	}
 
-	public void setLoad(Load load);
+	public boolean canCover(int nbArg, Set<String> namedArgument) {
+		return nbArg == 1;
+	}
 
-	public void setStart(Day start);
-
-	public void setEnd(Day end);
-
-	public void setColors(CenterBorderColor... colors);
-
-	public void addResource(Resource resource, int percentage);
-
-	public void setDiamond(boolean diamond);
-
-	public boolean isDiamond();
-
-	public void setCompletion(int completion);
-
-	public void setUrl(Url url);
-
-	public void putInSameRowAs(Task row);
-
-	public Task getRow();
-
-	public void addPause(Day pause);
-
-	public void addPause(DayOfWeek pause);
-
-	public void setNote(Display note);
-
-	public StyleBuilder getStyleBuilder();
-
+	public TValue executeReturnFunction(TContext context, TMemory memory, LineLocation location, List<TValue> values,
+			Map<String, TValue> named) throws EaterException, EaterExceptionLocated {
+		try {
+			return TValue.fromString("" + Integer.toHexString(values.get(0).toInt()));
+		} catch (Throwable t) {
+			return TValue.fromString("");
+		}
+	}
 }
