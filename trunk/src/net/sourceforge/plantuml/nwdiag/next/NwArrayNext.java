@@ -34,46 +34,58 @@
  */
 package net.sourceforge.plantuml.nwdiag.next;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+public class NwArrayNext {
 
-public class NTetris<S extends Staged> {
+	private final LinkedElementNext data[][];
 
-	private final Map<S, Integer> all = new LinkedHashMap<>();
-	private final BooleanGrid grid = new BooleanGrid();
-	
-	@Override
-	public String toString() {
-		return all.toString();
+	public NwArrayNext(int lines, int cols) {
+		this.data = new LinkedElementNext[lines][cols];
 	}
 
-	public void add(S element) {
-		int x = 0;
-		while (true) {
-			if (grid.isSpaceAvailable(element, x)) {
-				all.put(element, x);
-				grid.useSpace(element, x);
-				return;
-			}
-			x++;
-			if (x > 100) {
-				throw new IllegalStateException();
-			}
-		}
+	public int getNbLines() {
+		return data.length;
 	}
 
-	public final Map<S, Integer> getPositions() {
-		return Collections.unmodifiableMap(all);
+	public int getNbCols() {
+		return data[0].length;
 	}
 
-	public int getNWidth() {
-		int max = 0;
-		for (Entry<S, Integer> ent : all.entrySet()) {
-			max = Math.max(max, ent.getValue() + ent.getKey().getNWidth());
-		}
-		return max;
+	public LinkedElementNext get(int i, int j) {
+		return data[i][j];
 	}
+
+	public LinkedElementNext[] getLine(int i) {
+		return data[i];
+	}
+
+	public void set(int i, int j, LinkedElementNext value) {
+		data[i][j] = value;
+	}
+
+//	public void swapCols(int col1, int col2) {
+//		if (col1 == col2) {
+//			throw new IllegalArgumentException();
+//		}
+//		for (int i = 0; i < getNbLines(); i++) {
+//			final LinkedElement tmp = data[i][col1];
+//			data[i][col1] = data[i][col2];
+//			data[i][col2] = tmp;
+//		}
+//
+//	}
+//
+//	public Footprint getFootprint(NwGroupLegacy group) {
+//		int min = Integer.MAX_VALUE;
+//		int max = Integer.MIN_VALUE;
+//		for (int i = 0; i < getNbLines(); i++) {
+//			for (int j = 0; j < getNbCols(); j++) {
+//				if (data[i][j] != null && group.matches(data[i][j])) {
+//					min = Math.min(min, j);
+//					max = Math.max(max, j);
+//				}
+//			}
+//		}
+//		return new Footprint(min, max);
+//	}
 
 }
