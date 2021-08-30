@@ -34,17 +34,8 @@
  */
 package net.sourceforge.plantuml.nwdiag.legacy;
 
-import java.awt.geom.Dimension2D;
-
-import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.nwdiag.core.Network;
 import net.sourceforge.plantuml.nwdiag.core.NwGroup;
-import net.sourceforge.plantuml.ugraphic.MinMax;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class NwGroupLegacy extends NwGroup {
 
@@ -55,9 +46,9 @@ public class NwGroupLegacy extends NwGroup {
 		return getName() + " " + network + " " + names();
 	}
 
-	public NwGroupLegacy(String name, NetworkLegacy network) {
+	public NwGroupLegacy(String name, Network network) {
 		super(name);
-		this.network = network;
+		this.network = (NetworkLegacy) network;
 	}
 
 	public int size() {
@@ -69,27 +60,6 @@ public class NwGroupLegacy extends NwGroup {
 			return false;
 		}
 		return names().contains(tested.getElement().getName());
-	}
-
-	public void drawGroup(UGraphic ug, MinMax size, ISkinParam skinParam) {
-		TextBlock block = null;
-		Dimension2D blockDim = null;
-		if (getDescription() != null) {
-			block = Display.getWithNewlines(getDescription()).create(getGroupDescriptionFontConfiguration(),
-					HorizontalAlignment.LEFT, skinParam);
-			blockDim = block.calculateDimension(ug.getStringBounder());
-			final double dy = size.getMinY() - blockDim.getHeight();
-			size = size.addPoint(size.getMinX(), dy);
-		}
-		HColor color = getColor();
-		if (color == null) {
-			color = colors.getColorOrWhite(skinParam.getThemeStyle(), "#AAA");
-		}
-		size.draw(ug, color);
-
-		if (block != null) {
-			block.drawU(ug.apply(new UTranslate(size.getMinX() + 5, size.getMinY())));
-		}
 	}
 
 	public final NetworkLegacy getNetwork() {
