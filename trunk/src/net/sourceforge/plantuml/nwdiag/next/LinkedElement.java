@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
-import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
@@ -51,10 +50,9 @@ import net.sourceforge.plantuml.nwdiag.core.Network;
 import net.sourceforge.plantuml.ugraphic.MinMax;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.utils.MathUtils;
 
-public class LinkedElementNext {
+public class LinkedElement {
 
 	public static final int MAGIC = 15;
 
@@ -65,7 +63,7 @@ public class LinkedElementNext {
 	private final List<Network> networks;
 	private final double topMargin;
 
-	public LinkedElementNext(double topMargin, NServer server, TextBlock box, Map<Network, TextBlock> conns,
+	public LinkedElement(double topMargin, NServer server, TextBlock box, Map<Network, TextBlock> conns,
 			List<Network> networks) {
 		this.topMargin = topMargin;
 		this.networks = networks;
@@ -119,9 +117,6 @@ public class LinkedElementNext {
 		final double alpha = yMiddle - dimBox.getHeight() / 2;
 		final double posLink1 = (yMiddle - dimBox.getHeight() / 2 - topMargin + MAGIC) / 2;
 
-		final HColor color = ColorParam.activityBorder.getDefaultValue();
-		ug = ug.apply(color);
-
 		final double xMiddle = width / 2;
 		final double xLinkPos = width / 2;
 
@@ -132,9 +127,9 @@ public class LinkedElementNext {
 				skip.add(n.getY());
 		}
 
-		if (server.hasItsOwnColumn()) {
+		if (server.printFirstLink()) {
 			if (network.isVisible()) {
-				new VerticalLine(ynet1 + GridTextBlockDecoratedNext.NETWORK_THIN, ynet1 + alpha, skip)
+				new VerticalLine(ynet1 + GridTextBlockDecorated.NETWORK_THIN, ynet1 + alpha, skip)
 						.drawU(ug.apply(UTranslate.dx(xLinkPos + network.magicDelta())));
 			} else {
 				new VerticalLine(ynet1, ynet1 + alpha, Collections.<Double>emptySet())
@@ -205,7 +200,7 @@ public class LinkedElementNext {
 		return network;
 	}
 
-	public final NServer getElement() {
+	public final NServer getServer() {
 		return server;
 	}
 

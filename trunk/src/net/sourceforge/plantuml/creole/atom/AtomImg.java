@@ -35,10 +35,11 @@
  */
 package net.sourceforge.plantuml.creole.atom;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.awt.Color;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
@@ -157,7 +158,7 @@ public class AtomImg extends AbstractAtom implements Atom {
 
 	private static Atom buildRasterFromData(String source, final FontConfiguration fc, final byte[] data, double scale,
 			Url url) throws IOException {
-		final BufferedImage read = ImageIO.read(new ByteArrayInputStream(data));
+		final BufferedImage read = ImageIO.read(data);
 		if (read == null) {
 			return AtomTextUtils.createLegacy("(Cannot decode: " + source + ")", fc);
 		}
@@ -185,7 +186,7 @@ public class AtomImg extends AbstractAtom implements Atom {
 		if (read == null) {
 			return AtomTextUtils.createLegacy("(Cannot decode SVG: " + text + ")", fc);
 		}
-		return new AtomImgSvg(new TileImageSvg(new String(read, "UTF-8")));
+		return new AtomImgSvg(new TileImageSvg(new String(read, UTF_8)));
 	}
 
 	// End

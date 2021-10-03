@@ -35,6 +35,7 @@
  */
 package net.sourceforge.plantuml.ugraphic;
 
+import static net.sourceforge.plantuml.graphic.TextBlockUtils.createTextLayout;
 import static net.sourceforge.plantuml.ugraphic.ImageBuilder.plainPngBuilder;
 
 import java.awt.Font;
@@ -43,7 +44,6 @@ import java.awt.Shape;
 import java.awt.font.TextLayout;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,7 +55,6 @@ import javax.xml.transform.TransformerException;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.graphic.UDrawable;
 import net.sourceforge.plantuml.security.ImageIO;
 import net.sourceforge.plantuml.security.SFile;
@@ -103,7 +102,7 @@ public class FontChecker {
 	}
 
 	public String getCharDesc(char c) {
-		final TextLayout t = new TextLayout("" + c, font.getUnderlayingFont(), TextBlockUtils.getFontRenderContext());
+		final TextLayout t = createTextLayout(font, "" + c);
 		final Shape sh = t.getOutline(null);
 		final double current[] = new double[6];
 		final PathIterator it = sh.getPathIterator(null);
@@ -121,7 +120,7 @@ public class FontChecker {
 	}
 
 	public String getCharDescVerbose(char c) {
-		final TextLayout t = new TextLayout("" + c, font.getUnderlayingFont(), TextBlockUtils.getFontRenderContext());
+		final TextLayout t = createTextLayout(font, "" + c);
 		final Shape sh = t.getOutline(null);
 		final double current[] = new double[6];
 		final PathIterator it = sh.getPathIterator(null);
@@ -176,15 +175,15 @@ public class FontChecker {
 			public void drawU(UGraphic ug) {
 				ug = ug.apply(HColorUtils.BLACK);
 				ug.draw(new URectangle(dim - 1, dim - 1));
-				if (ug instanceof UGraphic2) {
-					ug = (UGraphic2) ug.apply(new UTranslate(dim / 3, 2 * dim / 3));
+				if (!(ug instanceof LimitFinder)) {
+					ug = ug.apply(new UTranslate(dim / 3, 2 * dim / 3));
 					final UText text = new UText("" + c, FontConfiguration.blackBlueTrue(font));
 					ug.draw(text);
 				}
 			}
 		};
 		final byte[] bytes = plainPngBuilder(drawable).writeByteArray();
-		return ImageIO.read(new ByteArrayInputStream(bytes));
+		return ImageIO.read(bytes);
 	}
 
 	// public BufferedImage getBufferedImageOld(char c) throws IOException {

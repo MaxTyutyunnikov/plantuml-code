@@ -46,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +69,7 @@ import net.sourceforge.plantuml.security.SecurityUtils;
 import net.sourceforge.plantuml.sprite.SpriteGrayLevel;
 import net.sourceforge.plantuml.sprite.SpriteUtils;
 import net.sourceforge.plantuml.stats.StatsUtils;
-import net.sourceforge.plantuml.swing.MainWindow2;
+import net.sourceforge.plantuml.swing.MainWindow;
 import net.sourceforge.plantuml.syntax.LanguageDescriptor;
 import net.sourceforge.plantuml.utils.Cypher;
 import net.sourceforge.plantuml.version.Version;
@@ -171,7 +170,7 @@ public class Run {
 				}
 			}
 			try {
-				new MainWindow2(option, dir);
+				new MainWindow(option, dir);
 			} catch (java.awt.HeadlessException e) {
 				System.err.println("There is an issue with your server. You will find some tips here:");
 				System.err.println("https://forum.plantuml.net/3399/problem-with-x11-and-headless-exception");
@@ -298,17 +297,10 @@ public class Run {
 			return;
 		}
 
-		InputStream stream = null;
 		final BufferedImage im;
-		try {
-			stream = source.openStream();
+		try (InputStream stream = source.openStream()) {
 			im = ImageIO.read(stream);
-		} finally {
-			if (stream != null) {
-				stream.close();
-			}
 		}
-
 		final String name = getSpriteName(fileName);
 		final String s = compressed ? SpriteUtils.encodeCompressed(im, name, level)
 				: SpriteUtils.encode(im, name, level);
@@ -546,24 +538,24 @@ public class Run {
 					.withPreprocFormat();
 			final SFile file = suggested.getFile(0);
 			Log.info("Export preprocessing source to " + file.getPrintablePath());
-			final PrintWriter pw = charset == null ? file.createPrintWriter() : file.createPrintWriter(charset);
-			int level = 0;
-			for (CharSequence cs : blockUml.getDefinition(true)) {
-				String s = cs.toString();
-				if (cypher != null) {
-					if (s.contains("skinparam") && s.contains("{")) {
-						level++;
+			try (final PrintWriter pw = charset == null ? file.createPrintWriter() : file.createPrintWriter(charset)) {
+				int level = 0;
+				for (CharSequence cs : blockUml.getDefinition(true)) {
+					String s = cs.toString();
+					if (cypher != null) {
+						if (s.contains("skinparam") && s.contains("{")) {
+							level++;
+						}
+						if (level == 0 && s.contains("skinparam") == false) {
+							s = cypher.cypher(s);
+						}
+						if (level > 0 && s.contains("}")) {
+							level--;
+						}
 					}
-					if (level == 0 && s.contains("skinparam") == false) {
-						s = cypher.cypher(s);
-					}
-					if (level > 0 && s.contains("}")) {
-						level--;
-					}
+					pw.println(s);
 				}
-				pw.println(s);
 			}
-			pw.close();
 		}
 	}
 

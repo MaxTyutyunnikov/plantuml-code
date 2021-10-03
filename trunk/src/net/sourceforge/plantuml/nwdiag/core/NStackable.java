@@ -32,60 +32,14 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.nwdiag.legacy;
+package net.sourceforge.plantuml.nwdiag.core;
 
-public class NwArray {
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-	private final LinkedElement data[][];
+public interface NStackable {
 
-	public NwArray(int lines, int cols) {
-		this.data = new LinkedElement[lines][cols];
-	}
+	public void setDescription(String description);
 
-	public int getNbLines() {
-		return data.length;
-	}
-
-	public int getNbCols() {
-		return data[0].length;
-	}
-
-	public LinkedElement get(int i, int j) {
-		return data[i][j];
-	}
-
-	public LinkedElement[] getLine(int i) {
-		return data[i];
-	}
-
-	public void set(int i, int j, LinkedElement value) {
-		data[i][j] = value;
-	}
-
-	public void swapCols(int col1, int col2) {
-		if (col1 == col2) {
-			throw new IllegalArgumentException();
-		}
-		for (int i = 0; i < getNbLines(); i++) {
-			final LinkedElement tmp = data[i][col1];
-			data[i][col1] = data[i][col2];
-			data[i][col2] = tmp;
-		}
-
-	}
-
-	public Footprint getFootprint(NwGroupLegacy group) {
-		int min = Integer.MAX_VALUE;
-		int max = Integer.MIN_VALUE;
-		for (int i = 0; i < getNbLines(); i++) {
-			for (int j = 0; j < getNbCols(); j++) {
-				if (data[i][j] != null && group.matches(data[i][j])) {
-					min = Math.min(min, j);
-					max = Math.max(max, j);
-				}
-			}
-		}
-		return new Footprint(min, max);
-	}
+	public void setColor(HColor color);
 
 }
