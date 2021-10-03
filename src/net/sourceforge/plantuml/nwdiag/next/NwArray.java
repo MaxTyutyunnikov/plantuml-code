@@ -32,43 +32,60 @@
  * Original Author:  Arnaud Roques
  *
  */
-package net.sourceforge.plantuml.nwdiag.legacy;
+package net.sourceforge.plantuml.nwdiag.next;
 
-public class Footprint {
+public class NwArray {
 
-	private final int min;
-	private final int max;
+	private final LinkedElement data[][];
 
-	public Footprint(int min, int max) {
-		if (max < min) {
-			throw new IllegalArgumentException();
-		}
-		assert max >= min;
-		this.min = min;
-		this.max = max;
+	public NwArray(int lines, int cols) {
+		this.data = new LinkedElement[lines][cols];
 	}
 
-	@Override
-	public String toString() {
-		return "" + min + " -> " + max;
+	public int getNbLines() {
+		return data.length;
 	}
 
-	public Footprint intersection(Footprint other) {
-		if (this.max < other.min) {
-			return null;
-		}
-		if (this.min > other.max) {
-			return null;
-		}
-		return new Footprint(Math.max(this.min, other.min), Math.min(this.max, other.max));
+	public int getNbCols() {
+		return data[0].length;
 	}
 
-	public final int getMin() {
-		return min;
+	public LinkedElement get(int i, int j) {
+		return data[i][j];
 	}
 
-	public final int getMax() {
-		return max;
+	public LinkedElement[] getLine(int i) {
+		return data[i];
 	}
+
+	public void set(int i, int j, LinkedElement value) {
+		data[i][j] = value;
+	}
+
+//	public void swapCols(int col1, int col2) {
+//		if (col1 == col2) {
+//			throw new IllegalArgumentException();
+//		}
+//		for (int i = 0; i < getNbLines(); i++) {
+//			final LinkedElement tmp = data[i][col1];
+//			data[i][col1] = data[i][col2];
+//			data[i][col2] = tmp;
+//		}
+//
+//	}
+//
+//	public Footprint getFootprint(NwGroupLegacy group) {
+//		int min = Integer.MAX_VALUE;
+//		int max = Integer.MIN_VALUE;
+//		for (int i = 0; i < getNbLines(); i++) {
+//			for (int j = 0; j < getNbCols(); j++) {
+//				if (data[i][j] != null && group.matches(data[i][j])) {
+//					min = Math.min(min, j);
+//					max = Math.max(max, j);
+//				}
+//			}
+//		}
+//		return new Footprint(min, max);
+//	}
 
 }

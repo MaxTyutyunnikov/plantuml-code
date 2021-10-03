@@ -53,8 +53,6 @@ import net.sourceforge.plantuml.EnsureVisible;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.anim.AffineTransformation;
-import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.png.PngIO;
 import net.sourceforge.plantuml.posimo.DotPath;
 import net.sourceforge.plantuml.ugraphic.AbstractCommonUGraphic;
@@ -65,7 +63,6 @@ import net.sourceforge.plantuml.ugraphic.UChange;
 import net.sourceforge.plantuml.ugraphic.UClip;
 import net.sourceforge.plantuml.ugraphic.UEllipse;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UGraphic2;
 import net.sourceforge.plantuml.ugraphic.UImage;
 import net.sourceforge.plantuml.ugraphic.UImageSvg;
 import net.sourceforge.plantuml.ugraphic.ULine;
@@ -77,7 +74,7 @@ import net.sourceforge.plantuml.ugraphic.UText;
 import net.sourceforge.plantuml.ugraphic.color.ColorMapper;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureVisible, UGraphic2 {
+public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureVisible {
 
 	private BufferedImage bufferedImage;
 
@@ -125,7 +122,7 @@ public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureV
 
 	public UGraphicG2d(HColor defaultBackground, ColorMapper colorMapper, Graphics2D g2d, double dpiFactor,
 			AffineTransformation affineTransform, double dx, double dy) {
-		super(defaultBackground, colorMapper, g2d);
+		super(defaultBackground, colorMapper, FileFormat.PNG.getDefaultStringBounder(), g2d);
 		this.hasAffineTransform = affineTransform != null;
 		this.dpiFactor = dpiFactor;
 		if (dpiFactor != 1.0) {
@@ -143,7 +140,7 @@ public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureV
 	private void register(double dpiFactor) {
 		registerDriver(URectangle.class, new DriverRectangleG2d(dpiFactor, this));
 		if (this.hasAffineTransform || dpiFactor != 1.0) {
-			registerDriver(UText.class, new DriverTextAsPathG2d(this, TextBlockUtils.getFontRenderContext()));
+			registerDriver(UText.class, new DriverTextAsPathG2d(this));
 		} else {
 			registerDriver(UText.class, new DriverTextG2d(this));
 		}
@@ -156,13 +153,6 @@ public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureV
 		registerDriver(DotPath.class, new DriverDotPathG2d(this));
 		registerDriver(UPath.class, new DriverPathG2d(dpiFactor));
 		registerDriver(UCenteredCharacter.class, new DriverCenteredCharacterG2d());
-	}
-
-	public StringBounder getStringBounder() {
-		// if (hasAffineTransform) {
-		// return TextBlockUtils.getDummyStringBounder();
-		// }
-		return FileFormat.PNG.getDefaultStringBounder();
 	}
 
 	@Override
@@ -215,7 +205,8 @@ public class UGraphicG2d extends AbstractUGraphic<Graphics2D> implements EnsureV
 		return getGraphicObject();
 	}
 
-	public void writeImageTOBEMOVED(OutputStream os, String metadata, int dpi) throws IOException {
+	@Override
+	public void writeToStream(OutputStream os, String metadata, int dpi) throws IOException {
 		final BufferedImage im = getBufferedImage();
 		PngIO.write(im, os, metadata, dpi);
 	}

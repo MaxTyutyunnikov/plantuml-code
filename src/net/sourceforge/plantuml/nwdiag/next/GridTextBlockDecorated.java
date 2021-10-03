@@ -40,19 +40,25 @@ import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.nwdiag.core.Network;
 import net.sourceforge.plantuml.nwdiag.core.NwGroup;
+import net.sourceforge.plantuml.style.PName;
+import net.sourceforge.plantuml.style.SName;
+import net.sourceforge.plantuml.style.Style;
+import net.sourceforge.plantuml.style.StyleBuilder;
+import net.sourceforge.plantuml.style.StyleSignature;
 import net.sourceforge.plantuml.ugraphic.MinMax;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.URectangle;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.ugraphic.color.HColor;
 
-public class GridTextBlockDecoratedNext extends GridTextBlockSimpleNext {
+public class GridTextBlockDecorated extends GridTextBlockSimple {
 
 	public static final int NETWORK_THIN = 5;
 
 	private final List<NwGroup> groups;
 	private final List<Network> networks;
 
-	public GridTextBlockDecoratedNext(int lines, int cols, List<NwGroup> groups, List<Network> networks,
+	public GridTextBlockDecorated(int lines, int cols, List<NwGroup> groups, List<Network> networks,
 			ISkinParam skinparam) {
 		super(lines, cols, skinparam);
 		this.groups = groups;
@@ -62,13 +68,20 @@ public class GridTextBlockDecoratedNext extends GridTextBlockSimpleNext {
 	@Override
 	protected void drawGrid(UGraphic ug) {
 		for (NwGroup group : groups) {
-			drawGroups(ug, group, skinparam);
+			drawGroups(ug, group, getSkinParam());
 		}
 		drawNetworkTube(ug);
-		drawLinks(ug);
+		drawLinks(ug, getSkinParam().getCurrentStyleBuilder());
 	}
 
-	private void drawLinks(UGraphic ug) {
+	private void drawLinks(UGraphic ug, StyleBuilder styleBuilder) {
+
+		final Style style = getStyleDefinitionNetwork(SName.arrow).getMergedStyle(styleBuilder);
+		final HColor lineColor = style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+				getSkinParam().getIHtmlColorSet());
+
+		ug = ug.apply(lineColor);
+
 		final StringBounder stringBounder = ug.getStringBounder();
 		for (int i = 0; i < data.getNbLines(); i++) {
 			final double lineHeight = lineHeight(stringBounder, i);
@@ -94,8 +107,8 @@ public class GridTextBlockDecoratedNext extends GridTextBlockSimpleNext {
 			double x = 0;
 			for (int j = 0; j < data.getNbCols(); j++) {
 				final double colWidth = colWidth(stringBounder, j);
-				final LinkedElementNext element = data.get(i, j);
-				if (element != null && group.matches(element)) {
+				final LinkedElement element = data.get(i, j);
+				if (element != null && group.contains(element.getServer())) {
 					final MinMax minMax = element.getMinMax(stringBounder, colWidth, lineHeight)
 							.translate(new UTranslate(x, y));
 					size = size == null ? minMax : size.addMinMax(minMax);
@@ -112,7 +125,7 @@ public class GridTextBlockDecoratedNext extends GridTextBlockSimpleNext {
 
 	private boolean isThereALink(int j, Network network) {
 		for (int i = 0; i < data.getNbLines(); i++) {
-			final LinkedElementNext element = data.get(i, j);
+			final LinkedElement element = data.get(i, j);
 			if (element != null && element.isLinkedTo(network)) {
 				return true;
 			}
@@ -120,7 +133,11 @@ public class GridTextBlockDecoratedNext extends GridTextBlockSimpleNext {
 		return false;
 	}
 
-	private void drawNetworkTube(final UGraphic ug) {
+	private StyleSignature getStyleDefinitionNetwork(SName sname) {
+		return StyleSignature.of(SName.root, SName.element, SName.nwdiagDiagram, sname);
+	}
+
+	private void drawNetworkTube(UGraphic ug) {
 
 		final StringBounder stringBounder = ug.getStringBounder();
 		double y = 0;
@@ -129,8 +146,17 @@ public class GridTextBlockDecoratedNext extends GridTextBlockSimpleNext {
 			computeMixMax(data.getLine(i), stringBounder, network);
 
 			final URectangle rect = new URectangle(network.getXmax() - network.getXmin(), NETWORK_THIN);
-			rect.setDeltaShadow(1.0);
+
 			UGraphic ug2 = ug.apply(new UTranslate(network.getXmin(), y));
+			final StyleBuilder styleBuilder = getSkinParam().getCurrentStyleBuilder();
+			final Style style = getStyleDefinitionNetwork(SName.network).getMergedStyle(styleBuilder);
+			final double deltaShadow = style.value(PName.Shadowing).asDouble();
+			ug2 = ug2.apply(style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(),
+					getSkinParam().getIHtmlColorSet()));
+			ug2 = ug2.apply(style.value(PName.BackGroundColor)
+					.asColor(getSkinParam().getThemeStyle(), getSkinParam().getIHtmlColorSet()).bg());
+
+			rect.setDeltaShadow(deltaShadow);
 			if (network != null && network.getColor() != null) {
 				ug2 = ug2.apply(network.getColor().bg());
 			}
@@ -144,7 +170,7 @@ public class GridTextBlockDecoratedNext extends GridTextBlockSimpleNext {
 		}
 	}
 
-	private void computeMixMax(LinkedElementNext line[], StringBounder stringBounder, Network network) {
+	private void computeMixMax(LinkedElement line[], StringBounder stringBounder, Network network) {
 		double x = 0;
 		double xmin = network.isFullWidth() ? 0 : -1;
 		double xmax = 0;

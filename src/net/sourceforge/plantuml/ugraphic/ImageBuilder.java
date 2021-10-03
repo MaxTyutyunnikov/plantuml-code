@@ -43,7 +43,6 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -274,16 +273,15 @@ public class ImageBuilder {
 		final Scale scale = titledDiagram == null ? null : titledDiagram.getScale();
 		final double scaleFactor = (scale == null ? 1 : scale.getScale(dim.getWidth(), dim.getHeight())) * getDpi()
 				/ 96.0;
-		final UGraphic2 ug = createUGraphic(fileFormatOption, dim, animationArg, dx, dy, scaleFactor);
-		UGraphic ug2 = ug;
+		UGraphic ug = createUGraphic(fileFormatOption, dim, animationArg, dx, dy, scaleFactor);
 		maybeDrawBorder(ug, dim);
 		if (randomPixel) {
-			drawRandomPoint(ug2);
+			drawRandomPoint(ug);
 		}
-		ug2 = handwritten(ug2.apply(new UTranslate(margin.getLeft(), margin.getTop())));
-		udrawable.drawU(ug2);
-		ug2.flushUg();
-		ug.writeImageTOBEMOVED(os, metadata, 96);
+		ug = handwritten(ug.apply(new UTranslate(margin.getLeft(), margin.getTop())));
+		udrawable.drawU(ug);
+		ug.flushUg();
+		ug.writeToStream(os, metadata, 96);
 		os.flush();
 
 		if (ug instanceof UGraphicG2d) {
@@ -401,14 +399,10 @@ public class ImageBuilder {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		writeImageInternal(new FileFormatOption(FileFormat.PNG), baos, Animation.singleton(affineTransform));
 		baos.close();
-
-		final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-		final Image im = ImageIO.read(bais);
-		bais.close();
-		return im;
+		return ImageIO.read(baos.toByteArray());
 	}
 
-	private UGraphic2 createUGraphic(FileFormatOption option, final Dimension2D dim, Animation animationArg, double dx,
+	private UGraphic createUGraphic(FileFormatOption option, final Dimension2D dim, Animation animationArg, double dx,
 			double dy, double scaleFactor) {
 		switch (option.getFileFormat()) {
 		case PNG:
@@ -440,7 +434,7 @@ public class ImageBuilder {
 		}
 	}
 
-	private UGraphic2 createUGraphicSVG(double scaleFactor, Dimension2D dim) {
+	private UGraphic createUGraphicSVG(double scaleFactor, Dimension2D dim) {
 		final String hoverPathColorRGB = getHoverPathColorRGB();
 		final LengthAdjust lengthAdjust = skinParam == null ? LengthAdjust.defaultValue() : skinParam.getlengthAdjust();
 		final String preserveAspectRatio = getPreserveAspectRatio();
@@ -453,7 +447,7 @@ public class ImageBuilder {
 
 	}
 
-	private UGraphic2 createUGraphicPNG(double scaleFactor, final Dimension2D dim, Animation affineTransforms,
+	private UGraphic createUGraphicPNG(double scaleFactor, final Dimension2D dim, Animation affineTransforms,
 			double dx, double dy, String watermark) {
 		Color backColor = getDefaultBackColor();
 
