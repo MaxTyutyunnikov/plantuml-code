@@ -33,12 +33,15 @@
  *
  *
  */
-package net.sourceforge.plantuml.activitydiagram3.ftile;
+package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import net.sourceforge.plantuml.graphic.StringBounder;
+import java.util.List;
 
-public interface FtileOverpassing extends Ftile {
+import net.sourceforge.plantuml.graphic.UDrawable;
+import net.sourceforge.plantuml.ugraphic.UShape;
 
-	public FtileGeometry getOverpassDimension(StringBounder stringBounder);
+public interface GConnection extends UDrawable, UShape {
+
+	public List<GPoint> getHooks();
 
 }
