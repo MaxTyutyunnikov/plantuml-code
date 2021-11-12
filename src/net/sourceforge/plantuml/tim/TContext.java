@@ -86,6 +86,7 @@ import net.sourceforge.plantuml.tim.iterator.CodeIteratorWhile;
 import net.sourceforge.plantuml.tim.stdlib.AlwaysFalse;
 import net.sourceforge.plantuml.tim.stdlib.AlwaysTrue;
 import net.sourceforge.plantuml.tim.stdlib.CallUserFunction;
+import net.sourceforge.plantuml.tim.stdlib.Chr;
 import net.sourceforge.plantuml.tim.stdlib.Darken;
 import net.sourceforge.plantuml.tim.stdlib.DateFunction;
 import net.sourceforge.plantuml.tim.stdlib.Dec2hex;
@@ -105,6 +106,7 @@ import net.sourceforge.plantuml.tim.stdlib.InvokeProcedure;
 import net.sourceforge.plantuml.tim.stdlib.IsDark;
 import net.sourceforge.plantuml.tim.stdlib.IsLight;
 import net.sourceforge.plantuml.tim.stdlib.Lighten;
+import net.sourceforge.plantuml.tim.stdlib.LoadJson;
 import net.sourceforge.plantuml.tim.stdlib.LogicalNot;
 import net.sourceforge.plantuml.tim.stdlib.Lower;
 import net.sourceforge.plantuml.tim.stdlib.Newline;
@@ -112,6 +114,7 @@ import net.sourceforge.plantuml.tim.stdlib.RetrieveProcedure;
 import net.sourceforge.plantuml.tim.stdlib.ReverseColor;
 import net.sourceforge.plantuml.tim.stdlib.ReverseHsluvColor;
 import net.sourceforge.plantuml.tim.stdlib.SetVariableValue;
+import net.sourceforge.plantuml.tim.stdlib.Size;
 import net.sourceforge.plantuml.tim.stdlib.StringFunction;
 import net.sourceforge.plantuml.tim.stdlib.Strlen;
 import net.sourceforge.plantuml.tim.stdlib.Strpos;
@@ -175,6 +178,9 @@ public class TContext {
 		functionsSet.addFunction(new Hex2dec());
 		functionsSet.addFunction(new Dec2hex());
 		functionsSet.addFunction(new HslColor());
+		functionsSet.addFunction(new LoadJson());
+		functionsSet.addFunction(new Chr());
+		functionsSet.addFunction(new Size());
 		// %standard_exists_function
 		// %str_replace
 		// !exit
@@ -579,7 +585,7 @@ public class TContext {
 	}
 
 	private void executeTheme(TMemory memory, StringLocated s) throws EaterException, EaterExceptionLocated {
-		final EaterTheme eater = new EaterTheme(s.getTrimmed());
+		final EaterTheme eater = new EaterTheme(s.getTrimmed(), importedFiles);
 		eater.analyze(this, memory);
 		final ReadLine reader = eater.getTheme();
 		if (reader == null) {

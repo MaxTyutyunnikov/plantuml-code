@@ -36,12 +36,8 @@
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
 import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
@@ -49,66 +45,55 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
-import net.sourceforge.plantuml.utils.MathUtils;
 
-public class GtileIfSimple extends AbstractGtile {
+public class GtileWithMargin extends AbstractGtileRoot implements Gtile {
 
-	protected final List<Gtile> gtiles;
-	private final List<Dimension2D> dims = new ArrayList<>();
-	protected final List<UTranslate> positions = new ArrayList<>();
+	protected final AbstractGtileRoot orig;
+	protected final double north;
+	protected final double south;
+	private final double east;
+
+	public GtileWithMargin(AbstractGtileRoot orig, double north, double south, double east) {
+		super(orig.stringBounder, orig.skinParam());
+		this.orig = orig;
+		this.north = north;
+		this.south = south;
+		this.east = east;
+	}
 
 	@Override
-	public String toString() {
-		return "GtileIfSimple " + gtiles;
+	public Set<Swimlane> getSwimlanes() {
+		return orig.getSwimlanes();
 	}
 
-	public GtileIfSimple(List<Gtile> gtiles) {
-		super(gtiles.get(0).getStringBounder(), gtiles.get(0).skinParam());
-		this.gtiles = gtiles;
-
-		double dx = 0;
-		for (Gtile tile : gtiles) {
-			final Dimension2D dim = tile.calculateDimension(getStringBounder());
-			final UTranslate pos = UTranslate.dx(dx);
-			dx += dim.getWidth() + getMargin();
-			dims.add(dim);
-			positions.add(pos);
-		}
-	}
-
-	private double getMargin() {
-		return 20;
-	}
-
-	public void drawU(UGraphic ug) {
-		for (int i = 0; i < gtiles.size(); i++) {
-			final Gtile tile = gtiles.get(i);
-			final UTranslate pos = positions.get(i);
-			ug.apply(pos).draw(tile);
-		}
+	@Override
+	public Swimlane getSwimlane(String point) {
+		return orig.getSwimlane(point);
 	}
 
 	@Override
 	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		Point2D result = new Point2D.Double();
-		for (int i = 0; i < dims.size(); i++) {
-			final Dimension2D dim = dims.get(i);
-			final UTranslate pos = positions.get(i);
-			final Point2D corner = pos.getTranslated(dim);
-			result = MathUtils.max(result, corner);
-		}
-		return new Dimension2DDouble(result);
+		final Dimension2D result = orig.calculateDimension(stringBounder);
+		return Dimension2DDouble.delta(result, east, north + south);
 	}
 
-	public Set<Swimlane> getSwimlanes() {
-		final Set<Swimlane> result = new HashSet<>();
-		for (Gtile tile : gtiles)
-			result.addAll(tile.getSwimlanes());
-		return Collections.unmodifiableSet(result);
+	private UTranslate getTranslate() {
+		return new UTranslate(east, north);
 	}
 
-	public Collection<Gtile> getMyChildren() {
-		return Collections.unmodifiableCollection(gtiles);
+	@Override
+	protected void drawUInternal(UGraphic ug) {
+		orig.drawU(ug.apply(getTranslate()));
+	}
+
+	@Override
+	protected UTranslate getCoordImpl(String name) {
+		return orig.getCoordImpl(name).compose(getTranslate());
+	}
+
+	@Override
+	public Collection<GConnection> getInnerConnections() {
+		return Collections.emptyList();
 	}
 
 }
