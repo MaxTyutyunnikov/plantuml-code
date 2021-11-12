@@ -71,7 +71,8 @@ public class GtileEmpty extends AbstractGtile {
 		return "FtileEmpty";
 	}
 
-	public void drawU(UGraphic ug) {
+	@Override
+	protected void drawUInternal(UGraphic ug) {
 	}
 
 	@Override
