@@ -62,7 +62,11 @@ public class StyleExtractor {
 						break;
 					line = data.next();
 				}
+			} else if (line.getString().trim().startsWith("!assume ")) {
+				// Ignore
 			} else if (line.getString().trim().startsWith("!pragma ")) {
+				// Ignore
+			} else if (line.getString().trim().startsWith("hide ")) {
 				// Ignore
 			} else if (line.getString().trim().startsWith("title ")) {
 				this.title = line.getString().trim().substring("title ".length()).trim();

@@ -2,15 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2021, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
- * 
+ *
  * http://plantuml.com/patreon (only 1$ per month!)
  * http://plantuml.com/paypal
- * 
+ *
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -30,36 +30,25 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
+ *
  *
  */
-package net.sourceforge.plantuml.command;
+package net.sourceforge.plantuml.security.authentication;
 
-import net.sourceforge.plantuml.LineLocation;
-import net.sourceforge.plantuml.UmlDiagram;
-import net.sourceforge.plantuml.command.regex.IRegex;
-import net.sourceforge.plantuml.command.regex.RegexConcat;
-import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.command.regex.RegexResult;
+import java.net.URLConnection;
 
-public class CommandHideUnlinked extends SingleLineCommand2<UmlDiagram> {
-
-	public CommandHideUnlinked() {
-		super(getRegexConcat());
-	}
-
-	static IRegex getRegexConcat() {
-		return RegexConcat.build(CommandHideUnlinked.class.getName(), RegexLeaf.start(), //
-				new RegexLeaf("HIDE", "(hide|show)"), //
-				RegexLeaf.spaceOneOrMore(), //
-				new RegexLeaf("unlinked"), //
-				RegexLeaf.end()); //
-	}
-
-	@Override
-	protected CommandExecutionResult executeArg(UmlDiagram diagram, LineLocation location, RegexResult arg) {
-		diagram.setHideUnlinkedData(arg.get("HIDE", 0).equalsIgnoreCase("hide"));
-		return CommandExecutionResult.ok();
-	}
-
+/**
+ * The security access interceptor applies the authentication information to a HTTP connection. This can be a
+ * user/password combination for BasicAuth or a bearer token for OAuth2.
+ *
+ * @author Aljoscha Rittner
+ */
+public interface SecurityAccessInterceptor {
+	/**
+	 * Applies to a connection the authentication information.
+	 *
+	 * @param authentication the determined authentication data to authorize for the endpoint access
+	 * @param connection     the connection to the endpoint
+	 */
+	void apply(SecurityAuthentication authentication, URLConnection connection);
 }
