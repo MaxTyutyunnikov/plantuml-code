@@ -52,6 +52,7 @@ import net.sourceforge.plantuml.creole.Stripe;
 import net.sourceforge.plantuml.creole.StripeStyle;
 import net.sourceforge.plantuml.creole.StripeStyleType;
 import net.sourceforge.plantuml.creole.atom.Atom;
+import net.sourceforge.plantuml.creole.atom.AtomEmoji;
 import net.sourceforge.plantuml.creole.atom.AtomImg;
 import net.sourceforge.plantuml.creole.atom.AtomMath;
 import net.sourceforge.plantuml.creole.atom.AtomOpenIcon;
@@ -60,6 +61,7 @@ import net.sourceforge.plantuml.creole.atom.AtomSprite;
 import net.sourceforge.plantuml.creole.command.Command;
 import net.sourceforge.plantuml.creole.command.CommandCreoleColorAndSizeChange;
 import net.sourceforge.plantuml.creole.command.CommandCreoleColorChange;
+import net.sourceforge.plantuml.creole.command.CommandCreoleEmoji;
 import net.sourceforge.plantuml.creole.command.CommandCreoleExposantChange;
 import net.sourceforge.plantuml.creole.command.CommandCreoleFontFamilyChange;
 import net.sourceforge.plantuml.creole.command.CommandCreoleImg;
@@ -74,6 +76,7 @@ import net.sourceforge.plantuml.creole.command.CommandCreoleSprite;
 import net.sourceforge.plantuml.creole.command.CommandCreoleStyle;
 import net.sourceforge.plantuml.creole.command.CommandCreoleSvgAttributeChange;
 import net.sourceforge.plantuml.creole.command.CommandCreoleUrl;
+import net.sourceforge.plantuml.emoji.Emoji;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.FontPosition;
 import net.sourceforge.plantuml.graphic.FontStyle;
@@ -84,6 +87,7 @@ import net.sourceforge.plantuml.openiconic.OpenIcon;
 import net.sourceforge.plantuml.security.SecurityUtils;
 import net.sourceforge.plantuml.sprite.Sprite;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
+import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 import net.sourceforge.plantuml.utils.CharHidder;
 
 public class StripeSimple implements Stripe {
@@ -92,7 +96,6 @@ public class StripeSimple implements Stripe {
 
 	final private List<Atom> atoms = new ArrayList<>();
 
-	// final private List<Command> commands = new ArrayList<>();
 	final private Map<Character, List<Command>> commands = new HashMap<>();
 
 	private HorizontalAlignment align = HorizontalAlignment.LEFT;
@@ -134,9 +137,9 @@ public class StripeSimple implements Stripe {
 		addCommand(CommandCreoleStyle.createLegacyEol(FontStyle.ITALIC));
 		addCommand(CommandCreoleStyle.createLegacy(FontStyle.PLAIN));
 		addCommand(CommandCreoleStyle.createLegacyEol(FontStyle.PLAIN));
-		if (modeSimpleLine == CreoleMode.FULL) {
+		if (modeSimpleLine == CreoleMode.FULL)
 			addCommand(CommandCreoleStyle.createCreole(FontStyle.UNDERLINE));
-		}
+
 		addCommand(CommandCreoleStyle.createLegacy(FontStyle.UNDERLINE));
 		addCommand(CommandCreoleStyle.createLegacyEol(FontStyle.UNDERLINE));
 		addCommand(CommandCreoleStyle.createCreole(FontStyle.STRIKE));
@@ -158,6 +161,7 @@ public class StripeSimple implements Stripe {
 		addCommand(CommandCreoleImg.create());
 		addCommand(CommandCreoleQrcode.create());
 		addCommand(CommandCreoleOpenIcon.create());
+		addCommand(CommandCreoleEmoji.create());
 		addCommand(CommandCreoleMath.create());
 		addCommand(CommandCreoleLatex.create());
 		addCommand(CommandCreoleSprite.create());
@@ -166,15 +170,14 @@ public class StripeSimple implements Stripe {
 		addCommand(CommandCreoleFontFamilyChange.createEol());
 		addCommand(CommandCreoleMonospaced.create());
 		addCommand(CommandCreoleUrl.create());
-		if (SecurityUtils.allowSvgText()) {
+		if (SecurityUtils.allowSvgText())
 			addCommand(CommandCreoleSvgAttributeChange.create());
-		}
 
 		this.header = style.getHeader(fontConfiguration, context);
 
-		if (this.header != null) {
+		if (this.header != null)
 			this.atoms.add(this.header);
-		}
+
 	}
 
 	private void addCommand(Command cmd) {
@@ -191,9 +194,9 @@ public class StripeSimple implements Stripe {
 	}
 
 	public List<Atom> getAtoms() {
-		if (atoms.size() == 0) {
+		if (atoms.size() == 0)
 			atoms.add(AtomTextUtils.createLegacy(" ", fontConfiguration));
-		}
+
 		return Collections.unmodifiableList(atoms);
 	}
 
@@ -206,9 +209,9 @@ public class StripeSimple implements Stripe {
 	}
 
 	public void analyzeAndAdd(String line) {
-		if (Objects.requireNonNull(line).contains("" + BackSlash.hiddenNewLine())) {
+		if (Objects.requireNonNull(line).contains("" + BackSlash.hiddenNewLine()))
 			throw new IllegalArgumentException(line);
-		}
+
 		line = CharHidder.hide(line);
 		if (style.getType() == StripeStyleType.HEADING) {
 			fontConfiguration = fontConfigurationForHeading(fontConfiguration, style.getOrder());
@@ -221,16 +224,16 @@ public class StripeSimple implements Stripe {
 	}
 
 	private static FontConfiguration fontConfigurationForHeading(FontConfiguration fontConfiguration, int order) {
-		if (order == 0) {
-			fontConfiguration = fontConfiguration.bigger(4).bold();
-		} else if (order == 1) {
-			fontConfiguration = fontConfiguration.bigger(2).bold();
-		} else if (order == 2) {
-			fontConfiguration = fontConfiguration.bigger(1).bold();
-		} else {
-			fontConfiguration = fontConfiguration.italic();
+		switch (order) {
+		case 0:
+			return fontConfiguration.bigger(4).bold();
+		case 1:
+			return fontConfiguration.bigger(2).bold();
+		case 2:
+			return fontConfiguration.bigger(1).bold();
+		default:
+			return fontConfiguration.italic();
 		}
-		return fontConfiguration;
 	}
 
 	public void addImage(String src, double scale) {
@@ -251,16 +254,34 @@ public class StripeSimple implements Stripe {
 
 	public void addSprite(String src, double scale, HColor color) {
 		final Sprite sprite = skinParam.getSprite(src);
-		if (sprite != null) {
+		if (sprite != null)
 			atoms.add(new AtomSprite(color, scale, fontConfiguration, sprite, null));
-		}
 	}
 
 	public void addOpenIcon(String src, double scale, HColor color) {
 		final OpenIcon openIcon = OpenIcon.retrieve(src);
-		if (openIcon != null) {
+		if (openIcon != null)
 			atoms.add(new AtomOpenIcon(color, scale, openIcon, fontConfiguration, null));
-		}
+	}
+
+	public void addEmoji(String emojiName, String forcedColor) {
+		final Emoji emoji = Emoji.retrieve(emojiName);
+		if (emoji == null)
+			return;
+
+		HColor col = null;
+		if (forcedColor == null)
+			col = null;
+		else if (forcedColor.equals("#0") || forcedColor.equals("#000") || forcedColor.equals("#black"))
+			col = fontConfiguration.getColor();
+		else
+			try {
+				col = skinParam.getIHtmlColorSet().getColor(skinParam.getThemeStyle(), forcedColor);
+			} catch (NoSuchColorException e) {
+				col = null;
+			}
+
+		atoms.add(new AtomEmoji(emoji, 1, fontConfiguration.getSize2D(), col));
 	}
 
 	public void addMath(ScientificEquationSafe math) {
@@ -285,9 +306,9 @@ public class StripeSimple implements Stripe {
 	}
 
 	private void addPending(StringBuilder pending) {
-		if (pending.length() == 0) {
+		if (pending.length() == 0)
 			return;
-		}
+
 		atoms.add(AtomTextUtils.createLegacy(pending.toString(), fontConfiguration));
 		pending.setLength(0);
 	}
@@ -295,12 +316,10 @@ public class StripeSimple implements Stripe {
 	private Command searchCommand(String line) {
 		final List<Command> localList = commands.get(line.charAt(0));
 		if (localList != null)
-			for (Command cmd : localList) {
-				final int i = cmd.matchingSize(line);
-				if (i != 0) {
+			for (Command cmd : localList)
+				if (cmd.matchingSize(line) != 0)
 					return cmd;
-				}
-			}
+
 		return null;
 	}
 
