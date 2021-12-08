@@ -36,8 +36,6 @@
 package net.sourceforge.plantuml.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -193,8 +191,6 @@ final public class UmlSource {
 
 	/**
 	 * Return the number of line in the diagram.
-	 * 
-	 * @return
 	 */
 	public int getTotalLineCount() {
 		return source.size();
@@ -208,7 +204,7 @@ final public class UmlSource {
 	 * Check if a source diagram description is empty. Does not take comment line
 	 * into account.
 	 * 
-	 * @return <code>true<code> if the diagram does not contain information.
+	 * @return <code>true</code> if the diagram does not contain information.
 	 */
 	public boolean isEmpty() {
 		for (StringLocated s : source) {
@@ -231,8 +227,6 @@ final public class UmlSource {
 	/**
 	 * Retrieve the title, if defined in the diagram source. Never return
 	 * <code>null</code>.
-	 * 
-	 * @return
 	 */
 	public Display getTitle() {
 		final Pattern2 p = MyPattern.cmpile("^[%s]*title[%s]+(.+)$");
