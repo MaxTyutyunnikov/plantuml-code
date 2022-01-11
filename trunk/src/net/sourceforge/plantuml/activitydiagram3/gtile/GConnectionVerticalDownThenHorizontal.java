@@ -43,7 +43,6 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.Hexagon;
 import net.sourceforge.plantuml.activitydiagram3.ftile.MergeStrategy;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.Rainbow;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UPolygon;
@@ -130,32 +129,38 @@ public class GConnectionVerticalDownThenHorizontal extends GAbstractConnection {
 //		return getSimpleSnake().getMaxX(stringBounder);
 //	}
 
-	private Rainbow getInLinkRenderingColor() {
-		Rainbow color;
-		color = Rainbow.build(gpoint1.getGtile().skinParam());
-//		final LinkRendering linkRendering = tile.getInLinkRendering();
-//		if (linkRendering == null) {
-//			if (UseStyle.useBetaStyle()) {
-//				final Style style = getDefaultStyleDefinitionArrow()
-//						.getMergedStyle(skinParam().getCurrentStyleBuilder());
-//				return Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
-//			} else {
-//				color = Rainbow.build(skinParam());
-//			}
-//		} else {
-//			color = linkRendering.getRainbow();
-//		}
-//		if (color.size() == 0) {
-//			if (UseStyle.useBetaStyle()) {
-//				final Style style = getDefaultStyleDefinitionArrow()
-//						.getMergedStyle(skinParam().getCurrentStyleBuilder());
-//				return Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
-//			} else {
-//				color = Rainbow.build(skinParam());
-//			}
-//		}
-		return color;
-	}
+//	// DUPLICATE 4561
+//	private Rainbow getInLinkRenderingColor() {
+//		Rainbow color;
+//		final ISkinParam skinParam = gpoint1.getGtile().skinParam();
+//		if (UseStyle.useBetaStyle()) {
+//			final Style style = getDefaultStyleDefinitionArrow().getMergedStyle(skinParam.getCurrentStyleBuilder());
+//			color = Rainbow.build(style, skinParam.getIHtmlColorSet(), skinParam.getThemeStyle());
+//		} else
+//			color = Rainbow.build(skinParam);
+////		final LinkRendering linkRendering = tile.getInLinkRendering();
+////		if (linkRendering == null) {
+////			if (UseStyle.useBetaStyle()) {
+////				final Style style = getDefaultStyleDefinitionArrow()
+////						.getMergedStyle(skinParam().getCurrentStyleBuilder());
+////				return Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
+////			} else {
+////				color = Rainbow.build(skinParam());
+////			}
+////		} else {
+////			color = linkRendering.getRainbow();
+////		}
+////		if (color.size() == 0) {
+////			if (UseStyle.useBetaStyle()) {
+////				final Style style = getDefaultStyleDefinitionArrow()
+////						.getMergedStyle(skinParam().getCurrentStyleBuilder());
+////				return Rainbow.build(style, skinParam().getIHtmlColorSet(), skinParam().getThemeStyle());
+////			} else {
+////				color = Rainbow.build(skinParam());
+////			}
+////		}
+//		return color;
+//	}
 
 //	@Override
 //	public void drawTranslate(UGraphic ug, UTranslate translate1, UTranslate translate2) {
