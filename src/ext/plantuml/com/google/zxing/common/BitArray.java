@@ -230,7 +230,10 @@ public final class BitArray {
   }
 
   private static int[] makeArray(int size) {
-    return new int[(size + 31) >> 5];
+    final int tmp = (size + 31) >> 5;
+        if (tmp>1000)
+        	throw new IllegalArgumentException("Memory error");
+	return new int[tmp];
   }
   
   public String toString() {
