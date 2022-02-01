@@ -41,6 +41,7 @@ import java.util.List;
 import net.sourceforge.plantuml.ISkinSimple;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.PSystemCommandFactory;
+import net.sourceforge.plantuml.command.CommonCommands;
 import net.sourceforge.plantuml.compositediagram.command.CommandCreateBlock;
 import net.sourceforge.plantuml.compositediagram.command.CommandCreatePackageBlock;
 import net.sourceforge.plantuml.compositediagram.command.CommandEndPackageBlock;
@@ -62,7 +63,7 @@ public class CompositeDiagramFactory extends PSystemCommandFactory {
 		cmds.add(new CommandLinkBlock());
 		cmds.add(new CommandCreatePackageBlock());
 		cmds.add(new CommandEndPackageBlock());
-		addCommonCommands1(cmds);
+		CommonCommands.addCommonCommands1(cmds);
 
 		return cmds;
 	}
