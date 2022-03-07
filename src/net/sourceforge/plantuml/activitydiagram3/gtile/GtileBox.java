@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
@@ -68,7 +68,7 @@ import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
@@ -94,12 +94,12 @@ public class GtileBox extends AbstractGtile {
 	private final HColor backColor;
 	private final Style style;
 
-	static public StyleSignature getDefaultStyleDefinitionActivity() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.activity);
+	static public StyleSignatureBasic getDefaultStyleDefinitionActivity() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.activity);
 	}
 
-	static public StyleSignature getDefaultStyleDefinitionArrow() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.arrow);
+	static public StyleSignatureBasic getDefaultStyleDefinitionArrow() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.arrow);
 	}
 
 	final public LinkRendering getInLinkRendering() {
@@ -124,7 +124,7 @@ public class GtileBox extends AbstractGtile {
 		Style style = null;
 		Style styleArrow = null;
 		if (UseStyle.useBetaStyle()) {
-			style = getDefaultStyleDefinitionActivity().with(stereotype)
+			style = getDefaultStyleDefinitionActivity().withTOBECHANGED(stereotype)
 					.getMergedStyle(skinParam.getCurrentStyleBuilder());
 			styleArrow = getDefaultStyleDefinitionArrow().getMergedStyle(skinParam.getCurrentStyleBuilder());
 		}

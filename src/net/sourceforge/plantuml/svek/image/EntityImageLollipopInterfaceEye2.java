@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.svek.image;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Objects;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
@@ -80,8 +80,8 @@ public class EntityImageLollipopInterfaceEye2 extends AbstractEntityImage {
 		super(entity, skinParam);
 		final Stereotype stereotype = entity.getStereotype();
 
-		final USymbol symbol = Objects.requireNonNull(entity.getUSymbol() == null ? skinParam.componentStyle().toUSymbol()
-				: entity.getUSymbol());
+		final USymbol symbol = Objects.requireNonNull(
+				entity.getUSymbol() == null ? skinParam.componentStyle().toUSymbol() : entity.getUSymbol());
 
 		this.desc = BodyFactory.create2(skinParam.getDefaultTextAlignment(HorizontalAlignment.CENTER),
 				entity.getDisplay(), symbol.getFontParam(), skinParam, stereotype, entity,

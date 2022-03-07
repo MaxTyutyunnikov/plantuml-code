@@ -20,6 +20,8 @@
  */
 package org.stathissideris.ascii2image.core;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.HashMap;
 
 import org.stathissideris.ascii2image.graphics.CustomShapeDefinition;
@@ -40,6 +42,11 @@ public class RenderingOptions {
 	private int cellHeight = 14;
 	
 	private float scale = 1;
+
+	private Color backgroundColor = Color.white;
+
+	private Font font = new Font("Dialog", Font.BOLD, 12);
+	private boolean forceFontSize = false;
 
 	/**
 	 * @return
@@ -113,4 +120,35 @@ public class RenderingOptions {
 		antialias = b;
 	}
 
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	public void setBackgroundColor(Color backgroundColor) {
+		this.backgroundColor = backgroundColor;
+	}
+	
+	public boolean needsTransparency() {
+		return backgroundColor.getAlpha() < 255;
+	}
+
+	public Font getFont()
+	{
+		return font;
+	}
+
+	public void setFont(Font font)
+	{
+		this.font = font;
+	}
+
+	public boolean getForceFontSize()
+	{
+		return forceFontSize;
+	}
+
+	public void setForceFontSize(boolean forceFontSize)
+	{
+		this.forceFontSize = forceFontSize;
+	}
 }

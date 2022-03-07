@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -48,7 +48,7 @@ import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.style.Styleable;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 
@@ -67,8 +67,12 @@ abstract class FtileDiamondWIP extends AbstractFtile implements Styleable {
 
 	protected final double shadowing;
 
-	final public StyleSignature getDefaultStyleDefinition() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.activity, SName.diamond);
+	final public StyleSignatureBasic getStyleSignature() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.activity, SName.diamond);
+	}
+	
+	final public Style getStyle() {
+		return getStyleSignature().getMergedStyle(skinParam().getCurrentStyleBuilder());
 	}
 
 	@Override
@@ -80,7 +84,7 @@ abstract class FtileDiamondWIP extends AbstractFtile implements Styleable {
 			Swimlane swimlane, TextBlock north, TextBlock south, TextBlock east, TextBlock west) {
 		super(skinParam);
 		if (UseStyle.useBetaStyle()) {
-			Style style = getDefaultStyleDefinition().getMergedStyle(skinParam.getCurrentStyleBuilder());
+			Style style = getStyleSignature().getMergedStyle(skinParam.getCurrentStyleBuilder());
 			this.borderColor = borderColor; //style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
 			this.backColor = backColor; //style.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(), getIHtmlColorSet());
 			this.shadowing = style.value(PName.Shadowing).asDouble();

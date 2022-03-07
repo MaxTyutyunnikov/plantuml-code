@@ -2,15 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
- * 
+ *
  * http://plantuml.com/patreon (only 1$ per month!)
  * http://plantuml.com/paypal
- * 
+ *
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -31,14 +31,16 @@
  *
  * Original Author:  Arnaud Roques
  * Modified by : Arno Peterson
- * 
+ *
  *
  */
 package net.sourceforge.plantuml.svek.image;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -64,12 +66,13 @@ import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.graphic.USymbol;
+import net.sourceforge.plantuml.graphic.USymbols;
 import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.Bibliotekon;
 import net.sourceforge.plantuml.svek.Margins;
@@ -115,17 +118,17 @@ public class EntityImageDescription extends AbstractEntityImage {
 		this.links = links;
 		final Stereotype stereotype = entity.getStereotype();
 		USymbol symbol = getUSymbol(entity);
-		if (symbol == USymbol.FOLDER)
+		if (symbol == USymbols.FOLDER)
 			this.shapeType = ShapeType.FOLDER;
-		else if (symbol == USymbol.HEXAGON)
+		else if (symbol == USymbols.HEXAGON)
 			this.shapeType = ShapeType.HEXAGON;
-		else if (symbol == USymbol.INTERFACE)
+		else if (symbol == USymbols.INTERFACE)
 			this.shapeType = getSkinParam().fixCircleLabelOverlapping() ? ShapeType.RECTANGLE_WITH_CIRCLE_INSIDE
 					: ShapeType.RECTANGLE;
 		else
 			this.shapeType = ShapeType.RECTANGLE;
 
-		this.hideText = symbol == USymbol.INTERFACE;
+		this.hideText = symbol == USymbols.INTERFACE;
 
 		this.url = entity.getUrl99();
 
@@ -142,9 +145,9 @@ public class EntityImageDescription extends AbstractEntityImage {
 		Style style = null;
 		final HorizontalAlignment defaultAlign;
 		if (UseStyle.useBetaStyle()) {
-			final StyleSignature tmp = StyleSignature.of(SName.root, SName.element, styleName,
+			final StyleSignatureBasic tmp = StyleSignatureBasic.of(SName.root, SName.element, styleName,
 					symbol.getSkinParameter().getStyleName());
-			style = tmp.with(stereotype).getMergedStyle(getSkinParam().getCurrentStyleBuilder());
+			style = tmp.withTOBECHANGED(stereotype).getMergedStyle(getSkinParam().getCurrentStyleBuilder());
 			style = style.eventuallyOverride(colors);
 			final Style styleStereo = tmp.forStereotypeItself(stereotype)
 					.getMergedStyle(getSkinParam().getCurrentStyleBuilder());
@@ -188,7 +191,7 @@ public class EntityImageDescription extends AbstractEntityImage {
 		} else {
 			final HorizontalAlignment align = getSkinParam().getDefaultTextAlignment(defaultAlign);
 			desc = BodyFactory.create3(entity.getDisplay(), symbol.getFontParam(), getSkinParam(), align, fcTitle,
-					getSkinParam().wrapWidth());
+					getSkinParam().wrapWidth(), style);
 		}
 
 		stereo = TextBlockUtils.empty(0, 0);
@@ -286,7 +289,10 @@ public class EntityImageDescription extends AbstractEntityImage {
 
 	final public void drawU(UGraphic ug) {
 		ug.draw(new UComment("entity " + getEntity().getCodeGetName()));
-		ug.startGroup(UGroupType.CLASS, "elem " + getEntity().getCode() + " selected");
+		final Map<UGroupType, String> typeIDent = new EnumMap<>(UGroupType.class);
+		typeIDent.put(UGroupType.CLASS, "elem " + getEntity().getCode() + " selected");
+		typeIDent.put(UGroupType.ID, "elem_" + getEntity().getCode());
+		ug.startGroup(typeIDent);
 
 		if (url != null)
 			ug.startUrl(url);

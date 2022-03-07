@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -57,6 +57,7 @@ import net.sourceforge.plantuml.cucadiagram.LeafType;
 import net.sourceforge.plantuml.cucadiagram.NamespaceStrategy;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.graphic.USymbol;
+import net.sourceforge.plantuml.graphic.USymbols;
 import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
 
@@ -150,7 +151,7 @@ public class CommandCreateDomain extends SingleLineCommand2<DescriptionDiagram> 
 				type = "biddable";
 			}
 		}
-		USymbol usymbol = USymbol.fromString(type, diagram.getSkinParam());
+		USymbol usymbol = USymbols.fromString(type, diagram.getSkinParam());
 		entity.setUSymbol(usymbol);
 		return CommandExecutionResult.ok();
 	}

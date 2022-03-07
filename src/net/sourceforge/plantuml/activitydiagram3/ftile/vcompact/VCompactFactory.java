@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -71,7 +71,7 @@ import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 
@@ -94,23 +94,27 @@ public class VCompactFactory implements FtileFactory {
 		this.stringBounder = stringBounder;
 	}
 
-	private StyleSignature getSignatureCircle() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.circle);
+	private StyleSignatureBasic getSignatureCircleEnd() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.circle, SName.end);
 	}
 
-	private StyleSignature getSignatureCircleEnd() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.circle, SName.end);
+	private StyleSignatureBasic getSignatureCircleStop() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.circle, SName.stop);
 	}
 
-	private StyleSignature getSignatureCircleStop() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.circle, SName.stop);
+	private StyleSignatureBasic getSignatureCircleSpot() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.circle, SName.spot);
+	}
+
+	private StyleSignatureBasic getSignatureCircleStart() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.circle, SName.start);
 	}
 
 	public Ftile start(Swimlane swimlane) {
 		final HColor color;
 		Style style = null;
 		if (UseStyle.useBetaStyle()) {
-			style = getSignatureCircle().getMergedStyle(skinParam.getCurrentStyleBuilder());
+			style = getSignatureCircleStart().getMergedStyle(skinParam.getCurrentStyleBuilder());
 			color = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
 		} else {
 			color = rose.getHtmlColor(skinParam, ColorParam.activityStart);
@@ -135,7 +139,11 @@ public class VCompactFactory implements FtileFactory {
 
 	public Ftile spot(Swimlane swimlane, String spot, HColor color) {
 		final UFont font = skinParam.getFont(null, false, FontParam.ACTIVITY);
-		return new FtileCircleSpot(skinParam(), swimlane, spot, font, color);
+		Style style = null;
+		if (UseStyle.useBetaStyle()) {
+			style = getSignatureCircleSpot().getMergedStyle(skinParam.getCurrentStyleBuilder());
+		}
+		return new FtileCircleSpot(skinParam(), swimlane, spot, font, color, style);
 	}
 
 	public Ftile end(Swimlane swimlane) {

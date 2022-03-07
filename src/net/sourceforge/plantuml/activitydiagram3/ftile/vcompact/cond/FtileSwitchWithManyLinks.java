@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -41,7 +41,6 @@ import java.util.List;
 
 import net.sourceforge.plantuml.Direction;
 import net.sourceforge.plantuml.activitydiagram3.Branch;
-import net.sourceforge.plantuml.activitydiagram3.LinkRendering;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractConnection;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Arrows;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Connection;
@@ -50,7 +49,6 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileUtils;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.Rainbow;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
@@ -88,7 +86,7 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 			final double x2 = p2.getX();
 			final double y2 = p2.getY();
 
-			final Snake snake = Snake.create(null, arrowColor, Arrows.asToDown())
+			final Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToDown())
 					.withLabel(branch.getTextBlockPositive(), arrowHorizontalAlignment());
 			snake.addPoint(x1, y1);
 			snake.addPoint(x2, y1);
@@ -100,13 +98,13 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 		private Point2D getP1(StringBounder stringBounder) {
 			final FtileGeometry dimDiamond1 = diamond1.calculateDimension(stringBounder);
 			final Point2D pt;
-			if (getFtile2() == tiles.get(0)) {
+			if (getFtile2() == tiles.get(0))
 				pt = dimDiamond1.getPointD();
-			} else if (getFtile2() == tiles.get(tiles.size() - 1)) {
+			else if (getFtile2() == tiles.get(tiles.size() - 1))
 				pt = dimDiamond1.getPointB();
-			} else {
+			else
 				throw new IllegalStateException();
-			}
+
 			return getTranslateDiamond1(stringBounder).getTranslated(pt);
 		}
 
@@ -129,9 +127,9 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 		public void drawU(UGraphic ug) {
 			final StringBounder stringBounder = ug.getStringBounder();
 			final FtileGeometry geo = getFtile1().calculateDimension(stringBounder);
-			if (geo.hasPointOut() == false) {
+			if (geo.hasPointOut() == false)
 				return;
-			}
+
 			final Point2D p1 = getP1(stringBounder);
 			final double x1 = p1.getX();
 			final double y1 = p1.getY();
@@ -160,7 +158,8 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 			final double x2 = p2.getX();
 			final double y2 = p2.getY();
 
-			final Snake snake = Snake.create(arrowColor, arrow).withLabel(outLabel, VerticalAlignment.CENTER);
+			final Snake snake = Snake.create(skinParam(), arrowColor, arrow).withLabel(outLabel,
+					VerticalAlignment.CENTER);
 			snake.addPoint(x1, y1);
 			if (direction == Direction.LEFT && x2 > x1 - 10) {
 				snake.addPoint(x1, y2 - 8);
@@ -201,7 +200,7 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 			final double x2 = p2.getX();
 			final double y2 = p2.getY();
 
-			final Snake snake = Snake.create(null, arrowColor, Arrows.asToDown())
+			final Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToDown())
 					.withLabel(branch.getTextBlockPositive(), VerticalAlignment.CENTER);
 			if (x2 < p1d.getX() - margin || x2 > p1b.getX() + margin) {
 				snake.addPoint(x2, p1d.getY());
@@ -257,7 +256,7 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 
 			final double ym = (y1 + y2) / 2;
 
-			final Snake snake = Snake.create(null, arrowColor, Arrows.asToDown()).withLabel(outLabel,
+			final Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToDown()).withLabel(outLabel,
 					VerticalAlignment.CENTER);
 
 			if (x1 < p1d.getX() - margin || x1 > p1b.getX() + margin) {
@@ -320,18 +319,18 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 					branches.get(lastOutgoingArrow).getTextBlockSpecial()));
 		for (int i = firstOutgoingArrow + 1; i < lastOutgoingArrow; i++) {
 			final Ftile tile = tiles.get(i);
-			if (tile.calculateDimension(stringBounder).hasPointOut()) {
+			if (tile.calculateDimension(stringBounder).hasPointOut())
 				conns.add(new ConnectionVerticalBottom(tile, branches.get(i).getTextBlockSpecial()));
-			}
+
 		}
 	}
 
 	private int getFirstOutgoingArrow(StringBounder stringBounder) {
 		for (int i = 0; i < tiles.size() - 1; i++) {
 			final Ftile tile = tiles.get(i);
-			if (tile.calculateDimension(stringBounder).hasPointOut()) {
+			if (tile.calculateDimension(stringBounder).hasPointOut())
 				return i;
-			}
+
 		}
 		return tiles.size();
 	}
@@ -339,9 +338,9 @@ public class FtileSwitchWithManyLinks extends FtileSwitchWithDiamonds {
 	private int getLastOutgoingArrow(StringBounder stringBounder) {
 		for (int i = tiles.size() - 1; i >= 0; i--) {
 			final Ftile tile = tiles.get(i);
-			if (tile.calculateDimension(stringBounder).hasPointOut()) {
+			if (tile.calculateDimension(stringBounder).hasPointOut())
 				return i;
-			}
+
 		}
 		return -1;
 	}

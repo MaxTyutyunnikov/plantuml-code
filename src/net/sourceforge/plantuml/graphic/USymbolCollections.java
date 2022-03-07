@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.graphic;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.style.SName;
@@ -63,12 +63,11 @@ class USymbolCollections extends USymbol {
 	public SkinParameter getSkinParameter() {
 		return skinParameter;
 	}
-	
+
 	@Override
 	public SName getSName() {
 		return SName.collections;
 	}
-
 
 	private void drawCollections(UGraphic ug, double width, double height, double shadowing, double roundCorner) {
 		final URectangle small = new URectangle(width - getDeltaCollection(), height - getDeltaCollection())

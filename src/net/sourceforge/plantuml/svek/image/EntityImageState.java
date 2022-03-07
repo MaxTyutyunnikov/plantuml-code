@@ -2,15 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
- * 
+ *
  * http://plantuml.com/patreon (only 1$ per month!)
  * http://plantuml.com/paypal
- * 
+ *
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -30,12 +30,13 @@
  *
  *
  * Original Author:  Arnaud Roques
- * 
+ *
  *
  */
 package net.sourceforge.plantuml.svek.image;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
+import java.util.Collections;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FontParam;
@@ -89,34 +90,39 @@ public class EntityImageState extends EntityImageStateCommon {
 				skinParam.wrapWidth());
 
 	}
-	
+
 	public Dimension2D calculateDimension(StringBounder stringBounder) {
 		final Dimension2D dim = Dimension2DDouble.mergeTB(desc.calculateDimension(stringBounder),
 				fields.calculateDimension(stringBounder));
 		double heightSymbol = 0;
-		if (withSymbol) {
+		if (withSymbol)
 			heightSymbol += 2 * smallRadius + smallMarginY;
-		}
+
 		final Dimension2D result = Dimension2DDouble.delta(dim, MARGIN * 2 + 2 * MARGIN_LINE + heightSymbol);
 		return Dimension2DDouble.atLeast(result, MIN_WIDTH, MIN_HEIGHT);
 	}
 
 	final public void drawU(UGraphic ug) {
-		ug.startGroup(UGroupType.ID, getEntity().getIdent().toString("."));
-		if (url != null) {
+		ug.startGroup(Collections.singletonMap(UGroupType.ID, getEntity().getIdent().toString(".")));
+		if (url != null)
 			ug.startUrl(url);
-		}
+
 		final StringBounder stringBounder = ug.getStringBounder();
 		final Dimension2D dimTotal = calculateDimension(stringBounder);
 		final Dimension2D dimDesc = desc.calculateDimension(stringBounder);
 
-		ug = applyColor(ug);
+		final UStroke stroke;
+		if (UseStyle.useBetaStyle())
+			stroke = getStyleState().getStroke();
+		else
+			stroke = new UStroke();
+
+		ug = applyColorAndStroke(ug);
+		ug = ug.apply(stroke);
 		ug.draw(getShape(dimTotal));
 
 		final double yLine = MARGIN + dimDesc.getHeight() + MARGIN_LINE;
 		ug.apply(UTranslate.dy(yLine)).draw(ULine.hline(dimTotal.getWidth()));
-
-		ug = ug.apply(new UStroke());
 
 		if (withSymbol) {
 			final double xSymbol = dimTotal.getWidth();
@@ -132,9 +138,9 @@ public class EntityImageState extends EntityImageStateCommon {
 		final double yFields = yLine + MARGIN_LINE;
 		fields.drawU(ug.apply(new UTranslate(xFields, yFields)));
 
-		if (url != null) {
+		if (url != null)
 			ug.closeUrl();
-		}
+
 		ug.closeGroup();
 	}
 

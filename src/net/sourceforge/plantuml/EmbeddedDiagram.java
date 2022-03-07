@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -200,7 +200,8 @@ public class EmbeddedDiagram implements CharSequence {
 		}
 
 		private Diagram getSystem() throws IOException, InterruptedException {
-			final BlockUml blockUml = new BlockUml(system.as2(), Defines.createEmpty(), skinParam, null, null);
+			final BlockUml blockUml = new BlockUml(skinParam.getThemeStyle(), system.as2(), Defines.createEmpty(),
+					skinParam, null, null);
 			return blockUml.getDiagram();
 
 		}

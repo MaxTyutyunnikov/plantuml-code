@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -59,7 +59,7 @@ import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
@@ -326,7 +326,8 @@ public class Rose {
 					getUFont2(param, FontParam.SEQUENCE_DELAY), stringsToDisplay, param);
 		}
 		if (type == ComponentType.DESTROY) {
-			return new ComponentRoseDestroy(null, getHtmlColor(param, stereotype, ColorParam.sequenceLifeLineBorder));
+			return new ComponentRoseDestroy(styles == null ? null : styles[0],
+					getHtmlColor(param, stereotype, ColorParam.sequenceLifeLineBorder), param);
 		}
 		if (type == ComponentType.NEWPAGE) {
 			throw new UnsupportedOperationException();
@@ -374,7 +375,7 @@ public class Rose {
 		final HorizontalAlignment textHorizontalAlignment;
 		final ArrowDirection arrowDirection = config.getArrowDirection();
 		if (UseStyle.useBetaStyle()) {
-			final StyleSignature signature = StyleSignature.of(SName.root, SName.element, SName.sequenceDiagram,
+			final StyleSignatureBasic signature = StyleSignatureBasic.of(SName.root, SName.element, SName.sequenceDiagram,
 					SName.arrow);
 			final Style textStyle = signature.getMergedStyle(param.getCurrentStyleBuilder());
 			final String value = textStyle.value(PName.HorizontalAlignment).asString();

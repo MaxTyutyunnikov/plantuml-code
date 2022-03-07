@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -122,7 +122,7 @@ public class FtileFactoryDelegatorWhile extends FtileFactoryDelegator {
 					public void drawU(UGraphic ug) {
 						final UTranslate tr1 = genealogy.getTranslate(ftileBreak, ug.getStringBounder());
 
-						final Snake snake = Snake.create(arrowColor, Arrows.asToLeft());
+						final Snake snake = Snake.create(skinParam(), arrowColor, Arrows.asToLeft());
 						snake.addPoint(tr1.getDx(), tr1.getDy());
 						snake.addPoint(Hexagon.hexagonHalfSize, tr1.getDy());
 						ug.draw(snake);

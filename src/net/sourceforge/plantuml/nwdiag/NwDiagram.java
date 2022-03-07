@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -34,7 +34,7 @@
  */
 package net.sourceforge.plantuml.nwdiag;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,6 +50,7 @@ import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SpriteContainerEmpty;
 import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.UmlDiagramType;
+import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.ImageData;
@@ -74,7 +75,7 @@ import net.sourceforge.plantuml.style.ClockwiseTopRightBottomLeft;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
 import net.sourceforge.plantuml.style.StyleBuilder;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.TextBlockBackcolored;
 import net.sourceforge.plantuml.ugraphic.MinMax;
 import net.sourceforge.plantuml.ugraphic.UEmpty;
@@ -96,8 +97,8 @@ public class NwDiagram extends UmlDiagram {
 		return new DiagramDescription("(Nwdiag)");
 	}
 
-	public NwDiagram(UmlSource source) {
-		super(source, UmlDiagramType.NWDIAG);
+	public NwDiagram(ThemeStyle style, UmlSource source) {
+		super(style, source, UmlDiagramType.NWDIAG);
 	}
 
 	public void init() {
@@ -277,8 +278,8 @@ public class NwDiagram extends UmlDiagram {
 		};
 	}
 
-	private StyleSignature getStyleDefinitionNetwork(SName sname) {
-		return StyleSignature.of(SName.root, SName.element, SName.nwdiagDiagram, sname);
+	private StyleSignatureBasic getStyleDefinitionNetwork(SName sname) {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.nwdiagDiagram, sname);
 	}
 
 	private TextBlock toTextBlockForNetworkName(String name, String s) {

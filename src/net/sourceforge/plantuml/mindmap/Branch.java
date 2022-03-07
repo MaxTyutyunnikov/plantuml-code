@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -51,7 +51,7 @@ class Branch implements UDrawable {
 	private Finger finger;
 
 	void initRoot(StyleBuilder styleBuilder, HColor backColor, Display label, IdeaShape shape, String stereotype) {
-		root = new Idea(styleBuilder, backColor, label, shape, stereotype);
+		root = Idea.createIdeaSimple(styleBuilder, backColor, label, shape, stereotype);
 		last = root;
 	}
 
@@ -61,9 +61,9 @@ class Branch implements UDrawable {
 
 	Idea getParentOfLast(int nb) {
 		Idea result = last;
-		for (int i = 0; i < nb; i++) {
+		for (int i = 0; i < nb; i++)
 			result = result.getParent();
-		}
+
 		return result;
 	}
 

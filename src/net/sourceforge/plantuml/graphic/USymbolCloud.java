@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.graphic;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +61,11 @@ class USymbolCloud extends USymbol {
 	public SkinParameter getSkinParameter() {
 		return SkinParameter.CLOUD;
 	}
-	
+
 	@Override
 	public SName getSName() {
 		return SName.cloud;
 	}
-
 
 	private void drawCloud(UGraphic ug, double width, double height, double shadowing) {
 		final UPath shape = getSpecificFrontierForCloud(width, height);

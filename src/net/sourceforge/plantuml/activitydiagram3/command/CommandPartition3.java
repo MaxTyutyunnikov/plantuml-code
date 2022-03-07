@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -50,13 +50,14 @@ import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.graphic.USymbol;
+import net.sourceforge.plantuml.graphic.USymbols;
 import net.sourceforge.plantuml.graphic.color.ColorParser;
 import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 import net.sourceforge.plantuml.ugraphic.color.NoSuchColorException;
@@ -89,26 +90,26 @@ public class CommandPartition3 extends SingleLineCommand2<ActivityDiagram3> {
 
 	private USymbol getUSymbol(String type) {
 		if ("card".equalsIgnoreCase(type)) {
-			return USymbol.CARD;
+			return USymbols.CARD;
 		}
 		if ("package".equalsIgnoreCase(type)) {
-			return USymbol.PACKAGE;
+			return USymbols.PACKAGE;
 		}
 		if ("rectangle".equalsIgnoreCase(type)) {
-			return USymbol.RECTANGLE;
+			return USymbols.RECTANGLE;
 		}
-		return USymbol.FRAME;
+		return USymbols.FRAME;
 	}
 
 	private ColorParam getColorParamBorder(final USymbol symbol) {
-		if (symbol == USymbol.FRAME) {
+		if (symbol == USymbols.FRAME) {
 			return ColorParam.partitionBorder;
 		}
 		return symbol.getColorParamBorder();
 	}
 
 	private ColorParam getColorParamBack(final USymbol symbol) {
-		if (symbol == USymbol.FRAME) {
+		if (symbol == USymbols.FRAME) {
 			return ColorParam.partitionBackground;
 		}
 		return symbol.getColorParamBack();
@@ -118,10 +119,10 @@ public class CommandPartition3 extends SingleLineCommand2<ActivityDiagram3> {
 		return ColorParser.simpleColor(ColorType.BACK, id);
 	}
 
-	private StyleSignature getDefaultStyleDefinitionPartition(USymbol symbol) {
-		if (symbol == USymbol.RECTANGLE)
-			return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.rectangle);
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.partition);
+	private StyleSignatureBasic getDefaultStyleDefinitionPartition(USymbol symbol) {
+		if (symbol == USymbols.RECTANGLE)
+			return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.rectangle);
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.partition);
 	}
 
 	@Override
@@ -144,7 +145,7 @@ public class CommandPartition3 extends SingleLineCommand2<ActivityDiagram3> {
 		double roundCorner;
 
 		if (UseStyle.useBetaStyle()) {
-			final Style stylePartition = getDefaultStyleDefinitionPartition(symbol).with(stereotype)
+			final Style stylePartition = getDefaultStyleDefinitionPartition(symbol).withTOBECHANGED(stereotype)
 					.getMergedStyle(diagram.getSkinParam().getCurrentStyleBuilder());
 			borderColor = stylePartition.value(PName.LineColor).asColor(diagram.getSkinParam().getThemeStyle(),
 					diagram.getSkinParam().getIHtmlColorSet());
