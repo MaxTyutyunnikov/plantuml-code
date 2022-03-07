@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -37,7 +37,7 @@ package net.sourceforge.plantuml.svek.image;
 
 import static net.sourceforge.plantuml.utils.ObjectUtils.instanceOfAny;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,12 +82,7 @@ public class Footprint {
 
 		private MyUGraphic(MyUGraphic other, UChange change) {
 			super(other, change);
-			if (!instanceOfAny(change,
-					UBackground.class,
-					HColor.class,
-					UStroke.class,
-					UTranslate.class
-			)) {
+			if (!instanceOfAny(change, UBackground.class, HColor.class, UStroke.class, UTranslate.class)) {
 				throw new UnsupportedOperationException(change.getClass().toString());
 			}
 			this.all = other.all;

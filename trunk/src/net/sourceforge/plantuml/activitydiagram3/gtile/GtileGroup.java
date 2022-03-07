@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -60,7 +60,7 @@ import net.sourceforge.plantuml.graphic.USymbol;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UStroke;
@@ -82,8 +82,8 @@ public class GtileGroup extends AbstractGtileRoot {
 	private final USymbol type;
 	private final double roundCorner;
 
-	final public StyleSignature getDefaultStyleDefinitionPartition() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.partition);
+	final public StyleSignatureBasic getDefaultStyleDefinitionPartition() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.partition);
 	}
 
 	private double suppWidth(StringBounder stringBounder) {
@@ -126,7 +126,7 @@ public class GtileGroup extends AbstractGtileRoot {
 		if (Display.isNull(displayNote)) {
 			this.headerNote = TextBlockUtils.empty(0, 0);
 		} else {
-			this.headerNote = new FloatingNote(displayNote, skinParam, style);
+			this.headerNote = new FloatingNote(displayNote, skinParam);
 		}
 
 		final UStroke thickness = skinParam.getThickness(LineParam.partitionBorder, null);

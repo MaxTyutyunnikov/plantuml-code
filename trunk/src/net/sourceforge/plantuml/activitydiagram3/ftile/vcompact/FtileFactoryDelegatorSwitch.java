@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,10 +163,20 @@ public class FtileFactoryDelegatorSwitch extends FtileFactoryDelegator {
 	}
 
 	private Ftile getDiamond2(Swimlane swimlane, Branch branch0) {
-		final HColor borderColor = getRose().getHtmlColor(skinParam(), ColorParam.activityDiamondBorder);
-		final HColor backColor = branch0.getColor() == null
-				? getRose().getHtmlColor(skinParam(), ColorParam.activityDiamondBackground)
-				: branch0.getColor();
+		final HColor borderColor;
+		final HColor backColor;
+		if (UseStyle.useBetaStyle()) {
+			final Style style = getDefaultStyleDefinitionDiamond().getMergedStyle(skinParam().getCurrentStyleBuilder());
+			borderColor = style.value(PName.LineColor).asColor(skinParam().getThemeStyle(),
+					skinParam().getIHtmlColorSet());
+			backColor = branch0.getColor() == null ? style.value(PName.BackGroundColor)
+					.asColor(skinParam().getThemeStyle(), skinParam().getIHtmlColorSet()) : branch0.getColor();
+		} else {
+			borderColor = getRose().getHtmlColor(skinParam(), ColorParam.activityDiamondBorder);
+			backColor = branch0.getColor() == null
+					? getRose().getHtmlColor(skinParam(), ColorParam.activityDiamondBackground)
+					: branch0.getColor();
+		}
 
 		return new FtileDiamondInside(TextBlockUtils.empty(0, 0), branch0.skinParam(), backColor, borderColor,
 				swimlane);

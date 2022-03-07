@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
@@ -49,14 +49,16 @@ import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockUtils;
-import net.sourceforge.plantuml.graphic.USymbol;
+import net.sourceforge.plantuml.graphic.USymbols;
+import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.DecorateEntityImage;
 import net.sourceforge.plantuml.svek.TextBlockBackcolored;
 import net.sourceforge.plantuml.ugraphic.MinMax;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
@@ -88,25 +90,42 @@ public class AnnotatedWorker {
 
 	public TextBlock addFrame(final TextBlock original) {
 		final Display mainFrame = annotated.getMainFrame();
-		if (mainFrame == null) {
+		if (mainFrame == null)
 			return original;
-		}
 
 		final double x1 = 5;
 		final double x2 = 7;
 		final double y1 = 10;
 		final double y2 = 10;
 
-		final SymbolContext symbolContext = new SymbolContext(getBackgroundColor(), HColorUtils.BLACK)
-				.withShadow(getSkinParam().shadowing(null) ? 3 : 0);
+		final double deltaShadow;
+		final FontConfiguration fontConfiguration;
+		final UStroke stroke;
+		final HColor borderColor;
+		if (UseStyle.useBetaStyle()) {
+			final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.frame)
+					.getMergedStyle(skinParam.getCurrentStyleBuilder());
+			deltaShadow = style.value(PName.Shadowing).asDouble();
+			fontConfiguration = new FontConfiguration(getSkinParam(), style);
+			stroke = style.getStroke();
+			borderColor = style.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
+		} else {
+			deltaShadow = getSkinParam().shadowing(null) ? 3 : 0;
+			fontConfiguration = new FontConfiguration(getSkinParam(), FontParam.CAPTION, null);
+			stroke = new UStroke();
+			borderColor = HColorUtils.BLACK;
+		}
+
+		final SymbolContext symbolContext = new SymbolContext(getBackgroundColor(), borderColor).withShadow(deltaShadow)
+				.withStroke(stroke);
 		final MinMax originalMinMax = TextBlockUtils.getMinMax(original, stringBounder, false);
-		final TextBlock title = mainFrame.create(new FontConfiguration(getSkinParam(), FontParam.CAPTION, null),
-				HorizontalAlignment.CENTER, getSkinParam());
+
+		final TextBlock title = mainFrame.create(fontConfiguration, HorizontalAlignment.CENTER, getSkinParam());
 		final Dimension2D dimTitle = title.calculateDimension(stringBounder);
-		// final Dimension2D dimOriginal = original.calculateDimension(stringBounder);
+
 		final double width = x1 + Math.max(originalMinMax.getWidth(), dimTitle.getWidth()) + x2;
 		final double height = dimTitle.getHeight() + y1 + originalMinMax.getHeight() + y2;
-		final TextBlock frame = USymbol.FRAME.asBig(title, HorizontalAlignment.LEFT, TextBlockUtils.empty(0, 0), width,
+		final TextBlock frame = USymbols.FRAME.asBig(title, HorizontalAlignment.LEFT, TextBlockUtils.empty(0, 0), width,
 				height, symbolContext, skinParam.getStereotypeAlignment());
 
 		return new TextBlockBackcolored() {
@@ -143,9 +162,9 @@ public class AnnotatedWorker {
 
 	private TextBlock addLegend(TextBlock original) {
 		final DisplayPositioned legend = annotated.getLegend();
-		if (legend.isNull()) {
+		if (legend.isNull())
 			return original;
-		}
+
 		final TextBlock text = EntityImageLegend.create(legend.getDisplay(), getSkinParam());
 
 		return DecorateEntityImage.add(original, text, legend.getHorizontalAlignment(), legend.getVerticalAlignment());
@@ -157,20 +176,20 @@ public class AnnotatedWorker {
 
 	private TextBlock addCaption(TextBlock original) {
 		final DisplayPositioned caption = annotated.getCaption();
-		if (caption.isNull()) {
+		if (caption.isNull())
 			return original;
-		}
+
 		final TextBlock text = getCaption();
 		return DecorateEntityImage.addBottom(original, text, HorizontalAlignment.CENTER);
 	}
 
 	public TextBlock getCaption() {
 		final DisplayPositioned caption = annotated.getCaption();
-		if (caption.isNull()) {
+		if (caption.isNull())
 			return TextBlockUtils.empty(0, 0);
-		}
+
 		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignature.of(SName.root, SName.document, SName.caption)
+			final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.caption)
 					.getMergedStyle(skinParam.getCurrentStyleBuilder());
 			return style.createTextBlockBordered(caption.getDisplay(), skinParam.getIHtmlColorSet(), skinParam);
 		}
@@ -180,13 +199,12 @@ public class AnnotatedWorker {
 
 	private TextBlock addTitle(TextBlock original) {
 		final DisplayPositioned title = (DisplayPositioned) annotated.getTitle();
-		if (title.isNull()) {
+		if (title.isNull())
 			return original;
-		}
 
 		final TextBlock block;
 		if (UseStyle.useBetaStyle()) {
-			final Style style = StyleSignature.of(SName.root, SName.document, SName.title)
+			final Style style = StyleSignatureBasic.of(SName.root, SName.document, SName.title)
 					.getMergedStyle(skinParam.getCurrentStyleBuilder());
 			block = style.createTextBlockBordered(title.getDisplay(), skinParam.getIHtmlColorSet(), skinParam);
 		} else {
@@ -201,14 +219,14 @@ public class AnnotatedWorker {
 	private TextBlock addHeaderAndFooter(TextBlock original) {
 		final DisplaySection footer = annotated.getFooter();
 		final DisplaySection header = annotated.getHeader();
-		if (footer.isNull() && header.isNull()) {
+		if (footer.isNull() && header.isNull())
 			return original;
-		}
+
 		TextBlock textFooter = null;
 		if (footer.isNull() == false) {
 			Style style = null;
 			if (UseStyle.useBetaStyle()) {
-				style = StyleSignature.of(SName.root, SName.document, SName.footer)
+				style = StyleSignatureBasic.of(SName.root, SName.document, SName.footer)
 						.getMergedStyle(skinParam.getCurrentStyleBuilder());
 			}
 			textFooter = footer.createRibbon(new FontConfiguration(getSkinParam(), FontParam.FOOTER, null),
@@ -218,7 +236,7 @@ public class AnnotatedWorker {
 		if (header.isNull() == false) {
 			Style style = null;
 			if (UseStyle.useBetaStyle()) {
-				style = StyleSignature.of(SName.root, SName.document, SName.header)
+				style = StyleSignatureBasic.of(SName.root, SName.document, SName.header)
 						.getMergedStyle(skinParam.getCurrentStyleBuilder());
 			}
 			textHeader = header.createRibbon(new FontConfiguration(getSkinParam(), FontParam.HEADER, null),

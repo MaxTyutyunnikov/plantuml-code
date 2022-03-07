@@ -2,15 +2,15 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
- * 
+ *
  * If you like this project or if you find it useful, you can support us at:
- * 
+ *
  * http://plantuml.com/patreon (only 1$ per month!)
  * http://plantuml.com/paypal
- * 
+ *
  * This file is part of PlantUML.
  *
  * PlantUML is free software; you can redistribute it and/or modify it
@@ -34,15 +34,17 @@
  */
 package net.sourceforge.plantuml.ugraphic.svg;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.posimo.DotPath;
+import net.sourceforge.plantuml.svg.DarkStrategy;
 import net.sourceforge.plantuml.svg.LengthAdjust;
 import net.sourceforge.plantuml.svg.SvgGraphics;
 import net.sourceforge.plantuml.ugraphic.AbstractCommonUGraphic;
@@ -68,6 +70,7 @@ public class UGraphicSvg extends AbstractUGraphic<SvgGraphics> implements ClipCo
 
 	private final boolean textAsPath2;
 	private final String target;
+	private final boolean interactive;
 
 	public double dpiFactor() {
 		return 1;
@@ -82,15 +85,17 @@ public class UGraphicSvg extends AbstractUGraphic<SvgGraphics> implements ClipCo
 		super(other);
 		this.textAsPath2 = other.textAsPath2;
 		this.target = other.target;
+		this.interactive = other.interactive;
 		register();
 	}
 
 	public UGraphicSvg(HColor defaultBackground, boolean svgDimensionStyle, Dimension2D minDim, ColorMapper colorMapper,
 			boolean textAsPath, double scale, String linkTarget, String hover, long seed, String preserveAspectRatio,
-			StringBounder stringBounder, LengthAdjust lengthAdjust) {
-		this(defaultBackground, minDim, colorMapper, new SvgGraphics(colorMapper.toSvg(defaultBackground),
-				svgDimensionStyle, minDim, scale, hover, seed, preserveAspectRatio, lengthAdjust), textAsPath,
-				linkTarget, stringBounder);
+			StringBounder stringBounder, LengthAdjust lengthAdjust, boolean interactive) {
+		this(defaultBackground, minDim, colorMapper,
+				new SvgGraphics(colorMapper.toSvg(defaultBackground), svgDimensionStyle, minDim, scale, hover, seed,
+						preserveAspectRatio, lengthAdjust, DarkStrategy.IGNORE_DARK_COLOR, interactive),
+				textAsPath, linkTarget, stringBounder, interactive);
 		if (defaultBackground instanceof HColorGradient) {
 			final SvgGraphics svg = getGraphicObject();
 			svg.paintBackcolorGradient(colorMapper, (HColorGradient) defaultBackground);
@@ -113,10 +118,11 @@ public class UGraphicSvg extends AbstractUGraphic<SvgGraphics> implements ClipCo
 	}
 
 	private UGraphicSvg(HColor defaultBackground, Dimension2D minDim, ColorMapper colorMapper, SvgGraphics svg,
-			boolean textAsPath, String linkTarget, StringBounder stringBounder) {
+			boolean textAsPath, String linkTarget, StringBounder stringBounder, boolean interactive) {
 		super(defaultBackground, colorMapper, stringBounder, svg);
 		this.textAsPath2 = textAsPath;
 		this.target = linkTarget;
+		this.interactive = interactive;
 		register();
 	}
 
@@ -148,6 +154,14 @@ public class UGraphicSvg extends AbstractUGraphic<SvgGraphics> implements ClipCo
 			if (metadata != null)
 				getGraphicObject().addComment(metadata);
 
+			if (interactive) {
+				// For performance reasons and also because we want the entire graph DOM to be create so we can register
+				// the event handlers on them we will append to the end of the document
+				getGraphicObject().addStyle("onmouseinteractivefooter.css");
+				getGraphicObject().addScriptTag("https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js");
+				getGraphicObject().addScript("onmouseinteractivefooter.js");
+			}
+
 			getGraphicObject().createXml(os);
 		} catch (TransformerException e) {
 			throw new IOException(e.toString());
@@ -155,8 +169,8 @@ public class UGraphicSvg extends AbstractUGraphic<SvgGraphics> implements ClipCo
 	}
 
 	@Override
-	public void startGroup(UGroupType type, String ident) {
-		getGraphicObject().startGroup(type, ident);
+	public void startGroup(Map<UGroupType, String> typeIdents) {
+		getGraphicObject().startGroup(typeIdents);
 	}
 
 	@Override

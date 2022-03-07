@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.creole.Stencil;
 import net.sourceforge.plantuml.graphic.StringBounder;
@@ -105,7 +105,7 @@ public class Hexagon {
 		};
 	}
 
-	public static UPolygon asPolygonSquare(boolean shadowing, double width, double height) {
+	public static UPolygon asPolygonSquare(double shadowing, double width, double height) {
 		final UPolygon diams = new UPolygon();
 
 		diams.addPoint(width / 2, 0);
@@ -113,9 +113,7 @@ public class Hexagon {
 		diams.addPoint(width / 2, height);
 		diams.addPoint(0, height / 2);
 
-		if (shadowing) {
-			diams.setDeltaShadow(3);
-		}
+		diams.setDeltaShadow(shadowing);
 
 		return diams;
 	}

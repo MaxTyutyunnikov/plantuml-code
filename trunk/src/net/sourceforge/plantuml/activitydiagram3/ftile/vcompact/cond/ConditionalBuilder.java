@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact.cond;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.LineBreakStrategy;
@@ -68,9 +68,10 @@ import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.ConditionEndStyle;
 import net.sourceforge.plantuml.svek.ConditionStyle;
+import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
 
 public class ConditionalBuilder {
@@ -95,12 +96,12 @@ public class ConditionalBuilder {
 	private final Ftile tile2;
 	private final Url url;
 
-	public StyleSignature getDefaultStyleDefinitionDiamond() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.activity, SName.diamond);
+	private StyleSignatureBasic getStyleSignatureDiamond() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.activity, SName.diamond);
 	}
 
-	public StyleSignature getDefaultStyleDefinitionArrow() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.arrow);
+	private StyleSignatureBasic getStyleSignatureArrow() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.arrow);
 	}
 
 	public ConditionalBuilder(Swimlane swimlane, HColor borderColor, HColor backColor, Rainbow arrowColor,
@@ -114,19 +115,24 @@ public class ConditionalBuilder {
 				throw new IllegalArgumentException();
 			if (arrowColor == null)
 				throw new IllegalArgumentException();
-			final Style styleArrow = getDefaultStyleDefinitionArrow()
-					.getMergedStyle(skinParam.getCurrentStyleBuilder());
-			final Style styleDiamond = getDefaultStyleDefinitionDiamond()
-					.getMergedStyle(skinParam.getCurrentStyleBuilder());
+			final Style styleArrow = getStyleSignatureArrow().getMergedStyle(skinParam.getCurrentStyleBuilder());
+			final Style styleDiamond = getStyleSignatureDiamond().getMergedStyle(skinParam.getCurrentStyleBuilder());
 			this.diamondLineBreak = styleDiamond.wrapWidth();
 			this.labelLineBreak = styleArrow.wrapWidth();
-			this.borderColor = borderColor; /*styleDiamond.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
-					skinParam.getIHtmlColorSet());*/
-			this.backColor = backColor;/*styleDiamond.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
-					skinParam.getIHtmlColorSet())*/;
-			this.arrowColor = arrowColor;/* Rainbow.fromColor(
-					styleArrow.value(PName.LineColor).asColor(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet()),
-					null);*/
+			this.borderColor = borderColor; /*
+											 * styleDiamond.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
+											 * skinParam.getIHtmlColorSet());
+											 */
+			this.backColor = backColor;
+			/*
+			 * styleDiamond.value(PName.BackGroundColor).asColor(skinParam.getThemeStyle(),
+			 * skinParam.getIHtmlColorSet())
+			 */;
+			this.arrowColor = arrowColor;/*
+											 * Rainbow.fromColor(
+											 * styleArrow.value(PName.LineColor).asColor(skinParam.getThemeStyle(),
+											 * skinParam.getIHtmlColorSet()), null);
+											 */
 			this.fontTest = styleDiamond.getFontConfiguration(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
 			this.fontArrow = styleArrow.getFontConfiguration(skinParam.getThemeStyle(), skinParam.getIHtmlColorSet());
 		} else {
@@ -255,7 +261,10 @@ public class ConditionalBuilder {
 		final Sheet sheet = Parser.build(fontTest, skinParam.getDefaultTextAlignment(HorizontalAlignment.LEFT),
 				skinParam, CreoleMode.FULL).createSheet(labelTest);
 		final SheetBlock1 sheetBlock1 = new SheetBlock1(sheet, diamondLineBreak, skinParam.getPadding());
-		final TextBlock tbTest = new SheetBlock2(sheetBlock1, Hexagon.asStencil(sheetBlock1), tile1.getThickness());
+		
+		final UStroke thickness = tile1
+				.getThickness(getStyleSignatureDiamond().getMergedStyle(skinParam.getCurrentStyleBuilder()));
+		final TextBlock tbTest = new SheetBlock2(sheetBlock1, Hexagon.asStencil(sheetBlock1), thickness);
 
 		final Ftile shape1;
 		if (conditionStyle == ConditionStyle.INSIDE_HEXAGON) {

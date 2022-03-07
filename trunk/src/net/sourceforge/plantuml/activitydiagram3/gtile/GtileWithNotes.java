@@ -2,7 +2,7 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2020, Arnaud Roques
+ * (C) Copyright 2009-2023, Arnaud Roques
  *
  * Project Info:  http://plantuml.com
  * 
@@ -35,7 +35,7 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.gtile;
 
-import java.awt.geom.Dimension2D;
+import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import java.util.Collection;
 import java.util.Set;
 
@@ -63,7 +63,7 @@ import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.style.PName;
 import net.sourceforge.plantuml.style.SName;
 import net.sourceforge.plantuml.style.Style;
-import net.sourceforge.plantuml.style.StyleSignature;
+import net.sourceforge.plantuml.style.StyleSignatureBasic;
 import net.sourceforge.plantuml.svek.image.Opale;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UStroke;
@@ -80,8 +80,8 @@ public class GtileWithNotes extends AbstractGtile {
 
 	private final double suppSpace = 20;
 
-	public StyleSignature getDefaultStyleDefinition() {
-		return StyleSignature.of(SName.root, SName.element, SName.activityDiagram, SName.note);
+	public StyleSignatureBasic getDefaultStyleDefinition() {
+		return StyleSignatureBasic.of(SName.root, SName.element, SName.activityDiagram, SName.note);
 	}
 
 	@Override
@@ -118,6 +118,7 @@ public class GtileWithNotes extends AbstractGtile {
 			final HColor borderColor;
 			final FontConfiguration fc;
 			final double shadowing;
+			UStroke stroke = new UStroke();
 
 			final LineBreakStrategy wrapWidth;
 			if (UseStyle.useBetaStyle()) {
@@ -129,6 +130,7 @@ public class GtileWithNotes extends AbstractGtile {
 				fc = style.getFontConfiguration(skinParam.getThemeStyle(), getIHtmlColorSet());
 				shadowing = style.value(PName.Shadowing).asDouble();
 				wrapWidth = style.wrapWidth();
+				stroke = style.getStroke();
 			} else {
 				noteBackgroundColor = rose.getHtmlColor(skinParam2, ColorParam.noteBackground);
 				borderColor = rose.getHtmlColor(skinParam2, ColorParam.noteBorder);
@@ -150,9 +152,9 @@ public class GtileWithNotes extends AbstractGtile {
 				public double getEndingX(StringBounder stringBounder, double y) {
 					return sheet1.getEndingX(stringBounder, y) + 15;
 				}
-			}, new UStroke());
+			}, stroke);
 
-			final Opale opale = new Opale(shadowing, borderColor, noteBackgroundColor, sheet2, false);
+			final Opale opale = new Opale(shadowing, borderColor, noteBackgroundColor, sheet2, false, stroke);
 			final TextBlock opaleMarged = TextBlockUtils.withMargin(opale, 10, 10);
 			if (note.getNotePosition() == NotePosition.LEFT) {
 				if (left == null) {
