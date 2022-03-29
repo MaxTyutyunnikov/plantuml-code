@@ -88,8 +88,12 @@ public class StyleLoader {
 		InputStream internalIs = null;
 		SFile localFile = new SFile(filename);
 		Log.info("Trying to load style " + filename);
-		if (localFile.exists() == false)
-			localFile = FileSystem.getInstance().getFile(filename);
+		try {
+			if (localFile.exists() == false)
+				localFile = FileSystem.getInstance().getFile(filename);
+		} catch (IOException e) {
+			Log.info("Cannot open file. " + e);
+		}
 
 		if (localFile.exists()) {
 			Log.info("File found : " + localFile.getPrintablePath());
