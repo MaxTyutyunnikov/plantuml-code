@@ -83,8 +83,8 @@ public class FromSkinparamToStyle {
 		addMagic(SName.database);
 		addMagic(SName.entity);
 
-		addConFont("header", SName.header);
-		addConFont("footer", SName.footer);
+		addConFont("header", SName.document, SName.header);
+		addConFont("footer", SName.document, SName.footer);
 
 		addConvert("defaultFontSize", PName.FontSize, SName.element);
 
@@ -172,11 +172,12 @@ public class FromSkinparamToStyle {
 
 		addConvert("BackgroundColor", PName.BackGroundColor, SName.document);
 
-		addConvert("classBackgroundColor", PName.BackGroundColor, SName.class_);
-		addConvert("classBorderColor", PName.LineColor, SName.class_);
-		addConFont("class", SName.class_);
-		addConFont("classAttribute", SName.class_);
-		addConvert("classBorderThickness", PName.LineThickness, SName.class_);
+		addConvert("classBackgroundColor", PName.BackGroundColor, SName.element, SName.class_);
+		addConvert("classBorderColor", PName.LineColor, SName.element, SName.class_);
+		addConFont("class", SName.element, SName.class_);
+		addConFont("classAttribute", SName.element, SName.class_);
+		addConvert("classBorderThickness", PName.LineThickness, SName.element, SName.class_);
+		addConvert("classHeaderBackgroundColor", PName.BackGroundColor, SName.element, SName.class_, SName.header);
 
 		addConvert("objectBackgroundColor", PName.BackGroundColor, SName.object);
 		addConvert("objectBorderColor", PName.LineColor, SName.object);
@@ -208,6 +209,7 @@ public class FromSkinparamToStyle {
 		addMagic(SName.storage);
 		addMagic(SName.usecase);
 		addMagic(SName.map);
+		addMagic(SName.archimate);
 
 	}
 
@@ -232,7 +234,7 @@ public class FromSkinparamToStyle {
 		if (key.contains("<<")) {
 			final StringTokenizer st = new StringTokenizer(key, "<>");
 			this.key = st.nextToken();
-			this.stereo = st.nextToken();
+			this.stereo = st.hasMoreTokens() ? st.nextToken() : null;
 		} else {
 			this.key = key;
 			this.stereo = null;

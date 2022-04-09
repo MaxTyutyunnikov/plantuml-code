@@ -120,6 +120,19 @@ public class TikzGraphics {
 		return Objects.requireNonNull(result);
 	}
 
+	private boolean mustApplyFillColor() {
+		if (fillcolor == null)
+			return false;
+
+		if (HColorUtils.isTransparent(fillcolor))
+			return false;
+
+		if (mapper.toColor(fillcolor).getAlpha() == 0)
+			return false;
+		
+		return true;
+	}
+
 	private void appendFillColor(StringBuilder sb, boolean colorBackup) {
 		if (fillcolor == null)
 			return;
@@ -467,18 +480,6 @@ public class TikzGraphics {
 		}
 	}
 
-	private boolean mustApplyFillColor() {
-		if (fillcolor == null)
-			return false;
-
-		if (HColorUtils.isTransparent(fillcolor))
-			return false;
-
-		if (mapper.toColor(fillcolor).getAlpha() == 0)
-			return false;
-		return true;
-	}
-
 	public void rectangleRound(double x, double y, double width, double height, double r) {
 		double[] points = new double[8 * 2];
 		points[0] = x;
@@ -549,7 +550,7 @@ public class TikzGraphics {
 		if (color != null)
 			sb.append("color=" + getColorName(color) + ",");
 
-		if (fillcolor != null)
+		if (mustApplyFillColor())
 			sb.append("fill=" + getColorName(fillcolor) + ",");
 
 		sb.append("line width=" + thickness + "pt] " + couple(x, y) + " ellipse (" + format(width) + "pt and "
@@ -563,7 +564,7 @@ public class TikzGraphics {
 		if (color != null)
 			sb.append("color=" + getColorName(color) + ",");
 
-		if (fillcolor != null)
+		if (mustApplyFillColor())
 			sb.append("fill=" + getColorName(fillcolor) + ",");
 
 		sb.append("line width=" + thickness + "pt] " + couple(x, y) + " arc (" + angleStart + ":" + angleEnd + ":"
