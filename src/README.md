@@ -1,54 +1,61 @@
-# PlantUML : a free UML diagram generator
+PlantUML
+========
 
----
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/plantuml?logo=github)](https://github.com/sponsors/plantuml/)
+[![GitHub Org's stars](https://img.shields.io/github/stars/plantuml)](https://github.com/plantuml/plantuml/stargazers/)
+[![GitHub watchers](https://img.shields.io/github/watchers/plantuml/plantuml)](https://github.com/plantuml/plantuml/watchers/)
+[![GitHub contributors](https://img.shields.io/github/contributors-anon/plantuml/plantuml?color=blue)](https://github.com/plantuml/plantuml/graphs/contributors)
+[![GitHub forks](https://img.shields.io/github/forks/plantuml/plantuml)](https://github.com/plantuml/plantuml/network/)
+[![GitHub all releases](https://img.shields.io/sourceforge/dt/plantuml?color=blue)](https://github.com/plantuml/plantuml/releases)
 
-(C) Copyright 2009-2019, Arnaud Roques
-Project Info: [http://plantuml.com](http://plantuml.com)
+[![online](https://img.shields.io/endpoint?url=https://www.plantuml.com/plantuml/badge)](https://www.plantuml.com/plantuml)
+[![rate](https://img.shields.io/endpoint?url=https://www.plantuml.com/plantuml/rate)](https://www.plantuml.com/plantuml)
+[![peak](https://img.shields.io/endpoint?url=https://www.plantuml.com/plantuml/rate?peak)](https://www.plantuml.com/plantuml)
 
-This file is part of PlantUML.
+[![Release (latest by date)](https://img.shields.io/github/v/release/plantuml/plantuml)](https://github.com/plantuml/plantuml/releases/latest)
+[![Release Date](https://img.shields.io/github/release-date/plantuml/plantuml?color=blue)](https://github.com/plantuml/plantuml/releases/latest)
+[![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/plantuml/plantuml/latest)](https://github.com/plantuml/plantuml/commits/)
 
-PlantUML is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+[![Pre-release (latest by date)](https://img.shields.io/github/v/release/plantuml/plantuml?color=chocolate&include_prereleases)](https://github.com/plantuml/plantuml/releases/tag/snapshot)
+[![Pre-release Date](https://img.shields.io/github/release-date-pre/plantuml/plantuml?color=chocolate)](https://github.com/plantuml/plantuml/releases/tag/snapshot)
+[![GitHub last commit](https://img.shields.io/github/last-commit/plantuml/plantuml?color=chocolate)](https://github.com/plantuml/plantuml/commits/)
+[![CI](https://github.com/plantuml/plantuml/actions/workflows/ci.yml/badge.svg?color=chocolate)](https://github.com/plantuml/plantuml/actions/workflows/ci.yml)
 
-PlantUML distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
-License for more details.
+Generate UML diagram from textual description
 
-You should have received a copy of the GNU General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-USA.
+[PlantUML is **not** affected by the log4j vulnerability.](https://github.com/plantuml/plantuml/issues/826)
 
-Java is a trademark or registered trademark of Sun Microsystems, Inc.
-in the United States and other countries.
+PlantUML is a component that allows to quickly write:
 
-Original Author: Arnaud Roques
+ * [Sequence diagram](http://plantuml.com/sequence-diagram),
+ * [Use case diagram](http://plantuml.com/use-case-diagram),
+ * [Class diagram](http://plantuml.com/class-diagram),
+ * [Object diagram](http://plantuml.com/object-diagram),
+ * [Activity diagram](http://plantuml.com/activity-diagram-beta) (here is [the legacy syntax](http://plantuml.com/activity-diagram-legacy)),
+ * [Component diagram](http://plantuml.com/component-diagram),
+ * [Deployment diagram](http://plantuml.com/deployment-diagram),
+ * [State diagram](http://plantuml.com/state-diagram),
+ * [Timing diagram](http://plantuml.com/timing-diagram).
+ 
+The following non-UML diagrams are also supported:
+ * [JSON data](http://plantuml.com/json)
+ * [YAML data](http://plantuml.com/yaml)
+ * [Network diagram (nwdiag)](http://plantuml.com/nwdiag)
+ * [Wireframe graphical interface or UI mockups (salt)](http://plantuml.com/salt)
+ * [Archimate diagram](http://plantuml.com/archimate-diagram)
+ * [Specification and Description Language (SDL)](http://plantuml.com/activity-diagram-beta#sdl)
+ * [Ditaa diagram](http://plantuml.com/ditaa)
+ * [Gantt diagram](http://plantuml.com/gantt-diagram)
+ * [MindMap diagram](http://plantuml.com/mindmap-diagram)
+ * [Work Breakdown Structure diagram (WBS)](http://plantuml.com/wbs-diagram)
+ * [Mathematic with AsciiMath or JLaTeXMath notation](http://plantuml.com/ascii-math)
+ * [Entity Relationship diagram (IE/ER)](http://plantuml.com/ie-diagram)
 
----
+Furthermore:
+ * [Hyperlinks and tooltips](http://plantuml.com/link)
+ * [Creole](http://plantuml.com/creole): rich text, emoticons, unicode, icons
+ * [OpenIconic icons](http://plantuml.com/openiconic)
+ * [Sprite icons](http://plantuml.com/sprite)
+ * [AsciiMath mathematical expressions](http://plantuml.com/ascii-math)
 
-
-PlantUML is an open-source component used to draw UML diagrams from their textual description.
-
-### Overview
-This documentation will _not_ describe the PlantUML language description.
-Please refer to [PlantUML site](http://plantuml.com) for that.
-
-Here, some information about how PlantUML is implemented will be provided to help the
-integration of PlantUML with other programs.
-
-Unfortunatly, here, we have to raise a **warning**:
-
-While PlantUML language description remains stable over version and follow ascending
-compatibility, the *implementation* of PlantUML changes very often over time.
-
-So if you use classes described in this documentation, it's very likely that you will have
-an issue someday, because thoses class may change without any notice. They could even be deleted.
-
-It used to happen more often than you think over years, because we try to constantly improve the
-general design of PlantUML, and this imply a continuous refactoring.
-
-The only exception is the `net.sourceforge.plantuml` package, that we will keep
-as stable as possible over time.
+To know more about PlantUML, please visit https://plantuml.com/
