@@ -38,17 +38,18 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.UseStyle;
 import net.sourceforge.plantuml.api.ThemeStyle;
 import net.sourceforge.plantuml.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
@@ -74,7 +75,6 @@ import net.sourceforge.plantuml.ugraphic.ULine;
 import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.color.HColor;
-import net.sourceforge.plantuml.ugraphic.color.HColorUtils;
 
 public class TimingDiagram extends UmlDiagram implements Clocks {
 
@@ -89,7 +89,7 @@ public class TimingDiagram extends UmlDiagram implements Clocks {
 	private final TimingRuler ruler = new TimingRuler(getSkinParam());
 	private TimeTick now;
 	private Player lastPlayer;
-	private boolean drawTimeAxis = true;
+	private TimeAxisStategy timeAxisStategy = TimeAxisStategy.AUTOMATIC;
 	private boolean compactByDefault = false;
 
 	public DiagramDescription getDescription() {
@@ -139,9 +139,6 @@ public class TimingDiagram extends UmlDiagram implements Clocks {
 	}
 
 	private HColor black() {
-		if (UseStyle.useBetaStyle() == false)
-			return HColorUtils.BLACK;
-
 		final Style style = getStyleSignature().getMergedStyle(getSkinParam().getCurrentStyleBuilder());
 		return style.value(PName.LineColor).asColor(getSkinParam().getThemeStyle(), getSkinParam().getIHtmlColorSet());
 
@@ -180,8 +177,7 @@ public class TimingDiagram extends UmlDiagram implements Clocks {
 			first = false;
 		}
 		ug = ug.apply(widthPart1);
-		if (this.drawTimeAxis)
-			ruler.drawTimeAxis(ug.apply(getLastTranslate(stringBounder)));
+		ruler.drawTimeAxis(ug.apply(getLastTranslate(stringBounder)), this.timeAxisStategy, codes);
 
 		for (TimeMessage timeMessage : messages)
 			drawMessages(ug, timeMessage);
@@ -380,8 +376,8 @@ public class TimingDiagram extends UmlDiagram implements Clocks {
 		ruler.scaleInPixels(tick, pixel);
 	}
 
-	public CommandExecutionResult hideTimeAxis() {
-		this.drawTimeAxis = false;
+	public CommandExecutionResult setTimeAxisStategy(TimeAxisStategy newStrategy) {
+		this.timeAxisStategy = newStrategy;
 		return CommandExecutionResult.ok();
 	}
 
@@ -393,6 +389,25 @@ public class TimingDiagram extends UmlDiagram implements Clocks {
 
 	public void goCompactMode() {
 		this.compactByDefault = true;
+	}
+
+	private SimpleDateFormat sdf;
+
+	public CommandExecutionResult useDateFormat(String dateFormat) {
+		try {
+			this.sdf = new SimpleDateFormat(dateFormat, Locale.US);
+		} catch (Exception e) {
+			return CommandExecutionResult.error("Bad date format");
+		}
+
+		return CommandExecutionResult.ok();
+	}
+
+	@Override
+	public TimingFormat getTimingFormatDate() {
+		if (sdf == null)
+			return TimingFormat.DATE;
+		return TimingFormat.create(sdf);
 	}
 
 }
