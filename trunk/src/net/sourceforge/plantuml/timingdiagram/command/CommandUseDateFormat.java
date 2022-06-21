@@ -33,20 +33,39 @@
  * 
  *
  */
-package net.sourceforge.plantuml.graphic;
+package net.sourceforge.plantuml.timingdiagram.command;
 
-import net.sourceforge.plantuml.style.SName;
-import net.sourceforge.plantuml.svek.EntityDomain;
+import net.sourceforge.plantuml.LineLocation;
+import net.sourceforge.plantuml.command.CommandExecutionResult;
+import net.sourceforge.plantuml.command.SingleLineCommand2;
+import net.sourceforge.plantuml.command.regex.IRegex;
+import net.sourceforge.plantuml.command.regex.RegexConcat;
+import net.sourceforge.plantuml.command.regex.RegexLeaf;
+import net.sourceforge.plantuml.command.regex.RegexResult;
+import net.sourceforge.plantuml.timingdiagram.TimingDiagram;
 
-class USymbolEntityDomain extends USymbolSimpleAbstract {
+public class CommandUseDateFormat extends SingleLineCommand2<TimingDiagram> {
 
-	@Override
-	public SName getSName() {
-		return SName.entity;
+	public CommandUseDateFormat() {
+		super(getRegexConcat());
+	}
+
+	private static IRegex getRegexConcat() {
+		return RegexConcat.build(CommandUseDateFormat.class.getName(), RegexLeaf.start(), //
+				new RegexLeaf("use"), //
+				RegexLeaf.spaceZeroOrMore(), //
+				new RegexLeaf("date"), //
+				RegexLeaf.spaceZeroOrMore(), //
+				new RegexLeaf("format"), //
+				RegexLeaf.spaceZeroOrMore(), //
+				new RegexLeaf("FORMAT", "[%g]([^%g]+)[%g]"), //
+				RegexLeaf.end());
 	}
 
 	@Override
-	protected TextBlock getDrawing(final SymbolContext symbolContext) {
-		return new EntityDomain(symbolContext.withDeltaShadow(symbolContext.isShadowing() ? 4.0 : 0.0));
+	final protected CommandExecutionResult executeArg(TimingDiagram diagram, LineLocation location, RegexResult arg) {
+		final String format = arg.get("FORMAT", 0);
+		return diagram.useDateFormat(format);
 	}
+
 }
